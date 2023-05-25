@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Import;
  * {@link org.springframework.context.annotation.Configuration}
  * <code>@Configuration</code> classes.
  *
+ *
  * @author Spencer Gibb
  * @author Dave Syer
  * @since 1.0
