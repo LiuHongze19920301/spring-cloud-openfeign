@@ -379,6 +379,7 @@ public class FeignClientFactoryBean implements FactoryBean<Object>, Initializing
      * @return a {@link Feign} client created with the specified data and the context
      * information
      */
+    @SuppressWarnings("unchecked")
     <T> T getTarget() {
         FeignContext context = beanFactory != null
             ? beanFactory.getBean(FeignContext.class)
@@ -397,8 +398,7 @@ public class FeignClientFactoryBean implements FactoryBean<Object>, Initializing
                 url = name;
             }
             url += cleanPath();
-            return (T) loadBalance(builder, context,
-                new HardCodedTarget<>(type, name, url));
+            return (T) loadBalance(builder, context, new HardCodedTarget<>(type, name, url));
         }
         if (StringUtils.hasText(url) && !url.startsWith("http")) {
             url = "http://" + url;
