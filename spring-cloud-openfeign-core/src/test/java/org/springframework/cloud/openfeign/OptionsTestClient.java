@@ -35,47 +35,46 @@ import feign.Response;
  */
 public class OptionsTestClient implements Client {
 
-	private final static ObjectMapper mapper;
+    private final static ObjectMapper mapper;
 
-	static {
-		mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
+    static {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-	@Override
-	public Response execute(Request request, Request.Options options) {
-		return Response.builder().status(200).request(request).headers(headers()).body(prepareResponse(options))
-				.build();
-	}
+    @Override
+    public Response execute(Request request, Request.Options options) {
+        return Response.builder().status(200).request(request).headers(headers()).body(prepareResponse(options))
+            .build();
+    }
 
-	private Map<String, Collection<String>> headers() {
-		Map<String, Collection<String>> headers = new LinkedHashMap<>();
-		headers.put("Content-Type", Collections.singletonList("application/json"));
-		return headers;
-	}
+    private Map<String, Collection<String>> headers() {
+        Map<String, Collection<String>> headers = new LinkedHashMap<>();
+        headers.put("Content-Type", Collections.singletonList("application/json"));
+        return headers;
+    }
 
-	private byte[] prepareResponse(Request.Options options) {
-		try {
+    private byte[] prepareResponse(Request.Options options) {
+        try {
 
-			OptionsResponseForTests response = new OptionsResponseForTests(options.connectTimeoutMillis(),
-					TimeUnit.MILLISECONDS, options.readTimeoutMillis(), TimeUnit.MILLISECONDS);
-			return mapper.writeValueAsString(response).getBytes();
-		}
-		catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
+            OptionsResponseForTests response = new OptionsResponseForTests(options.connectTimeoutMillis(),
+                TimeUnit.MILLISECONDS, options.readTimeoutMillis(), TimeUnit.MILLISECONDS);
+            return mapper.writeValueAsString(response).getBytes();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	record OptionsResponseForTests(long connectTimeout, TimeUnit connectTimeoutUnit, long readTimeout,
-			TimeUnit readTimeoutUnit) {
+    record OptionsResponseForTests(long connectTimeout, TimeUnit connectTimeoutUnit, long readTimeout,
+                                   TimeUnit readTimeoutUnit) {
 
-		@Override
-		public String toString() {
-			return "OptionsResponseForTests{" + "connectTimeout=" + connectTimeout + ", connectTimeoutUnit="
-					+ connectTimeoutUnit + ", readTimeout=" + readTimeout + ", readTimeoutUnit=" + readTimeoutUnit
-					+ '}';
-		}
+        @Override
+        public String toString () {
+            return "OptionsResponseForTests{" + "connectTimeout=" + connectTimeout + ", connectTimeoutUnit="
+                + connectTimeoutUnit + ", readTimeout=" + readTimeout + ", readTimeoutUnit=" + readTimeoutUnit
+                + '}';
+        }
 
-	}
+    }
 
 }

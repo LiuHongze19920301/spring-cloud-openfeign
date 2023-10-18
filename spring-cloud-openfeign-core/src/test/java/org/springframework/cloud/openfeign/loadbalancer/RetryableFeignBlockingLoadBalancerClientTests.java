@@ -82,322 +82,322 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RetryableFeignBlockingLoadBalancerClientTests {
 
-	private final Client delegate = mock(Client.class);
+    private final Client delegate = mock(Client.class);
 
-	private final LoadBalancedRetryFactory retryFactory = mock(LoadBalancedRetryFactory.class);
+    private final LoadBalancedRetryFactory retryFactory = mock(LoadBalancedRetryFactory.class);
 
-	private final BlockingLoadBalancerClient loadBalancerClient = mock(BlockingLoadBalancerClient.class);
+    private final BlockingLoadBalancerClient loadBalancerClient = mock(BlockingLoadBalancerClient.class);
 
-	private final LoadBalancerClientFactory loadBalancerClientFactory = mock(LoadBalancerClientFactory.class);
+    private final LoadBalancerClientFactory loadBalancerClientFactory = mock(LoadBalancerClientFactory.class);
 
-	private final LoadBalancerProperties properties = new LoadBalancerProperties();
+    private final LoadBalancerProperties properties = new LoadBalancerProperties();
 
-	private final List<LoadBalancerFeignRequestTransformer> transformers = Arrays.asList(new InstanceIdTransformer(),
-			new ServiceIdTransformer());
+    private final List<LoadBalancerFeignRequestTransformer> transformers = Arrays.asList(new InstanceIdTransformer(),
+        new ServiceIdTransformer());
 
-	private final RetryableFeignBlockingLoadBalancerClient feignBlockingLoadBalancerClient = new RetryableFeignBlockingLoadBalancerClient(
-			delegate, loadBalancerClient, retryFactory, loadBalancerClientFactory, transformers);
+    private final RetryableFeignBlockingLoadBalancerClient feignBlockingLoadBalancerClient = new RetryableFeignBlockingLoadBalancerClient(
+        delegate, loadBalancerClient, retryFactory, loadBalancerClientFactory, transformers);
 
-	private final ServiceInstance serviceInstance = new DefaultServiceInstance("test-a", "test", "testhost", 80, false);
+    private final ServiceInstance serviceInstance = new DefaultServiceInstance("test-a", "test", "testhost", 80, false);
 
-	@BeforeEach
-	void setUp() {
-		when(loadBalancerClientFactory.getProperties(any(String.class))).thenReturn(properties);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
-	}
+    @BeforeEach
+    void setUp() {
+        when(loadBalancerClientFactory.getProperties(any(String.class))).thenReturn(properties);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
+    }
 
-	@Test
-	void shouldExtractServiceIdFromRequestUrl() throws IOException {
-		Request request = testRequest();
-		Response response = testResponse(200);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create("http://testhost:80/path"));
+    @Test
+    void shouldExtractServiceIdFromRequestUrl() throws IOException {
+        Request request = testRequest();
+        Response response = testResponse(200);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create("http://testhost:80/path"));
 
-		feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		verify(loadBalancerClient).choose(eq("test"), any());
-		verify(loadBalancerClient).reconstructURI(serviceInstance, URI.create("http://test/path"));
+        verify(loadBalancerClient).choose(eq("test"), any());
+        verify(loadBalancerClient).reconstructURI(serviceInstance, URI.create("http://test/path"));
 
-		verify(delegate).execute(
-				argThat((Request actualRequest) -> actualRequest.url().equals("http://testhost:80/path")), any());
-	}
+        verify(delegate).execute(
+            argThat((Request actualRequest) -> actualRequest.url().equals("http://testhost:80/path")), any());
+    }
 
-	private Response testResponse(int status) {
-		return Response.builder().request(testRequest()).status(status).build();
-	}
+    private Response testResponse(int status) {
+        return Response.builder().request(testRequest()).status(status).build();
+    }
 
-	private Response testResponse(int status, String body) {
-		// ByteArrayInputStream ignores close() and must be wrapped
-		InputStream reallyCloseable = new BufferedInputStream(
-				new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
-		return Response.builder().request(testRequest()).status(status).body(reallyCloseable, null).build();
-	}
+    private Response testResponse(int status, String body) {
+        // ByteArrayInputStream ignores close() and must be wrapped
+        InputStream reallyCloseable = new BufferedInputStream(
+            new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
+        return Response.builder().request(testRequest()).status(status).body(reallyCloseable, null).build();
+    }
 
-	@Test
-	void shouldExecuteOriginalRequestIfInstanceNotFound() throws IOException {
-		Request request = testRequest();
-		Response response = testResponse(503);
-		when(loadBalancerClient.choose(eq("test"), any())).thenReturn(null);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+    @Test
+    void shouldExecuteOriginalRequestIfInstanceNotFound() throws IOException {
+        Request request = testRequest();
+        Response response = testResponse(503);
+        when(loadBalancerClient.choose(eq("test"), any())).thenReturn(null);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
 
-		feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		verify(delegate).execute(eq(request), any());
-	}
+        verify(delegate).execute(eq(request), any());
+    }
 
-	@Test
-	void shouldRetryOnRepeatableStatusCode() throws IOException {
-		properties.getRetry().getRetryableStatusCodes().add(503);
-		Request request = testRequest();
-		Response response = testResponse(503);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create("http://testhost:80/path"));
+    @Test
+    void shouldRetryOnRepeatableStatusCode() throws IOException {
+        properties.getRetry().getRetryableStatusCodes().add(503);
+        Request request = testRequest();
+        Response response = testResponse(503);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create("http://testhost:80/path"));
 
-		feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		verify(loadBalancerClient, times(2)).choose(eq("test"), any());
-		verify(loadBalancerClient, times(2)).reconstructURI(serviceInstance, URI.create("http://test/path"));
-		verify(delegate, times(2)).execute(any(), any());
-	}
+        verify(loadBalancerClient, times(2)).choose(eq("test"), any());
+        verify(loadBalancerClient, times(2)).reconstructURI(serviceInstance, URI.create("http://test/path"));
+        verify(delegate, times(2)).execute(any(), any());
+    }
 
-	@Test
-	void shouldReuseServerInstanceOnSameInstanceRetry() throws IOException {
-		properties.getRetry().setMaxRetriesOnSameServiceInstance(1);
-		properties.getRetry().setMaxRetriesOnNextServiceInstance(0);
-		properties.getRetry().getRetryableStatusCodes().add(503);
-		Request request = testRequest();
-		Response response = testResponse(503);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create("http://testhost:80/path"));
+    @Test
+    void shouldReuseServerInstanceOnSameInstanceRetry() throws IOException {
+        properties.getRetry().setMaxRetriesOnSameServiceInstance(1);
+        properties.getRetry().setMaxRetriesOnNextServiceInstance(0);
+        properties.getRetry().getRetryableStatusCodes().add(503);
+        Request request = testRequest();
+        Response response = testResponse(503);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create("http://testhost:80/path"));
 
-		feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		verify(loadBalancerClient, times(1)).choose(eq("test"), any());
-		verify(loadBalancerClient, times(2)).reconstructURI(serviceInstance, URI.create("http://test/path"));
-		verify(delegate, times(2)).execute(any(), any());
-	}
+        verify(loadBalancerClient, times(1)).choose(eq("test"), any());
+        verify(loadBalancerClient, times(2)).reconstructURI(serviceInstance, URI.create("http://test/path"));
+        verify(delegate, times(2)).execute(any(), any());
+    }
 
-	@Test
-	void shouldReuseServerInstanceOnSameInstanceRetryWithBothSameAndNextRetries() throws IOException {
-		properties.getRetry().setMaxRetriesOnSameServiceInstance(1);
-		properties.getRetry().setMaxRetriesOnNextServiceInstance(1);
-		properties.getRetry().getRetryableStatusCodes().add(503);
-		Request request = testRequest();
-		Response response = testResponse(503);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create("http://testhost:80/path"));
+    @Test
+    void shouldReuseServerInstanceOnSameInstanceRetryWithBothSameAndNextRetries() throws IOException {
+        properties.getRetry().setMaxRetriesOnSameServiceInstance(1);
+        properties.getRetry().setMaxRetriesOnNextServiceInstance(1);
+        properties.getRetry().getRetryableStatusCodes().add(503);
+        Request request = testRequest();
+        Response response = testResponse(503);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create("http://testhost:80/path"));
 
-		feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		verify(loadBalancerClient, times(2)).choose(eq("test"), any());
-		verify(loadBalancerClient, times(4)).reconstructURI(serviceInstance, URI.create("http://test/path"));
-		verify(delegate, times(4)).execute(any(), any());
-	}
+        verify(loadBalancerClient, times(2)).choose(eq("test"), any());
+        verify(loadBalancerClient, times(4)).reconstructURI(serviceInstance, URI.create("http://test/path"));
+        verify(delegate, times(4)).execute(any(), any());
+    }
 
-	@Test
-	void shouldNotRetryOnDisabled() throws IOException {
-		properties.getRetry().setEnabled(false);
-		Request request = testRequest();
-		when(delegate.execute(any(), any())).thenThrow(new IOException());
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+    @Test
+    void shouldNotRetryOnDisabled() throws IOException {
+        properties.getRetry().setEnabled(false);
+        Request request = testRequest();
+        when(delegate.execute(any(), any())).thenThrow(new IOException());
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
 
-		assertThatThrownBy(() -> feignBlockingLoadBalancerClient.execute(request, new Request.Options()))
-				.isInstanceOf(IOException.class);
+        assertThatThrownBy(() -> feignBlockingLoadBalancerClient.execute(request, new Request.Options()))
+            .isInstanceOf(IOException.class);
 
-		verify(delegate, times(1)).execute(any(), any());
-	}
+        verify(delegate, times(1)).execute(any(), any());
+    }
 
-	@Test
-	void shouldExposeResponseBodyOnRetry() throws IOException {
-		properties.getRetry().getRetryableStatusCodes().add(503);
-		Request request = testRequest();
-		when(delegate.execute(any(), any())).thenReturn(testResponse(503, "foo"), testResponse(503, "foo"));
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create("http://testhost:80/path"));
+    @Test
+    void shouldExposeResponseBodyOnRetry() throws IOException {
+        properties.getRetry().getRetryableStatusCodes().add(503);
+        Request request = testRequest();
+        when(delegate.execute(any(), any())).thenReturn(testResponse(503, "foo"), testResponse(503, "foo"));
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create("http://testhost:80/path"));
 
-		Response response = feignBlockingLoadBalancerClient.execute(request, new Request.Options());
+        Response response = feignBlockingLoadBalancerClient.execute(request, new Request.Options());
 
-		String bodyContent = IOUtils.toString(response.body().asReader(StandardCharsets.UTF_8));
-		assertThat(bodyContent).isEqualTo("foo");
-	}
+        String bodyContent = IOUtils.toString(response.body().asReader(StandardCharsets.UTF_8));
+        assertThat(bodyContent).isEqualTo("foo");
+    }
 
-	@Test
-	void shouldPassCorrectRequestToDelegate() throws IOException {
-		Request request = testRequest();
-		Request.Options options = new Request.Options();
-		String url = "http://127.0.0.1/path";
-		ServiceInstance serviceInstance = new DefaultServiceInstance("test-1", "test", "test-host", 8888, false);
-		when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create(url));
-		Response response = testResponse(200);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
-				.thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
+    @Test
+    void shouldPassCorrectRequestToDelegate() throws IOException {
+        Request request = testRequest();
+        Request.Options options = new Request.Options();
+        String url = "http://127.0.0.1/path";
+        ServiceInstance serviceInstance = new DefaultServiceInstance("test-1", "test", "test-host", 8888, false);
+        when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create(url));
+        Response response = testResponse(200);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        when(retryFactory.createRetryPolicy(any(), eq(loadBalancerClient)))
+            .thenReturn(new BlockingLoadBalancedRetryPolicy(properties));
 
-		feignBlockingLoadBalancerClient.execute(request, options);
+        feignBlockingLoadBalancerClient.execute(request, options);
 
-		ArgumentCaptor<Request> captor = ArgumentCaptor.forClass(Request.class);
-		verify(delegate, times(1)).execute(captor.capture(), eq(options));
-		Request actualRequest = captor.getValue();
-		assertThat(actualRequest.httpMethod()).isEqualTo(Request.HttpMethod.GET);
-		assertThat(actualRequest.url()).isEqualTo(url);
-		assertThat(actualRequest.headers()).hasSize(3);
-		assertThat(actualRequest.headers()).containsEntry(HttpHeaders.CONTENT_TYPE,
-				Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
-		assertThat(actualRequest.headers()).containsEntry("X-ServiceId", Collections.singletonList("test"));
-		assertThat(actualRequest.headers()).containsEntry("X-InstanceId", Collections.singletonList("test-1"));
-		assertThat(new String(actualRequest.body())).isEqualTo("hello");
-	}
+        ArgumentCaptor<Request> captor = ArgumentCaptor.forClass(Request.class);
+        verify(delegate, times(1)).execute(captor.capture(), eq(options));
+        Request actualRequest = captor.getValue();
+        assertThat(actualRequest.httpMethod()).isEqualTo(Request.HttpMethod.GET);
+        assertThat(actualRequest.url()).isEqualTo(url);
+        assertThat(actualRequest.headers()).hasSize(3);
+        assertThat(actualRequest.headers()).containsEntry(HttpHeaders.CONTENT_TYPE,
+            Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
+        assertThat(actualRequest.headers()).containsEntry("X-ServiceId", Collections.singletonList("test"));
+        assertThat(actualRequest.headers()).containsEntry("X-InstanceId", Collections.singletonList("test-1"));
+        assertThat(new String(actualRequest.body())).isEqualTo("hello");
+    }
 
-	@Test
-	void shouldExecuteLoadBalancerLifecycleCallbacks() throws IOException {
-		Request request = testRequest();
-		Request.Options options = new Request.Options();
-		String url = "http://127.0.0.1/path";
-		ServiceInstance serviceInstance = new DefaultServiceInstance("test-1", "test", "test-host", 8888, false);
-		when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
-		when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
-				.thenReturn(URI.create(url));
-		Response response = testResponse(200);
-		when(delegate.execute(any(), any())).thenReturn(response);
-		String callbackTestHint = "callbackTestHint";
-		properties.getHint().put("test", callbackTestHint);
-		Map<String, LoadBalancerLifecycle> loadBalancerLifecycleBeans = new HashMap<>();
-		loadBalancerLifecycleBeans.put("loadBalancerLifecycle", new TestLoadBalancerLifecycle());
-		loadBalancerLifecycleBeans.put("anotherLoadBalancerLifecycle", new AnotherLoadBalancerLifecycle());
-		when(loadBalancerClientFactory.getInstances("test", LoadBalancerLifecycle.class))
-				.thenReturn(loadBalancerLifecycleBeans);
+    @Test
+    void shouldExecuteLoadBalancerLifecycleCallbacks() throws IOException {
+        Request request = testRequest();
+        Request.Options options = new Request.Options();
+        String url = "http://127.0.0.1/path";
+        ServiceInstance serviceInstance = new DefaultServiceInstance("test-1", "test", "test-host", 8888, false);
+        when(loadBalancerClient.choose(eq("test"), any())).thenReturn(serviceInstance);
+        when(loadBalancerClient.reconstructURI(serviceInstance, URI.create("http://test/path")))
+            .thenReturn(URI.create(url));
+        Response response = testResponse(200);
+        when(delegate.execute(any(), any())).thenReturn(response);
+        String callbackTestHint = "callbackTestHint";
+        properties.getHint().put("test", callbackTestHint);
+        Map<String, LoadBalancerLifecycle> loadBalancerLifecycleBeans = new HashMap<>();
+        loadBalancerLifecycleBeans.put("loadBalancerLifecycle", new TestLoadBalancerLifecycle());
+        loadBalancerLifecycleBeans.put("anotherLoadBalancerLifecycle", new AnotherLoadBalancerLifecycle());
+        when(loadBalancerClientFactory.getInstances("test", LoadBalancerLifecycle.class))
+            .thenReturn(loadBalancerLifecycleBeans);
 
-		feignBlockingLoadBalancerClient.execute(request, options);
+        feignBlockingLoadBalancerClient.execute(request, options);
 
-		Collection<org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> lifecycleLogRequests = ((TestLoadBalancerLifecycle) loadBalancerLifecycleBeans
-				.get("loadBalancerLifecycle")).getStartLog().values();
-		Collection<org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> lifecycleLogStartedRequests = ((TestLoadBalancerLifecycle) loadBalancerLifecycleBeans
-				.get("loadBalancerLifecycle")).getStartRequestLog().values();
-		Collection<CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> anotherLifecycleLogRequests = ((AnotherLoadBalancerLifecycle) loadBalancerLifecycleBeans
-				.get("anotherLoadBalancerLifecycle")).getCompleteLog().values();
-		assertThat(lifecycleLogRequests).extracting(lbRequest -> lbRequest.getContext().getHint())
-				.contains(callbackTestHint);
-		assertThat(lifecycleLogStartedRequests).extracting(lbRequest -> lbRequest.getContext().getHint())
-				.contains(callbackTestHint);
-		assertThat(anotherLifecycleLogRequests)
-				.extracting(completionContext -> completionContext.getClientResponse().getHttpStatus())
-				.contains(HttpStatus.OK);
-	}
+        Collection<org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> lifecycleLogRequests = ((TestLoadBalancerLifecycle) loadBalancerLifecycleBeans
+            .get("loadBalancerLifecycle")).getStartLog().values();
+        Collection<org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> lifecycleLogStartedRequests = ((TestLoadBalancerLifecycle) loadBalancerLifecycleBeans
+            .get("loadBalancerLifecycle")).getStartRequestLog().values();
+        Collection<CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> anotherLifecycleLogRequests = ((AnotherLoadBalancerLifecycle) loadBalancerLifecycleBeans
+            .get("anotherLoadBalancerLifecycle")).getCompleteLog().values();
+        assertThat(lifecycleLogRequests).extracting(lbRequest -> lbRequest.getContext().getHint())
+            .contains(callbackTestHint);
+        assertThat(lifecycleLogStartedRequests).extracting(lbRequest -> lbRequest.getContext().getHint())
+            .contains(callbackTestHint);
+        assertThat(anotherLifecycleLogRequests)
+            .extracting(completionContext -> completionContext.getClientResponse().getHttpStatus())
+            .contains(HttpStatus.OK);
+    }
 
-	private Request testRequest() {
-		return testRequest("test");
-	}
+    private Request testRequest() {
+        return testRequest("test");
+    }
 
-	private Request testRequest(String host) {
-		return Request.create(Request.HttpMethod.GET, "http://" + host + "/path", testHeaders(), "hello".getBytes(),
-				StandardCharsets.UTF_8, null);
-	}
+    private Request testRequest(String host) {
+        return Request.create(Request.HttpMethod.GET, "http://" + host + "/path", testHeaders(), "hello".getBytes(),
+            StandardCharsets.UTF_8, null);
+    }
 
-	private Map<String, Collection<String>> testHeaders() {
-		Map<String, Collection<String>> feignHeaders = new HashMap<>();
-		feignHeaders.put(HttpHeaders.CONTENT_TYPE, Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
-		return feignHeaders;
+    private Map<String, Collection<String>> testHeaders() {
+        Map<String, Collection<String>> feignHeaders = new HashMap<>();
+        feignHeaders.put(HttpHeaders.CONTENT_TYPE, Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
+        return feignHeaders;
 
-	}
+    }
 
-	protected static class TestLoadBalancerLifecycle
-			implements LoadBalancerLifecycle<RetryableRequestContext, ResponseData, ServiceInstance> {
+    protected static class TestLoadBalancerLifecycle
+        implements LoadBalancerLifecycle<RetryableRequestContext, ResponseData, ServiceInstance> {
 
-		final Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> startLog = new ConcurrentHashMap<>();
+        final Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> startLog = new ConcurrentHashMap<>();
 
-		final Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> startRequestLog = new ConcurrentHashMap<>();
+        final Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> startRequestLog = new ConcurrentHashMap<>();
 
-		final Map<String, CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> completeLog = new ConcurrentHashMap<>();
+        final Map<String, CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> completeLog = new ConcurrentHashMap<>();
 
-		@Override
-		public void onStart(org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext> request) {
-			startLog.put(getName() + UUID.randomUUID(), request);
-		}
+        @Override
+        public void onStart(org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext> request) {
+            startLog.put(getName() + UUID.randomUUID(), request);
+        }
 
-		@Override
-		public void onStartRequest(
-				org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext> request,
-				org.springframework.cloud.client.loadbalancer.Response<ServiceInstance> lbResponse) {
-			startRequestLog.put(getName() + UUID.randomUUID(), request);
-		}
+        @Override
+        public void onStartRequest(
+            org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext> request,
+            org.springframework.cloud.client.loadbalancer.Response<ServiceInstance> lbResponse) {
+            startRequestLog.put(getName() + UUID.randomUUID(), request);
+        }
 
-		@Override
-		public void onComplete(
-				CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext> completionContext) {
-			completeLog.put(getName() + UUID.randomUUID(), completionContext);
-		}
+        @Override
+        public void onComplete(
+            CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext> completionContext) {
+            completeLog.put(getName() + UUID.randomUUID(), completionContext);
+        }
 
-		Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> getStartLog() {
-			return startLog;
-		}
+        Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> getStartLog() {
+            return startLog;
+        }
 
-		Map<String, CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> getCompleteLog() {
-			return completeLog;
-		}
+        Map<String, CompletionContext<ResponseData, ServiceInstance, RetryableRequestContext>> getCompleteLog() {
+            return completeLog;
+        }
 
-		Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> getStartRequestLog() {
-			return startRequestLog;
-		}
+        Map<String, org.springframework.cloud.client.loadbalancer.Request<RetryableRequestContext>> getStartRequestLog() {
+            return startRequestLog;
+        }
 
-		protected String getName() {
-			return this.getClass().getSimpleName();
-		}
+        protected String getName() {
+            return this.getClass().getSimpleName();
+        }
 
-	}
+    }
 
-	protected static class AnotherLoadBalancerLifecycle
-			extends RetryableFeignBlockingLoadBalancerClientTests.TestLoadBalancerLifecycle {
+    protected static class AnotherLoadBalancerLifecycle
+        extends RetryableFeignBlockingLoadBalancerClientTests.TestLoadBalancerLifecycle {
 
-		@Override
-		protected String getName() {
-			return this.getClass().getSimpleName();
-		}
+        @Override
+        protected String getName() {
+            return this.getClass().getSimpleName();
+        }
 
-	}
+    }
 
-	private static class InstanceIdTransformer implements LoadBalancerFeignRequestTransformer {
+    private static class InstanceIdTransformer implements LoadBalancerFeignRequestTransformer {
 
-		@Override
-		public Request transformRequest(Request request, ServiceInstance instance) {
-			Map<String, Collection<String>> headers = new HashMap<>(request.headers());
-			headers.put("X-InstanceId", Collections.singletonList(instance.getInstanceId()));
-			return Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset(),
-					request.requestTemplate());
-		}
+        @Override
+        public Request transformRequest(Request request, ServiceInstance instance) {
+            Map<String, Collection<String>> headers = new HashMap<>(request.headers());
+            headers.put("X-InstanceId", Collections.singletonList(instance.getInstanceId()));
+            return Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset(),
+                request.requestTemplate());
+        }
 
-	}
+    }
 
-	private static class ServiceIdTransformer implements LoadBalancerFeignRequestTransformer {
+    private static class ServiceIdTransformer implements LoadBalancerFeignRequestTransformer {
 
-		@Override
-		public Request transformRequest(Request request, ServiceInstance instance) {
-			Map<String, Collection<String>> headers = new HashMap<>(request.headers());
-			headers.put("X-ServiceId", Collections.singletonList(instance.getServiceId()));
-			return Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset(),
-					request.requestTemplate());
-		}
+        @Override
+        public Request transformRequest(Request request, ServiceInstance instance) {
+            Map<String, Collection<String>> headers = new HashMap<>(request.headers());
+            headers.put("X-ServiceId", Collections.singletonList(instance.getServiceId()));
+            return Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset(),
+                request.requestTemplate());
+        }
 
-	}
+    }
 
 }

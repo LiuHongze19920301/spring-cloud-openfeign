@@ -49,8 +49,7 @@ public class SortJsonComponent {
 			value.iterator().forEachRemaining(v -> {
 				try {
 					gen.writeObject(v);
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					throw new EncodeException("Couldn't serialize object " + v);
 				}
 			});
@@ -68,14 +67,14 @@ public class SortJsonComponent {
 
 		@Override
 		public Sort deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-				throws IOException {
+			throws IOException {
 			TreeNode treeNode = jsonParser.getCodec().readTree(jsonParser);
 			if (treeNode.isArray()) {
 				ArrayNode arrayNode = (ArrayNode) treeNode;
 				List<Sort.Order> orders = new ArrayList<>();
 				for (JsonNode jsonNode : arrayNode) {
 					Sort.Order order = new Sort.Order(Sort.Direction.valueOf(jsonNode.get("direction").textValue()),
-							jsonNode.get("property").textValue());
+						jsonNode.get("property").textValue());
 					orders.add(order);
 				}
 				return Sort.by(orders);

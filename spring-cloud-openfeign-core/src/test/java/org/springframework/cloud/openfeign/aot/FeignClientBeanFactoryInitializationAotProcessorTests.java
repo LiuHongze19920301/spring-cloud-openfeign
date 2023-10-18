@@ -67,12 +67,12 @@ class FeignClientBeanFactoryInitializationAotProcessorTests {
 	private final FeignClientFactory feignClientFactory = mock(FeignClientFactory.class);
 
 	private final BeanFactoryInitializationCode beanFactoryInitializationCode = new MockBeanFactoryInitializationCode(
-			generationContext);
+		generationContext);
 
 	@BeforeEach
 	void setUp() {
 		Map<String, FeignClientSpecification> configurations = Map.of("test",
-				new FeignClientSpecification("test", TestClient.class.getCanonicalName(), new Class<?>[] {}));
+			new FeignClientSpecification("test", TestClient.class.getCanonicalName(), new Class<?>[]{}));
 		when(feignClientFactory.getConfigurations()).thenReturn(configurations);
 
 	}
@@ -82,7 +82,7 @@ class FeignClientBeanFactoryInitializationAotProcessorTests {
 		DefaultListableBeanFactory beanFactory = beanFactory();
 		GenericApplicationContext context = new GenericApplicationContext(beanFactory);
 		FeignClientBeanFactoryInitializationAotProcessor processor = new FeignClientBeanFactoryInitializationAotProcessor(
-				context, feignClientFactory);
+			context, feignClientFactory);
 
 		BeanFactoryInitializationAotContribution contribution = processor.processAheadOfTime(beanFactory);
 		assertThat(contribution).isNotNull();
@@ -97,9 +97,9 @@ class FeignClientBeanFactoryInitializationAotProcessorTests {
 	}
 
 	private static void verifyContribution(
-			FeignClientBeanFactoryInitializationAotProcessor.AotContribution contribution) {
+		FeignClientBeanFactoryInitializationAotProcessor.AotContribution contribution) {
 		BeanDefinition contributionBeanDefinition = contribution.getFeignClientBeanDefinitions()
-				.get(TestClient.class.getCanonicalName());
+			.get(TestClient.class.getCanonicalName());
 		assertThat(contributionBeanDefinition.getBeanClassName()).isEqualTo(BEAN_DEFINITION_CLASS_NAME);
 		PropertyValues propertyValues = contributionBeanDefinition.getPropertyValues();
 		assertThat(propertyValues).isNotEmpty();
@@ -110,11 +110,11 @@ class FeignClientBeanFactoryInitializationAotProcessorTests {
 
 	private DefaultListableBeanFactory beanFactory() {
 		GenericBeanDefinition beanDefinition = new GenericBeanDefinition(new RootBeanDefinition(TestClient.class,
-				new ConstructorArgumentValues(),
-				new MutablePropertyValues(List.of(new PropertyValue("type", TestClient.class.getCanonicalName()),
-						new PropertyValue("qualifiers", new String[] { "test" }),
-						new PropertyValue("fallback", String.class),
-						new PropertyValue("fallbackFactory", Void.class)))));
+			new ConstructorArgumentValues(),
+			new MutablePropertyValues(List.of(new PropertyValue("type", TestClient.class.getCanonicalName()),
+				new PropertyValue("qualifiers", new String[]{"test"}),
+				new PropertyValue("fallback", String.class),
+				new PropertyValue("fallbackFactory", Void.class)))));
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 		beanFactory.registerBeanDefinition(TestClient.class.getCanonicalName(), beanDefinition);
 		return beanFactory;

@@ -56,8 +56,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = FeignHttpClientTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
-				"spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.loadbalancer.retry.enabled=false" })
+	value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
+		"spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.loadbalancer.retry.enabled=false"})
 @DirtiesContext
 class FeignHttpClientTests {
 
@@ -131,9 +131,9 @@ class FeignHttpClientTests {
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@RestController
-	@EnableFeignClients(clients = { TestClient.class, UserClient.class })
-	@LoadBalancerClients({ @LoadBalancerClient(name = "localapp", configuration = LocalClientConfiguration.class),
-			@LoadBalancerClient(name = "localapp1", configuration = LocalClientConfiguration.class) })
+	@EnableFeignClients(clients = {TestClient.class, UserClient.class})
+	@LoadBalancerClients({@LoadBalancerClient(name = "localapp", configuration = LocalClientConfiguration.class),
+		@LoadBalancerClient(name = "localapp1", configuration = LocalClientConfiguration.class)})
 	@Import(NoSecurityConfiguration.class)
 	protected static class Application implements UserService {
 
@@ -144,7 +144,7 @@ class FeignHttpClientTests {
 
 		@PatchMapping("/hellop")
 		public ResponseEntity<Void> patchHello(@RequestBody Hello hello,
-				@RequestHeader("Content-Length") int contentLength) {
+											   @RequestHeader("Content-Length") int contentLength) {
 			if (contentLength <= 0) {
 				throw new IllegalArgumentException("Invalid Content-Length " + contentLength);
 			}
@@ -247,7 +247,7 @@ class FeignHttpClientTests {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+				new DefaultServiceInstance("local-1", "local", "localhost", port, false));
 		}
 
 	}

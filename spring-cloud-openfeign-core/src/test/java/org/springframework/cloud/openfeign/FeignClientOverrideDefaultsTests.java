@@ -62,276 +62,276 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @DirtiesContext
 class FeignClientOverrideDefaultsTests {
 
-	@Autowired
-	private FeignClientFactory context;
+    @Autowired
+    private FeignClientFactory context;
 
-	@Autowired
-	private FooClient foo;
+    @Autowired
+    private FooClient foo;
 
-	@Autowired
-	private BarClient bar;
+    @Autowired
+    private BarClient bar;
 
-	@Test
-	void clientsAvailable() {
-		assertThat(foo).isNotNull();
-		assertThat(bar).isNotNull();
-	}
+    @Test
+    void clientsAvailable() {
+        assertThat(foo).isNotNull();
+        assertThat(bar).isNotNull();
+    }
 
-	@Test
-	void overrideDecoder() {
-		Decoder.Default.class.cast(context.getInstance("foo", Decoder.class));
-		OptionalDecoder.class.cast(context.getInstance("bar", Decoder.class));
-	}
+    @Test
+    void overrideDecoder() {
+        Decoder.Default.class.cast(context.getInstance("foo", Decoder.class));
+        OptionalDecoder.class.cast(context.getInstance("bar", Decoder.class));
+    }
 
-	@Test
-	void overrideEncoder() {
-		Encoder.Default.class.cast(context.getInstance("foo", Encoder.class));
-		PageableSpringEncoder.class.cast(context.getInstance("bar", Encoder.class));
-	}
+    @Test
+    void overrideEncoder() {
+        Encoder.Default.class.cast(context.getInstance("foo", Encoder.class));
+        PageableSpringEncoder.class.cast(context.getInstance("bar", Encoder.class));
+    }
 
-	@Test
-	void overrideLogger() {
-		Logger.JavaLogger.class.cast(context.getInstance("foo", Logger.class));
-		Slf4jLogger.class.cast(context.getInstance("bar", Logger.class));
-	}
+    @Test
+    void overrideLogger() {
+        Logger.JavaLogger.class.cast(context.getInstance("foo", Logger.class));
+        Slf4jLogger.class.cast(context.getInstance("bar", Logger.class));
+    }
 
-	@Test
-	void overrideContract() {
-		Contract.Default.class.cast(context.getInstance("foo", Contract.class));
-		SpringMvcContract.class.cast(context.getInstance("bar", Contract.class));
-	}
+    @Test
+    void overrideContract() {
+        Contract.Default.class.cast(context.getInstance("foo", Contract.class));
+        SpringMvcContract.class.cast(context.getInstance("bar", Contract.class));
+    }
 
-	@Test
-	void overrideLoggerLevel() {
-		assertThat(context.getInstance("foo", Logger.Level.class)).isNull();
-		assertThat(context.getInstance("bar", Logger.Level.class)).isEqualTo(Logger.Level.HEADERS);
-	}
+    @Test
+    void overrideLoggerLevel() {
+        assertThat(context.getInstance("foo", Logger.Level.class)).isNull();
+        assertThat(context.getInstance("bar", Logger.Level.class)).isEqualTo(Logger.Level.HEADERS);
+    }
 
-	@Test
-	void overrideRetryer() {
-		assertThat(context.getInstance("foo", Retryer.class)).isEqualTo(Retryer.NEVER_RETRY);
-		Retryer.Default.class.cast(context.getInstance("bar", Retryer.class));
-	}
+    @Test
+    void overrideRetryer() {
+        assertThat(context.getInstance("foo", Retryer.class)).isEqualTo(Retryer.NEVER_RETRY);
+        Retryer.Default.class.cast(context.getInstance("bar", Retryer.class));
+    }
 
-	@Test
-	void overrideErrorDecoder() {
-		assertThat(context.getInstance("foo", ErrorDecoder.class)).isNull();
-		ErrorDecoder.Default.class.cast(context.getInstance("bar", ErrorDecoder.class));
-	}
+    @Test
+    void overrideErrorDecoder() {
+        assertThat(context.getInstance("foo", ErrorDecoder.class)).isNull();
+        ErrorDecoder.Default.class.cast(context.getInstance("bar", ErrorDecoder.class));
+    }
 
-	@Test
-	void overrideRequestOptions() {
-		assertThat(context.getInstance("foo", Request.Options.class)).isNull();
-		Request.Options options = context.getInstance("bar", Request.Options.class);
-		assertThat(options.connectTimeoutMillis()).isEqualTo(1);
-		assertThat(options.readTimeoutMillis()).isEqualTo(1);
-		assertThat(options.isFollowRedirects()).isFalse();
-	}
+    @Test
+    void overrideRequestOptions() {
+        assertThat(context.getInstance("foo", Request.Options.class)).isNull();
+        Request.Options options = context.getInstance("bar", Request.Options.class);
+        assertThat(options.connectTimeoutMillis()).isEqualTo(1);
+        assertThat(options.readTimeoutMillis()).isEqualTo(1);
+        assertThat(options.isFollowRedirects()).isFalse();
+    }
 
-	@Test
-	void overrideQueryMapEncoder() {
-		assertThatCode(() -> {
-			FieldQueryMapEncoder.class.cast(context.getInstance("foo", QueryMapEncoder.class));
-			BeanQueryMapEncoder.class.cast(context.getInstance("bar", QueryMapEncoder.class));
-		}).doesNotThrowAnyException();
-	}
+    @Test
+    void overrideQueryMapEncoder() {
+        assertThatCode(() -> {
+            FieldQueryMapEncoder.class.cast(context.getInstance("foo", QueryMapEncoder.class));
+            BeanQueryMapEncoder.class.cast(context.getInstance("bar", QueryMapEncoder.class));
+        }).doesNotThrowAnyException();
+    }
 
-	@Test
-	void addRequestInterceptor() {
-		assertThat(context.getInstances("foo", RequestInterceptor.class).size()).isEqualTo(1);
-		assertThat(context.getInstances("bar", RequestInterceptor.class).size()).isEqualTo(2);
-	}
+    @Test
+    void addRequestInterceptor() {
+        assertThat(context.getInstances("foo", RequestInterceptor.class).size()).isEqualTo(1);
+        assertThat(context.getInstances("bar", RequestInterceptor.class).size()).isEqualTo(2);
+    }
 
-	@Test
-	void exceptionPropagationPolicy() {
-		assertThat(context.getInstances("foo", ExceptionPropagationPolicy.class)).isEmpty();
-		assertThat(context.getInstances("bar", ExceptionPropagationPolicy.class))
-				.containsValues(ExceptionPropagationPolicy.UNWRAP);
-	}
+    @Test
+    void exceptionPropagationPolicy() {
+        assertThat(context.getInstances("foo", ExceptionPropagationPolicy.class)).isEmpty();
+        assertThat(context.getInstances("bar", ExceptionPropagationPolicy.class))
+            .containsValues(ExceptionPropagationPolicy.UNWRAP);
+    }
 
-	@Test
-	void shouldOverrideMicrometerCapabilities() {
-		// override micrometerCapability
-		assertThat(context.getInstance("foo", MicrometerCapability.class))
-				.isExactlyInstanceOf(TestMicrometerCapability.class);
-		assertThat(context.getInstance("foo", MicrometerObservationCapability.class))
-				.isExactlyInstanceOf(MicrometerObservationCapability.class);
-		Map<String, Capability> fooCapabilities = context.getInstances("foo", Capability.class);
-		assertThat(fooCapabilities).hasSize(2);
-		assertThat(fooCapabilities.get("micrometerCapability")).isExactlyInstanceOf(TestMicrometerCapability.class);
-		assertThat(fooCapabilities.get("micrometerObservationCapability"))
-				.isExactlyInstanceOf(MicrometerObservationCapability.class);
+    @Test
+    void shouldOverrideMicrometerCapabilities() {
+        // override micrometerCapability
+        assertThat(context.getInstance("foo", MicrometerCapability.class))
+            .isExactlyInstanceOf(TestMicrometerCapability.class);
+        assertThat(context.getInstance("foo", MicrometerObservationCapability.class))
+            .isExactlyInstanceOf(MicrometerObservationCapability.class);
+        Map<String, Capability> fooCapabilities = context.getInstances("foo", Capability.class);
+        assertThat(fooCapabilities).hasSize(2);
+        assertThat(fooCapabilities.get("micrometerCapability")).isExactlyInstanceOf(TestMicrometerCapability.class);
+        assertThat(fooCapabilities.get("micrometerObservationCapability"))
+            .isExactlyInstanceOf(MicrometerObservationCapability.class);
 
-		// override micrometerObservationCapability
-		assertThat(context.getInstance("bar", MicrometerObservationCapability.class))
-				.isExactlyInstanceOf(TestMicrometerObservationCapability.class);
-		Map<String, Capability> barCapabilities = context.getInstances("bar", Capability.class);
-		assertThat(barCapabilities).hasSize(1);
-		assertThat(barCapabilities.get("micrometerCapability")).isNull();
-		assertThat(barCapabilities.get("micrometerObservationCapability"))
-				.isExactlyInstanceOf(TestMicrometerObservationCapability.class);
+        // override micrometerObservationCapability
+        assertThat(context.getInstance("bar", MicrometerObservationCapability.class))
+            .isExactlyInstanceOf(TestMicrometerObservationCapability.class);
+        Map<String, Capability> barCapabilities = context.getInstances("bar", Capability.class);
+        assertThat(barCapabilities).hasSize(1);
+        assertThat(barCapabilities.get("micrometerCapability")).isNull();
+        assertThat(barCapabilities.get("micrometerObservationCapability"))
+            .isExactlyInstanceOf(TestMicrometerObservationCapability.class);
 
-		// override both + an extra capability
-		assertThat(context.getInstance("baz", MicrometerCapability.class))
-				.isExactlyInstanceOf(TestMicrometerCapability.class);
-		assertThat(context.getInstance("baz", MicrometerObservationCapability.class))
-				.isExactlyInstanceOf(TestMicrometerObservationCapability.class);
-		Map<String, Capability> bazCapabilities = context.getInstances("baz", Capability.class);
-		assertThat(bazCapabilities).hasSize(3);
-		assertThat(bazCapabilities.get("micrometerCapability")).isExactlyInstanceOf(TestMicrometerCapability.class);
-		assertThat(bazCapabilities.get("micrometerObservationCapability"))
-				.isExactlyInstanceOf(TestMicrometerObservationCapability.class);
-		assertThat(bazCapabilities.get("noOpCapability")).isExactlyInstanceOf(NoOpCapability.class);
-	}
+        // override both + an extra capability
+        assertThat(context.getInstance("baz", MicrometerCapability.class))
+            .isExactlyInstanceOf(TestMicrometerCapability.class);
+        assertThat(context.getInstance("baz", MicrometerObservationCapability.class))
+            .isExactlyInstanceOf(TestMicrometerObservationCapability.class);
+        Map<String, Capability> bazCapabilities = context.getInstances("baz", Capability.class);
+        assertThat(bazCapabilities).hasSize(3);
+        assertThat(bazCapabilities.get("micrometerCapability")).isExactlyInstanceOf(TestMicrometerCapability.class);
+        assertThat(bazCapabilities.get("micrometerObservationCapability"))
+            .isExactlyInstanceOf(TestMicrometerObservationCapability.class);
+        assertThat(bazCapabilities.get("noOpCapability")).isExactlyInstanceOf(NoOpCapability.class);
+    }
 
-	@FeignClient(name = "foo", url = "https://foo", configuration = FooConfiguration.class)
-	interface FooClient {
+    @FeignClient(name = "foo", url = "https://foo", configuration = FooConfiguration.class)
+    interface FooClient {
 
-		@RequestLine("GET /")
-		String get();
+        @RequestLine("GET /")
+        String get();
 
-	}
+    }
 
-	@FeignClient(name = "bar", url = "https://bar", configuration = BarConfiguration.class)
-	interface BarClient {
+    @FeignClient(name = "bar", url = "https://bar", configuration = BarConfiguration.class)
+    interface BarClient {
 
-		@GetMapping("/")
-		String get();
+        @GetMapping("/")
+        String get();
 
-	}
+    }
 
-	@FeignClient(name = "baz", url = "https://baz", configuration = BazConfiguration.class)
-	interface BazClient {
+    @FeignClient(name = "baz", url = "https://baz", configuration = BazConfiguration.class)
+    interface BazClient {
 
-		@GetMapping("/baz")
-		String get();
+        @GetMapping("/baz")
+        String get();
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = { FooClient.class, BarClient.class, BazClient.class })
-	@EnableAutoConfiguration
-	protected static class TestConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableFeignClients(clients = {FooClient.class, BarClient.class, BazClient.class})
+    @EnableAutoConfiguration
+    protected static class TestConfiguration {
 
-		@Bean
-		RequestInterceptor defaultRequestInterceptor() {
-			return template -> {
-			};
-		}
+        @Bean
+        RequestInterceptor defaultRequestInterceptor() {
+            return template -> {
+            };
+        }
 
-	}
+    }
 
-	static class FooConfiguration {
+    static class FooConfiguration {
 
-		@Bean
-		Decoder feignDecoder() {
-			return new Decoder.Default();
-		}
+        @Bean
+        Decoder feignDecoder() {
+            return new Decoder.Default();
+        }
 
-		@Bean
-		Encoder feignEncoder() {
-			return new Encoder.Default();
-		}
+        @Bean
+        Encoder feignEncoder() {
+            return new Encoder.Default();
+        }
 
-		@Bean
-		Logger feignLogger() {
-			return new Logger.JavaLogger(FooConfiguration.class);
-		}
+        @Bean
+        Logger feignLogger() {
+            return new Logger.JavaLogger(FooConfiguration.class);
+        }
 
-		@Bean
-		Contract feignContract() {
-			return new Contract.Default();
-		}
+        @Bean
+        Contract feignContract() {
+            return new Contract.Default();
+        }
 
-		@Bean
-		QueryMapEncoder queryMapEncoder() {
-			return new FieldQueryMapEncoder();
-		}
+        @Bean
+        QueryMapEncoder queryMapEncoder() {
+            return new FieldQueryMapEncoder();
+        }
 
-		@Bean
-		MicrometerCapability micrometerCapability() {
-			return new TestMicrometerCapability();
-		}
+        @Bean
+        MicrometerCapability micrometerCapability() {
+            return new TestMicrometerCapability();
+        }
 
-	}
+    }
 
-	static class BarConfiguration {
+    static class BarConfiguration {
 
-		@Bean
-		Logger.Level feignLevel() {
-			return Logger.Level.HEADERS;
-		}
+        @Bean
+        Logger.Level feignLevel() {
+            return Logger.Level.HEADERS;
+        }
 
-		@Bean
-		Retryer feignRetryer() {
-			return new Retryer.Default();
-		}
+        @Bean
+        Retryer feignRetryer() {
+            return new Retryer.Default();
+        }
 
-		@Bean
-		ErrorDecoder feignErrorDecoder() {
-			return new ErrorDecoder.Default();
-		}
+        @Bean
+        ErrorDecoder feignErrorDecoder() {
+            return new ErrorDecoder.Default();
+        }
 
-		@Bean
-		Request.Options feignRequestOptions() {
-			return new Request.Options(1, TimeUnit.MILLISECONDS, 1, TimeUnit.MILLISECONDS, false);
-		}
+        @Bean
+        Request.Options feignRequestOptions() {
+            return new Request.Options(1, TimeUnit.MILLISECONDS, 1, TimeUnit.MILLISECONDS, false);
+        }
 
-		@Bean
-		RequestInterceptor feignRequestInterceptor() {
-			return new BasicAuthRequestInterceptor("user", "pass");
-		}
+        @Bean
+        RequestInterceptor feignRequestInterceptor() {
+            return new BasicAuthRequestInterceptor("user", "pass");
+        }
 
-		@Bean
-		QueryMapEncoder queryMapEncoder() {
-			return new BeanQueryMapEncoder();
-		}
+        @Bean
+        QueryMapEncoder queryMapEncoder() {
+            return new BeanQueryMapEncoder();
+        }
 
-		@Bean
-		ExceptionPropagationPolicy exceptionPropagationPolicy() {
-			return ExceptionPropagationPolicy.UNWRAP;
-		}
+        @Bean
+        ExceptionPropagationPolicy exceptionPropagationPolicy() {
+            return ExceptionPropagationPolicy.UNWRAP;
+        }
 
-		@Bean
-		MicrometerObservationCapability micrometerObservationCapability() {
-			return new TestMicrometerObservationCapability();
-		}
+        @Bean
+        MicrometerObservationCapability micrometerObservationCapability() {
+            return new TestMicrometerObservationCapability();
+        }
 
-	}
+    }
 
-	static class BazConfiguration {
+    static class BazConfiguration {
 
-		@Bean
-		MicrometerObservationCapability micrometerObservationCapability() {
-			return new TestMicrometerObservationCapability();
-		}
+        @Bean
+        MicrometerObservationCapability micrometerObservationCapability() {
+            return new TestMicrometerObservationCapability();
+        }
 
-		@Bean
-		MicrometerCapability micrometerCapability() {
-			return new TestMicrometerCapability();
-		}
+        @Bean
+        MicrometerCapability micrometerCapability() {
+            return new TestMicrometerCapability();
+        }
 
-		@Bean
-		Capability noOpCapability() {
-			return new NoOpCapability();
-		}
+        @Bean
+        Capability noOpCapability() {
+            return new NoOpCapability();
+        }
 
-	}
+    }
 
-	private static class TestMicrometerObservationCapability extends feign.micrometer.MicrometerObservationCapability {
+    private static class TestMicrometerObservationCapability extends feign.micrometer.MicrometerObservationCapability {
 
-		TestMicrometerObservationCapability() {
-			super(null);
-		}
+        TestMicrometerObservationCapability() {
+            super(null);
+        }
 
-	}
+    }
 
-	private static class TestMicrometerCapability extends feign.micrometer.MicrometerCapability {
+    private static class TestMicrometerCapability extends feign.micrometer.MicrometerCapability {
 
-	}
+    }
 
-	private static class NoOpCapability implements Capability {
+    private static class NoOpCapability implements Capability {
 
-	}
+    }
 
 }

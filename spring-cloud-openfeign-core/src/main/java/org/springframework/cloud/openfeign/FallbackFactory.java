@@ -23,7 +23,7 @@ import static feign.Util.checkNotNull;
 
 /**
  * Used to control the fallback given its cause.
- *
+ * <p>
  * Ex.
  *
  * <pre>
@@ -49,6 +49,7 @@ public interface FallbackFactory<T> {
 
 	/**
 	 * Returns an instance of the fallback appropriate for the given cause.
+	 *
 	 * @param cause cause of an exception.
 	 * @return fallback
 	 */

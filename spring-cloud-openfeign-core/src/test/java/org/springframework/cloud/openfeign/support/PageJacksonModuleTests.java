@@ -42,118 +42,118 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PageJacksonModuleTests {
 
-	private static ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
 
-	@BeforeAll
-	public static void initialize() {
-		objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new PageJacksonModule());
-		objectMapper.registerModule(new SortJacksonModule());
-	}
+    @BeforeAll
+    public static void initialize() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new PageJacksonModule());
+        objectMapper.registerModule(new SortJacksonModule());
+    }
 
-	@ParameterizedTest
-	@ValueSource(strings = { "totalElements", "total-elements", "total_elements", "totalelements", "TotalElements" })
-	public void deserializePage(String totalElements) throws JsonProcessingException {
-		// Given
-		String pageJson = "{\"content\":[\"A name\"], \"number\":1, \"size\":2, \"" + totalElements + "\": 3}";
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.getTotalElements()).isEqualTo(3);
-		assertThat(result.getContent()).hasSize(1);
-		assertThat(result.getPageable()).isNotNull();
-		assertThat(result.getPageable().getPageSize()).isEqualTo(2);
-		assertThat(result.getPageable().getPageNumber()).isEqualTo(1);
-	}
+    @ParameterizedTest
+    @ValueSource(strings = {"totalElements", "total-elements", "total_elements", "totalelements", "TotalElements"})
+    public void deserializePage(String totalElements) throws JsonProcessingException {
+        // Given
+        String pageJson = "{\"content\":[\"A name\"], \"number\":1, \"size\":2, \"" + totalElements + "\": 3}";
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getPageable()).isNotNull();
+        assertThat(result.getPageable().getPageSize()).isEqualTo(2);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(1);
+    }
 
-	@Test
-	public void serializeAndDeserializeEmpty() throws JsonProcessingException {
-		// Given
-		PageImpl<Object> objects = new PageImpl<>(new ArrayList<>(), Pageable.ofSize(1), 0);
-		String pageJson = objectMapper.writeValueAsString(objects);
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.getTotalElements()).isEqualTo(0);
-		assertThat(result.getContent()).hasSize(0);
-	}
+    @Test
+    public void serializeAndDeserializeEmpty() throws JsonProcessingException {
+        // Given
+        PageImpl<Object> objects = new PageImpl<>(new ArrayList<>(), Pageable.ofSize(1), 0);
+        String pageJson = objectMapper.writeValueAsString(objects);
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        assertThat(result.getContent()).hasSize(0);
+    }
 
-	@Test
-	public void serializeAndDeserializeFilledMultiple() throws JsonProcessingException {
-		// Given
-		ArrayList<Object> pageElements = new ArrayList<>();
-		pageElements.add("first element");
-		pageElements.add("second element");
-		PageImpl<Object> objects = new PageImpl<>(pageElements, PageRequest.of(6, 2), 100);
-		assertThat(objects.getContent()).hasSize(2);
-		assertThat(objects.getPageable().getPageSize()).isEqualTo(2);
+    @Test
+    public void serializeAndDeserializeFilledMultiple() throws JsonProcessingException {
+        // Given
+        ArrayList<Object> pageElements = new ArrayList<>();
+        pageElements.add("first element");
+        pageElements.add("second element");
+        PageImpl<Object> objects = new PageImpl<>(pageElements, PageRequest.of(6, 2), 100);
+        assertThat(objects.getContent()).hasSize(2);
+        assertThat(objects.getPageable().getPageSize()).isEqualTo(2);
 
-		String pageJson = objectMapper.writeValueAsString(objects);
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.getTotalElements()).isEqualTo(100);
-		assertThat(result.getContent()).hasSize(2);
-		assertThat(result.getContent().get(0)).isEqualTo("first element");
-		assertThat(result.getContent().get(1)).isEqualTo("second element");
-		assertThat(result.getPageable().getPageSize()).isEqualTo(2);
-		assertThat(result.getPageable().getPageNumber()).isEqualTo(6);
-	}
+        String pageJson = objectMapper.writeValueAsString(objects);
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(100);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0)).isEqualTo("first element");
+        assertThat(result.getContent().get(1)).isEqualTo("second element");
+        assertThat(result.getPageable().getPageSize()).isEqualTo(2);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(6);
+    }
 
-	@Test
-	public void serializeAndDeserializeEmptyCascade() throws JsonProcessingException {
-		// Given
-		PageImpl<Object> objects = new PageImpl<>(new ArrayList<>(), Pageable.ofSize(1), 0);
-		String pageJson = objectMapper.writeValueAsString(objects);
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.getTotalElements()).isEqualTo(0);
-		assertThat(result.getContent()).hasSize(0);
+    @Test
+    public void serializeAndDeserializeEmptyCascade() throws JsonProcessingException {
+        // Given
+        PageImpl<Object> objects = new PageImpl<>(new ArrayList<>(), Pageable.ofSize(1), 0);
+        String pageJson = objectMapper.writeValueAsString(objects);
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        assertThat(result.getContent()).hasSize(0);
 
-		String cascadedPageJson = objectMapper.writeValueAsString(result);
-		Page<?> cascadedResult = objectMapper.readValue(cascadedPageJson, Page.class);
-		assertThat(cascadedResult).isNotNull();
-		assertThat(cascadedResult.getTotalElements()).isEqualTo(0);
-		assertThat(cascadedResult.getContent()).hasSize(0);
-	}
+        String cascadedPageJson = objectMapper.writeValueAsString(result);
+        Page<?> cascadedResult = objectMapper.readValue(cascadedPageJson, Page.class);
+        assertThat(cascadedResult).isNotNull();
+        assertThat(cascadedResult.getTotalElements()).isEqualTo(0);
+        assertThat(cascadedResult.getContent()).hasSize(0);
+    }
 
-	@Test
-	public void serializeAndDeserializeFilledMultipleCascade() throws JsonProcessingException {
-		// Given
-		ArrayList<Object> pageElements = new ArrayList<>();
-		pageElements.add("first element in cascaded serialization");
-		pageElements.add("second element in cascaded serialization");
-		PageImpl<Object> objects = new PageImpl<>(pageElements, PageRequest.of(6, 2), 100);
-		assertThat(objects.getContent()).hasSize(2);
-		assertThat(objects.getPageable().getPageSize()).isEqualTo(2);
+    @Test
+    public void serializeAndDeserializeFilledMultipleCascade() throws JsonProcessingException {
+        // Given
+        ArrayList<Object> pageElements = new ArrayList<>();
+        pageElements.add("first element in cascaded serialization");
+        pageElements.add("second element in cascaded serialization");
+        PageImpl<Object> objects = new PageImpl<>(pageElements, PageRequest.of(6, 2), 100);
+        assertThat(objects.getContent()).hasSize(2);
+        assertThat(objects.getPageable().getPageSize()).isEqualTo(2);
 
-		String pageJson = objectMapper.writeValueAsString(objects);
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.getTotalElements()).isEqualTo(100);
-		assertThat(result.getContent()).hasSize(2);
-		assertThat(result.getContent().get(0)).isEqualTo("first element in cascaded serialization");
-		assertThat(result.getContent().get(1)).isEqualTo("second element in cascaded serialization");
-		assertThat(result.getPageable().getPageSize()).isEqualTo(2);
-		assertThat(result.getPageable().getPageNumber()).isEqualTo(6);
+        String pageJson = objectMapper.writeValueAsString(objects);
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(100);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0)).isEqualTo("first element in cascaded serialization");
+        assertThat(result.getContent().get(1)).isEqualTo("second element in cascaded serialization");
+        assertThat(result.getPageable().getPageSize()).isEqualTo(2);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(6);
 
-		String cascadedPageJson = objectMapper.writeValueAsString(result);
-		Page<?> cascadedResult = objectMapper.readValue(cascadedPageJson, Page.class);
-		// Then
-		assertThat(cascadedResult).isNotNull();
-		assertThat(cascadedResult.getTotalElements()).isEqualTo(100);
-		assertThat(cascadedResult.getContent()).hasSize(2);
-		assertThat(cascadedResult.getContent().get(0)).isEqualTo("first element in cascaded serialization");
-		assertThat(cascadedResult.getContent().get(1)).isEqualTo("second element in cascaded serialization");
-		assertThat(cascadedResult.getPageable().getPageSize()).isEqualTo(2);
-		assertThat(cascadedResult.getPageable().getPageNumber()).isEqualTo(6);
-	}
+        String cascadedPageJson = objectMapper.writeValueAsString(result);
+        Page<?> cascadedResult = objectMapper.readValue(cascadedPageJson, Page.class);
+        // Then
+        assertThat(cascadedResult).isNotNull();
+        assertThat(cascadedResult.getTotalElements()).isEqualTo(100);
+        assertThat(cascadedResult.getContent()).hasSize(2);
+        assertThat(cascadedResult.getContent().get(0)).isEqualTo("first element in cascaded serialization");
+        assertThat(cascadedResult.getContent().get(1)).isEqualTo("second element in cascaded serialization");
+        assertThat(cascadedResult.getPageable().getPageSize()).isEqualTo(2);
+        assertThat(cascadedResult.getPageable().getPageNumber()).isEqualTo(6);
+    }
 
 }

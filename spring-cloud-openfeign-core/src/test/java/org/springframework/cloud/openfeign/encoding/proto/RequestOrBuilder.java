@@ -20,22 +20,22 @@
 package org.springframework.cloud.openfeign.encoding.proto;
 
 public interface RequestOrBuilder extends
-		// @@protoc_insertion_point(interface_extends:Request)
-		com.google.protobuf.MessageOrBuilder {
+    // @@protoc_insertion_point(interface_extends:Request)
+    com.google.protobuf.MessageOrBuilder {
 
-	/**
-	 * <code>int32 id = 1;</code>
-	 */
-	int getId();
+    /**
+     * <code>int32 id = 1;</code>
+     */
+    int getId();
 
-	/**
-	 * <code>string msg = 2;</code>
-	 */
-	String getMsg();
+    /**
+     * <code>string msg = 2;</code>
+     */
+    String getMsg();
 
-	/**
-	 * <code>string msg = 2;</code>
-	 */
-	com.google.protobuf.ByteString getMsgBytes();
+    /**
+     * <code>string msg = 2;</code>
+     */
+    com.google.protobuf.ByteString getMsgBytes();
 
 }

@@ -44,76 +44,76 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = FeignClientDisabledFeaturesTests.TestConfiguration.class)
 class FeignClientDisabledFeaturesTests {
 
-	@Autowired
-	private FeignClientFactory context;
+    @Autowired
+    private FeignClientFactory context;
 
-	@Autowired
-	private FooClient foo;
+    @Autowired
+    private FooClient foo;
 
-	@Autowired
-	private BarClient bar;
+    @Autowired
+    private BarClient bar;
 
-	@Test
-	void clientsAvailable() {
-		assertThat(foo).isNotNull();
-		assertThat(bar).isNotNull();
-	}
+    @Test
+    void clientsAvailable() {
+        assertThat(foo).isNotNull();
+        assertThat(bar).isNotNull();
+    }
 
-	@Test
-	void capabilitiesShouldNotBeAvailable() {
-		assertThat(context.getInstance("foo", MicrometerCapability.class)).isNull();
-		assertThat(context.getInstances("foo", Capability.class)).isEmpty();
+    @Test
+    void capabilitiesShouldNotBeAvailable() {
+        assertThat(context.getInstance("foo", MicrometerCapability.class)).isNull();
+        assertThat(context.getInstances("foo", Capability.class)).isEmpty();
 
-		assertThat(context.getInstance("bar", MicrometerCapability.class)).isNull();
-		Map<String, Capability> barCapabilities = context.getInstances("bar", Capability.class);
-		assertThat(barCapabilities).hasSize(1);
-		assertThat(barCapabilities.get("noOpCapability")).isExactlyInstanceOf(NoOpCapability.class);
-	}
+        assertThat(context.getInstance("bar", MicrometerCapability.class)).isNull();
+        Map<String, Capability> barCapabilities = context.getInstances("bar", Capability.class);
+        assertThat(barCapabilities).hasSize(1);
+        assertThat(barCapabilities.get("noOpCapability")).isExactlyInstanceOf(NoOpCapability.class);
+    }
 
-	@FeignClient(name = "foo", url = "https://foo", configuration = FooConfiguration.class)
-	interface FooClient {
+    @FeignClient(name = "foo", url = "https://foo", configuration = FooConfiguration.class)
+    interface FooClient {
 
-		@RequestLine("GET /")
-		String get();
+        @RequestLine("GET /")
+        String get();
 
-	}
+    }
 
-	@FeignClient(name = "bar", url = "https://bar", configuration = BarConfiguration.class)
-	interface BarClient {
+    @FeignClient(name = "bar", url = "https://bar", configuration = BarConfiguration.class)
+    interface BarClient {
 
-		@GetMapping("/")
-		String get();
+        @GetMapping("/")
+        String get();
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@EnableConfigurationProperties(FeignClientProperties.class)
-	@EnableFeignClients(clients = { FooClient.class, BarClient.class })
-	protected static class TestConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @EnableConfigurationProperties(FeignClientProperties.class)
+    @EnableFeignClients(clients = {FooClient.class, BarClient.class})
+    protected static class TestConfiguration {
 
-	}
+    }
 
-	public static class FooConfiguration {
+    public static class FooConfiguration {
 
-		@Bean // if the feign configuration empty, the context is not able to start
-		public Contract feignContract() {
-			return new Contract.Default();
-		}
+        @Bean // if the feign configuration empty, the context is not able to start
+        public Contract feignContract() {
+            return new Contract.Default();
+        }
 
-	}
+    }
 
-	public static class BarConfiguration {
+    public static class BarConfiguration {
 
-		@Bean
-		public Capability noOpCapability() {
-			return new NoOpCapability();
-		}
+        @Bean
+        public Capability noOpCapability() {
+            return new NoOpCapability();
+        }
 
-	}
+    }
 
-	private static class NoOpCapability implements Capability {
+    private static class NoOpCapability implements Capability {
 
-	}
+    }
 
 }

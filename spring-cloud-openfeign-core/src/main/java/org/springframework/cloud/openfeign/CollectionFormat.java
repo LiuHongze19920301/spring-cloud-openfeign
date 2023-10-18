@@ -28,13 +28,14 @@ import java.lang.annotation.Target;
  * @author Sam Kruglov
  * @see feign.CollectionFormat
  */
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CollectionFormat {
 
 	/**
 	 * Allows setting the {@link feign.CollectionFormat} to be used while processing the
 	 * annotated method.
+	 *
 	 * @return the {@link feign.CollectionFormat} to be used
 	 */
 	feign.CollectionFormat value();

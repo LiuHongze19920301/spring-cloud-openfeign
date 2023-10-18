@@ -33,46 +33,46 @@ import static org.springframework.cloud.openfeign.test.EqualsAndHashCodeAssert.a
  */
 class MicrometerPropertiesTests {
 
-	@Test
-	void shouldBeEnabledByDefault() {
-		FeignClientProperties.MicrometerProperties properties = new FeignClientProperties.MicrometerProperties();
-		assertThat(properties.getEnabled()).isTrue();
-	}
+    @Test
+    void shouldBeEnabledByDefault() {
+        FeignClientProperties.MicrometerProperties properties = new FeignClientProperties.MicrometerProperties();
+        assertThat(properties.getEnabled()).isTrue();
+    }
 
-	@Test
-	void shouldBeDisabledWhenSet() {
-		FeignClientProperties.MicrometerProperties properties = new FeignClientProperties.MicrometerProperties();
-		properties.setEnabled(false);
-		assertThat(properties.getEnabled()).isFalse();
-	}
+    @Test
+    void shouldBeDisabledWhenSet() {
+        FeignClientProperties.MicrometerProperties properties = new FeignClientProperties.MicrometerProperties();
+        properties.setEnabled(false);
+        assertThat(properties.getEnabled()).isFalse();
+    }
 
-	/**
-	 * Sanity-checks equals and hashCode contracts but does not check every variation of
-	 * the fields.
-	 */
-	@Test
-	void shouldHaveSomewhatValidEqualsAndHashCode() {
-		FeignClientProperties.MicrometerProperties propertyOne = new FeignClientProperties.MicrometerProperties();
-		FeignClientProperties.MicrometerProperties propertyTwo = new FeignClientProperties.MicrometerProperties();
-		FeignClientProperties.MicrometerProperties propertyThree = new FeignClientProperties.MicrometerProperties();
-		FeignClientProperties.MicrometerProperties differentProperty = new FeignClientProperties.MicrometerProperties();
-		differentProperty.setEnabled(false);
+    /**
+     * Sanity-checks equals and hashCode contracts but does not check every variation of
+     * the fields.
+     */
+    @Test
+    void shouldHaveSomewhatValidEqualsAndHashCode() {
+        FeignClientProperties.MicrometerProperties propertyOne = new FeignClientProperties.MicrometerProperties();
+        FeignClientProperties.MicrometerProperties propertyTwo = new FeignClientProperties.MicrometerProperties();
+        FeignClientProperties.MicrometerProperties propertyThree = new FeignClientProperties.MicrometerProperties();
+        FeignClientProperties.MicrometerProperties differentProperty = new FeignClientProperties.MicrometerProperties();
+        differentProperty.setEnabled(false);
 
-		assertEqualsReflexivity(propertyOne);
+        assertEqualsReflexivity(propertyOne);
 
-		assertEqualsSymmetricity(propertyOne, propertyTwo);
-		assertEqualsSymmetricity(propertyOne, differentProperty);
-		assertEqualsSymmetricity(propertyOne, 42);
+        assertEqualsSymmetricity(propertyOne, propertyTwo);
+        assertEqualsSymmetricity(propertyOne, differentProperty);
+        assertEqualsSymmetricity(propertyOne, 42);
 
-		assertEqualsTransitivity(propertyOne, propertyTwo, propertyThree);
+        assertEqualsTransitivity(propertyOne, propertyTwo, propertyThree);
 
-		assertEqualsConsistency(propertyOne, propertyTwo);
-		assertEqualsConsistency(propertyOne, differentProperty);
-		assertEqualsConsistency(propertyOne, 42);
-		assertEqualsConsistency(propertyOne, null);
+        assertEqualsConsistency(propertyOne, propertyTwo);
+        assertEqualsConsistency(propertyOne, differentProperty);
+        assertEqualsConsistency(propertyOne, 42);
+        assertEqualsConsistency(propertyOne, null);
 
-		assertHashCodeConsistency(propertyOne);
-		assertEqualsAndHashCodeConsistency(propertyOne, propertyTwo);
-	}
+        assertHashCodeConsistency(propertyOne);
+        assertEqualsAndHashCodeConsistency(propertyOne, propertyTwo);
+    }
 
 }

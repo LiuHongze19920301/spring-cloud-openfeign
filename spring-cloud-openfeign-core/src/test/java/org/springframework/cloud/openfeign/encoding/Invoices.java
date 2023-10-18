@@ -31,19 +31,19 @@ import org.springframework.cloud.openfeign.encoding.app.domain.Invoice;
  */
 final class Invoices {
 
-	private Invoices() {
-		throw new IllegalStateException("Can't instantiate a utility class");
-	}
+    private Invoices() {
+        throw new IllegalStateException("Can't instantiate a utility class");
+    }
 
-	public static List<Invoice> createInvoiceList(int count) {
-		final List<Invoice> invoices = new ArrayList<>();
-		for (int ind = 0; ind < count; ind++) {
-			final Invoice invoice = new Invoice();
-			invoice.setTitle("Invoice " + (ind + 1));
-			invoice.setAmount(new BigDecimal(String.format(Locale.US, "%.2f", Math.random() * 1000)));
-			invoices.add(invoice);
-		}
-		return invoices;
-	}
+    public static List<Invoice> createInvoiceList(int count) {
+        final List<Invoice> invoices = new ArrayList<>();
+        for (int ind = 0; ind < count; ind++) {
+            final Invoice invoice = new Invoice();
+            invoice.setTitle("Invoice " + (ind + 1));
+            invoice.setAmount(new BigDecimal(String.format(Locale.US, "%.2f", Math.random() * 1000)));
+            invoices.add(invoice);
+        }
+        return invoices;
+    }
 
 }

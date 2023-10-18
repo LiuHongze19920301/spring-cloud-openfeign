@@ -93,7 +93,7 @@ public class PageableSupportTest {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("pageable",
-					new DefaultServiceInstance("pageable-1", "pageable", "localhost", port, false));
+				new DefaultServiceInstance("pageable-1", "pageable", "localhost", port, false));
 		}
 
 	}

@@ -69,34 +69,34 @@ public class HttpClient5FeignConfiguration {
 	@ConditionalOnMissingBean(HttpClientConnectionManager.class)
 	public HttpClientConnectionManager hc5ConnectionManager(FeignHttpClientProperties httpClientProperties) {
 		return PoolingHttpClientConnectionManagerBuilder.create()
-				.setSSLSocketFactory(httpsSSLConnectionSocketFactory(httpClientProperties.isDisableSslValidation()))
-				.setMaxConnTotal(httpClientProperties.getMaxConnections())
-				.setMaxConnPerRoute(httpClientProperties.getMaxConnectionsPerRoute())
-				.setConnPoolPolicy(PoolReusePolicy.valueOf(httpClientProperties.getHc5().getPoolReusePolicy().name()))
-				.setPoolConcurrencyPolicy(
-						PoolConcurrencyPolicy.valueOf(httpClientProperties.getHc5().getPoolConcurrencyPolicy().name()))
-				.setConnectionTimeToLive(
-						TimeValue.of(httpClientProperties.getTimeToLive(), httpClientProperties.getTimeToLiveUnit()))
-				.setDefaultSocketConfig(
-						SocketConfig.custom().setSoTimeout(Timeout.of(httpClientProperties.getHc5().getSocketTimeout(),
-								httpClientProperties.getHc5().getSocketTimeoutUnit())).build())
-				.build();
+			.setSSLSocketFactory(httpsSSLConnectionSocketFactory(httpClientProperties.isDisableSslValidation()))
+			.setMaxConnTotal(httpClientProperties.getMaxConnections())
+			.setMaxConnPerRoute(httpClientProperties.getMaxConnectionsPerRoute())
+			.setConnPoolPolicy(PoolReusePolicy.valueOf(httpClientProperties.getHc5().getPoolReusePolicy().name()))
+			.setPoolConcurrencyPolicy(
+				PoolConcurrencyPolicy.valueOf(httpClientProperties.getHc5().getPoolConcurrencyPolicy().name()))
+			.setConnectionTimeToLive(
+				TimeValue.of(httpClientProperties.getTimeToLive(), httpClientProperties.getTimeToLiveUnit()))
+			.setDefaultSocketConfig(
+				SocketConfig.custom().setSoTimeout(Timeout.of(httpClientProperties.getHc5().getSocketTimeout(),
+					httpClientProperties.getHc5().getSocketTimeoutUnit())).build())
+			.build();
 	}
 
 	@Bean
 	public CloseableHttpClient httpClient5(HttpClientConnectionManager connectionManager,
-			FeignHttpClientProperties httpClientProperties) {
+										   FeignHttpClientProperties httpClientProperties) {
 		httpClient5 = HttpClients.custom().disableCookieManagement().useSystemProperties()
-				.setConnectionManager(connectionManager).evictExpiredConnections()
-				.setDefaultRequestConfig(RequestConfig.custom()
-						.setConnectTimeout(
-								Timeout.of(httpClientProperties.getConnectionTimeout(), TimeUnit.MILLISECONDS))
-						.setRedirectsEnabled(httpClientProperties.isFollowRedirects())
-						.setConnectionRequestTimeout(
-								Timeout.of(httpClientProperties.getHc5().getConnectionRequestTimeout(),
-										httpClientProperties.getHc5().getConnectionRequestTimeoutUnit()))
-						.build())
-				.build();
+			.setConnectionManager(connectionManager).evictExpiredConnections()
+			.setDefaultRequestConfig(RequestConfig.custom()
+				.setConnectTimeout(
+					Timeout.of(httpClientProperties.getConnectionTimeout(), TimeUnit.MILLISECONDS))
+				.setRedirectsEnabled(httpClientProperties.isFollowRedirects())
+				.setConnectionRequestTimeout(
+					Timeout.of(httpClientProperties.getHc5().getConnectionRequestTimeout(),
+						httpClientProperties.getHc5().getConnectionRequestTimeoutUnit()))
+				.build())
+			.build();
 		return httpClient5;
 	}
 
@@ -109,20 +109,18 @@ public class HttpClient5FeignConfiguration {
 
 	private LayeredConnectionSocketFactory httpsSSLConnectionSocketFactory(boolean isDisableSslValidation) {
 		final SSLConnectionSocketFactoryBuilder sslConnectionSocketFactoryBuilder = SSLConnectionSocketFactoryBuilder
-				.create().setTlsVersions(TLS.V_1_3, TLS.V_1_2);
+			.create().setTlsVersions(TLS.V_1_3, TLS.V_1_2);
 
 		if (isDisableSslValidation) {
 			try {
 				final SSLContext sslContext = SSLContext.getInstance("SSL");
-				sslContext.init(null, new TrustManager[] { new DisabledValidationTrustManager() }, new SecureRandom());
+				sslContext.init(null, new TrustManager[]{new DisabledValidationTrustManager()}, new SecureRandom());
 				sslConnectionSocketFactoryBuilder.setSslContext(sslContext);
 				sslConnectionSocketFactoryBuilder.setHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-			}
-			catch (NoSuchAlgorithmException | KeyManagementException e) {
+			} catch (NoSuchAlgorithmException | KeyManagementException e) {
 				LOG.warn("Error creating SSLContext", e);
 			}
-		}
-		else {
+		} else {
 			sslConnectionSocketFactoryBuilder.setSslContext(SSLContexts.createSystemDefault());
 		}
 

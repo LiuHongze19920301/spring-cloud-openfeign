@@ -35,6 +35,7 @@ public final class EqualsAndHashCodeAssert {
 	/**
 	 * Checks if equals is reflexive: for any non-null reference value x, x.equals(x)
 	 * should return true.
+	 *
 	 * @param object the reference object to check
 	 */
 	public static void assertEqualsReflexivity(Object object) {
@@ -46,6 +47,7 @@ public final class EqualsAndHashCodeAssert {
 	 * x.equals(y) should return true if and only if y.equals(x) returns true The user of
 	 * this method should call this at least twice: once with objects that are equal and
 	 * once with objects that are not.
+	 *
 	 * @param objectOne a reference object to check
 	 * @param objectTwo another reference object to check
 	 */
@@ -57,8 +59,9 @@ public final class EqualsAndHashCodeAssert {
 	 * Checks if equals is transitive: for any non-null reference values x, y, and z, if
 	 * x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) should
 	 * return true.
-	 * @param objectOne a reference object to check
-	 * @param objectTwo another reference object to check
+	 *
+	 * @param objectOne   a reference object to check
+	 * @param objectTwo   another reference object to check
 	 * @param objectThree and the third reference object to check
 	 */
 	public static void assertEqualsTransitivity(Object objectOne, Object objectTwo, Object objectThree) {
@@ -72,6 +75,7 @@ public final class EqualsAndHashCodeAssert {
 	 * multiple invocations of x.equals(y) consistently return true or consistently return
 	 * false. The user of this method should call this at least twice: once with objects
 	 * that are equal and once with objects that are not.
+	 *
 	 * @param objectOne a reference object to check
 	 * @param objectTwo another reference object to check
 	 */
@@ -86,6 +90,7 @@ public final class EqualsAndHashCodeAssert {
 	 * Tries to check if hashCode is consistent: whenever it is invoked on the same object
 	 * more than once during an execution of a Java application, the hashCode method must
 	 * consistently return the same integer.
+	 *
 	 * @param object the reference object to check
 	 */
 	public static void assertHashCodeConsistency(Object object) {
@@ -99,6 +104,7 @@ public final class EqualsAndHashCodeAssert {
 	 * Checks if equals and hashCode are consistent to each other: if two objects are
 	 * equal according to the equals method, then calling the hashCode method on each of
 	 * the two objects must produce the same integer result.
+	 *
 	 * @param objectOne a reference object to check
 	 * @param objectTwo another reference object to check
 	 */

@@ -123,12 +123,12 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 	}
 
 	public SpringMvcContract(List<AnnotatedParameterProcessor> annotatedParameterProcessors,
-			ConversionService conversionService) {
+							 ConversionService conversionService) {
 		this(annotatedParameterProcessors, conversionService, true);
 	}
 
 	public SpringMvcContract(List<AnnotatedParameterProcessor> annotatedParameterProcessors,
-			ConversionService conversionService, boolean decodeSlash) {
+							 ConversionService conversionService, boolean decodeSlash) {
 		Assert.notNull(annotatedParameterProcessors, "Parameter processors can not be null.");
 		Assert.notNull(conversionService, "ConversionService can not be null.");
 
@@ -152,7 +152,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 			TypeDescriptor elementTypeDescriptor = getElementTypeDescriptor(typeDescriptor);
 
 			checkState(elementTypeDescriptor != null,
-					"Could not resolve element type of Iterable type %s. Not declared?", typeDescriptor);
+				"Could not resolve element type of Iterable type %s. Not declared?", typeDescriptor);
 
 			typeDescriptor = elementTypeDescriptor;
 		}
@@ -182,7 +182,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 		RequestMapping classAnnotation = findMergedAnnotation(clz, RequestMapping.class);
 		if (classAnnotation != null) {
 			LOG.error("Cannot process class: " + clz.getName()
-					+ ". @RequestMapping annotation is not allowed on @FeignClient interfaces.");
+				+ ". @RequestMapping annotation is not allowed on @FeignClient interfaces.");
 			throw new IllegalArgumentException("@RequestMapping annotation not allowed on @FeignClient interfaces");
 		}
 		CollectionFormat collectionFormat = findMergedAnnotation(clz, CollectionFormat.class);
@@ -205,7 +205,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 		}
 
 		if (!(methodAnnotation instanceof RequestMapping)
-				&& !methodAnnotation.annotationType().isAnnotationPresent(RequestMapping.class)) {
+			&& !methodAnnotation.annotationType().isAnnotationPresent(RequestMapping.class)) {
 			return;
 		}
 
@@ -213,7 +213,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 		// HTTP Method
 		RequestMethod[] methods = methodMapping.method();
 		if (methods.length == 0) {
-			methods = new RequestMethod[] { RequestMethod.GET };
+			methods = new RequestMethod[]{RequestMethod.GET};
 		}
 		checkOne(method, methods, "method");
 		data.template().method(Request.HttpMethod.valueOf(methods[0].name()));
@@ -256,13 +256,13 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 
 	private void checkAtMostOne(Method method, Object[] values, String fieldName) {
 		checkState(values != null && (values.length == 0 || values.length == 1),
-				"Method %s can only contain at most 1 %s field. Found: %s", method.getName(), fieldName,
-				values == null ? null : Arrays.asList(values));
+			"Method %s can only contain at most 1 %s field. Found: %s", method.getName(), fieldName,
+			values == null ? null : Arrays.asList(values));
 	}
 
 	private void checkOne(Method method, Object[] values, String fieldName) {
 		checkState(values != null && values.length == 1, "Method %s can only contain 1 %s field. Found: %s",
-				method.getName(), fieldName, values == null ? null : Arrays.asList(values));
+			method.getName(), fieldName, values == null ? null : Arrays.asList(values));
 	}
 
 	@Override
@@ -278,23 +278,22 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 					return false;
 				}
 			}
-		}
-		catch (NoClassDefFoundError ignored) {
+		} catch (NoClassDefFoundError ignored) {
 			// Do nothing; added to avoid exceptions if optional dependency not present
 		}
 
 		AnnotatedParameterProcessor.AnnotatedParameterContext context = new SimpleAnnotatedParameterContext(data,
-				paramIndex);
+			paramIndex);
 		Method method = processedMethods.get(data.configKey());
 		for (Annotation parameterAnnotation : annotations) {
 			AnnotatedParameterProcessor processor = annotatedArgumentProcessors
-					.get(parameterAnnotation.annotationType());
+				.get(parameterAnnotation.annotationType());
 			if (processor != null) {
 				Annotation processParameterAnnotation;
 				// synthesize, handling @AliasFor, while falling back to parameter name on
 				// missing String #value():
 				processParameterAnnotation = synthesizeWithMethodParameterNameAsFallbackValue(parameterAnnotation,
-						method, paramIndex);
+					method, paramIndex);
 				isHttpAnnotation |= processor.processArgument(context, processParameterAnnotation, method);
 			}
 		}
@@ -317,8 +316,8 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 			Annotation[] paramAnnotations = paramsAnnotations[i];
 			Class<?> parameterType = data.method().getParameterTypes()[i];
 			if (Arrays.stream(paramAnnotations).anyMatch(
-					annotation -> Map.class.isAssignableFrom(parameterType) && annotation instanceof RequestParam
-							|| annotation instanceof SpringQueryMap || annotation instanceof QueryMap)) {
+				annotation -> Map.class.isAssignableFrom(parameterType) && annotation instanceof RequestParam
+					|| annotation instanceof SpringQueryMap || annotation instanceof QueryMap)) {
 				return true;
 			}
 		}
@@ -348,14 +347,14 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 				int index = header.indexOf('=');
 				if (!header.contains("!=") && index >= 0) {
 					md.template().header(resolve(header.substring(0, index)),
-							resolve(header.substring(index + 1).trim()));
+						resolve(header.substring(index + 1).trim()));
 				}
 			}
 		}
 	}
 
 	private Map<Class<? extends Annotation>, AnnotatedParameterProcessor> toAnnotatedArgumentProcessorMap(
-			List<AnnotatedParameterProcessor> processors) {
+		List<AnnotatedParameterProcessor> processors) {
 		Map<Class<? extends Annotation>, AnnotatedParameterProcessor> result = new HashMap<>();
 		for (AnnotatedParameterProcessor processor : processors) {
 			result.put(processor.getAnnotationType(), processor);
@@ -379,7 +378,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 	}
 
 	private Annotation synthesizeWithMethodParameterNameAsFallbackValue(Annotation parameterAnnotation, Method method,
-			int parameterIndex) {
+																		int parameterIndex) {
 		Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(parameterAnnotation);
 		Object defaultValue = AnnotationUtils.getDefaultValue(parameterAnnotation);
 		if (defaultValue instanceof String && defaultValue.equals(annotationAttributes.get(AnnotationUtils.VALUE))) {
@@ -395,8 +394,8 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 	private boolean shouldAddParameterName(int parameterIndex, Type[] parameterTypes, String[] parameterNames) {
 		// has a parameter name
 		return parameterNames != null && parameterNames.length > parameterIndex
-		// has a type
-				&& parameterTypes != null && parameterTypes.length > parameterIndex;
+			// has a type
+			&& parameterTypes != null && parameterTypes.length > parameterIndex;
 	}
 
 	private boolean isMultipartFormData(MethodMetadata data) {
@@ -406,8 +405,7 @@ public class SpringMvcContract extends Contract.BaseContract implements Resource
 			String type = contentTypes.iterator().next();
 			try {
 				return Objects.equals(MediaType.valueOf(type), MediaType.MULTIPART_FORM_DATA);
-			}
-			catch (InvalidMediaTypeException ignored) {
+			} catch (InvalidMediaTypeException ignored) {
 				return false;
 			}
 		}

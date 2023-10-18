@@ -48,162 +48,162 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = FeignHttpClientUrlTests.TestConfig.class, webEnvironment = DEFINED_PORT,
-		value = { "spring.application.name=feignclienturltest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
-				"spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.loadbalancer.retry.enabled=false" })
+    value = {"spring.application.name=feignclienturltest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
+        "spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.loadbalancer.retry.enabled=false"})
 @DirtiesContext
 class FeignHttpClientUrlTests {
 
-	static int port;
+    static int port;
 
-	@Autowired
-	BeanUrlClientNoProtocol beanClientNoProtocol;
+    @Autowired
+    BeanUrlClientNoProtocol beanClientNoProtocol;
 
-	@Autowired
-	private UrlClient urlClient;
+    @Autowired
+    private UrlClient urlClient;
 
-	@Autowired
-	private BeanUrlClient beanClient;
+    @Autowired
+    private BeanUrlClient beanClient;
 
-	@BeforeAll
-	static void beforeClass() {
-		port = TestSocketUtils.findAvailableTcpPort();
-		System.setProperty("server.port", String.valueOf(port));
-	}
+    @BeforeAll
+    static void beforeClass() {
+        port = TestSocketUtils.findAvailableTcpPort();
+        System.setProperty("server.port", String.valueOf(port));
+    }
 
-	@AfterAll
-	static void afterClass() {
-		System.clearProperty("server.port");
-	}
+    @AfterAll
+    static void afterClass() {
+        System.clearProperty("server.port");
+    }
 
-	@Test
-	void testUrlHttpClient() {
-		assertThat(urlClient).as("UrlClient was null").isNotNull();
-		Hello hello = urlClient.getHello();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-	}
+    @Test
+    void testUrlHttpClient() {
+        assertThat(urlClient).as("UrlClient was null").isNotNull();
+        Hello hello = urlClient.getHello();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+    }
 
-	@Test
-	void testBeanUrl() {
-		Hello hello = beanClient.getHello();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-	}
+    @Test
+    void testBeanUrl() {
+        Hello hello = beanClient.getHello();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+    }
 
-	@Test
-	void testBeanUrlNoProtocol() {
-		Hello hello = beanClientNoProtocol.getHello();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-	}
+    @Test
+    void testBeanUrlNoProtocol() {
+        Hello hello = beanClientNoProtocol.getHello();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+    }
 
-	// this tests that
-	@FeignClient(name = "localappurl", url = "http://localhost:${server.port}/")
-	protected interface UrlClient {
+    // this tests that
+    @FeignClient(name = "localappurl", url = "http://localhost:${server.port}/")
+    protected interface UrlClient {
 
-		@GetMapping("/hello")
-		Hello getHello();
+        @GetMapping("/hello")
+        Hello getHello();
 
-	}
+    }
 
-	@FeignClient(name = "beanappurl", url = "#{SERVER_URL}path")
-	protected interface BeanUrlClient {
+    @FeignClient(name = "beanappurl", url = "#{SERVER_URL}path")
+    protected interface BeanUrlClient {
 
-		@GetMapping("/hello")
-		Hello getHello();
+        @GetMapping("/hello")
+        Hello getHello();
 
-	}
+    }
 
-	@FeignClient(name = "beanappurlnoprotocol", url = "#{SERVER_URL_NO_PROTOCOL}path")
-	protected interface BeanUrlClientNoProtocol {
+    @FeignClient(name = "beanappurlnoprotocol", url = "#{SERVER_URL_NO_PROTOCOL}path")
+    protected interface BeanUrlClientNoProtocol {
 
-		@GetMapping("/hello")
-		Hello getHello();
+        @GetMapping("/hello")
+        Hello getHello();
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@RestController
-	@EnableFeignClients(clients = { UrlClient.class, BeanUrlClient.class, BeanUrlClientNoProtocol.class })
-	@Import(NoSecurityConfiguration.class)
-	protected static class TestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @RestController
+    @EnableFeignClients(clients = {UrlClient.class, BeanUrlClient.class, BeanUrlClientNoProtocol.class})
+    @Import(NoSecurityConfiguration.class)
+    protected static class TestConfig {
 
-		@GetMapping("/hello")
-		public Hello getHello() {
-			return new Hello("hello world 1");
-		}
+        @GetMapping("/hello")
+        public Hello getHello() {
+            return new Hello("hello world 1");
+        }
 
-		@GetMapping("/path/hello")
-		public Hello getHelloWithPath() {
-			return getHello();
-		}
+        @GetMapping("/path/hello")
+        public Hello getHelloWithPath() {
+            return getHello();
+        }
 
-		@Bean(name = "SERVER_URL")
-		public String serverUrl() {
-			return "http://localhost:" + port + "/";
-		}
+        @Bean(name = "SERVER_URL")
+        public String serverUrl() {
+            return "http://localhost:" + port + "/";
+        }
 
-		@Bean(name = "SERVER_URL_NO_PROTOCOL")
-		public String serverUrlNoProtocol() {
-			return "localhost:" + port + "/";
-		}
+        @Bean(name = "SERVER_URL_NO_PROTOCOL")
+        public String serverUrlNoProtocol() {
+            return "localhost:" + port + "/";
+        }
 
-		@Bean
-		public Targeter feignTargeter() {
-			return new Targeter() {
-				@Override
-				public <T> T target(FeignClientFactoryBean factory, Feign.Builder feign, FeignClientFactory context,
-						Target.HardCodedTarget<T> target) {
-					Field field = ReflectionUtils.findField(Feign.Builder.class, "client");
-					ReflectionUtils.makeAccessible(field);
-					Client client = (Client) ReflectionUtils.getField(field, feign);
-					if (target.name().equals("localappurl")) {
-						assertThat(client).isInstanceOf(ApacheHttp5Client.class).as("client was wrong type");
-					}
-					return feign.target(target);
-				}
-			};
-		}
+        @Bean
+        public Targeter feignTargeter() {
+            return new Targeter() {
+                @Override
+                public <T> T target(FeignClientFactoryBean factory, Feign.Builder feign, FeignClientFactory context,
+                                    Target.HardCodedTarget<T> target) {
+                    Field field = ReflectionUtils.findField(Feign.Builder.class, "client");
+                    ReflectionUtils.makeAccessible(field);
+                    Client client = (Client) ReflectionUtils.getField(field, feign);
+                    if (target.name().equals("localappurl")) {
+                        assertThat(client).isInstanceOf(ApacheHttp5Client.class).as("client was wrong type");
+                    }
+                    return feign.target(target);
+                }
+            };
+        }
 
-	}
+    }
 
-	public static class Hello {
+    public static class Hello {
 
-		private String message;
+        private String message;
 
-		Hello() {
-		}
+        Hello() {
+        }
 
-		Hello(String message) {
-			this.message = message;
-		}
+        Hello(String message) {
+            this.message = message;
+        }
 
-		public String getMessage() {
-			return message;
-		}
+        public String getMessage() {
+            return message;
+        }
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+        public void setMessage(String message) {
+            this.message = message;
+        }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
-			Hello that = (Hello) o;
-			return Objects.equals(message, that.message);
-		}
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Hello that = (Hello) o;
+            return Objects.equals(message, that.message);
+        }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(message);
-		}
+        @Override
+        public int hashCode() {
+            return Objects.hash(message);
+        }
 
-	}
+    }
 
 }

@@ -38,58 +38,58 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 @SpringBootTest(classes = FeignClientsRegistrarIntegrationTests.QualifiersTestConfig.class)
 class FeignClientsRegistrarIntegrationTests {
 
-	@Autowired
-	ConfigurableApplicationContext context;
+    @Autowired
+    ConfigurableApplicationContext context;
 
-	@Test
-	void shouldUseQualifiersIfPresent() {
-		assertThat(context.getBean("qualifier1")).isNotNull();
-		assertThat(context.getBean("qualifier2")).isNotNull();
-		assertThatExceptionOfType(NoSuchBeanDefinitionException.class).isThrownBy(() -> context.getBean("qualifier3"));
-	}
+    @Test
+    void shouldUseQualifiersIfPresent() {
+        assertThat(context.getBean("qualifier1")).isNotNull();
+        assertThat(context.getBean("qualifier2")).isNotNull();
+        assertThatExceptionOfType(NoSuchBeanDefinitionException.class).isThrownBy(() -> context.getBean("qualifier3"));
+    }
 
-	@Test
-	void shouldUseDefaultQualifierWhenNonePresent() {
-		assertThat(context.getBean("noQualifiersFeignClient")).isNotNull();
-	}
+    @Test
+    void shouldUseDefaultQualifierWhenNonePresent() {
+        assertThat(context.getBean("noQualifiersFeignClient")).isNotNull();
+    }
 
-	@Test
-	void shouldUseDefaultQualifierWhenEmptyQualifiers() {
-		assertThat(context.getBean("emptyQualifiersNoQualifierFeignClient")).isNotNull();
-	}
+    @Test
+    void shouldUseDefaultQualifierWhenEmptyQualifiers() {
+        assertThat(context.getBean("emptyQualifiersNoQualifierFeignClient")).isNotNull();
+    }
 
-	@Test
-	void shouldUseDefaultQualifierWhenWhitespaceQualifiers() {
-		assertThat(context.getBean("whitespaceQualifiersNoQualifierFeignClient")).isNotNull();
-	}
+    @Test
+    void shouldUseDefaultQualifierWhenWhitespaceQualifiers() {
+        assertThat(context.getBean("whitespaceQualifiersNoQualifierFeignClient")).isNotNull();
+    }
 
-	@FeignClient(name = "qualifiersClient", qualifiers = { "qualifier1", "qualifier2" })
-	protected interface QualifiersClient {
+    @FeignClient(name = "qualifiersClient", qualifiers = {"qualifier1", "qualifier2"})
+    protected interface QualifiersClient {
 
-	}
+    }
 
-	@FeignClient(name = "noQualifiers")
-	protected interface NoQualifiersClient {
+    @FeignClient(name = "noQualifiers")
+    protected interface NoQualifiersClient {
 
-	}
+    }
 
-	@FeignClient(name = "emptyQualifiersNoQualifier", qualifiers = {})
-	protected interface EmptyQualifiersNoQualifierClient {
+    @FeignClient(name = "emptyQualifiersNoQualifier", qualifiers = {})
+    protected interface EmptyQualifiersNoQualifierClient {
 
-	}
+    }
 
-	@FeignClient(name = "whitespaceQualifiersNoQualifier", qualifiers = { " " })
-	protected interface WhitespaceQualifiersNoQualifierClient {
+    @FeignClient(name = "whitespaceQualifiersNoQualifier", qualifiers = {" "})
+    protected interface WhitespaceQualifiersNoQualifierClient {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@Import(NoSecurityConfiguration.class)
-	@EnableFeignClients(clients = { NoQualifiersClient.class, QualifiersClient.class,
-			EmptyQualifiersNoQualifierClient.class, WhitespaceQualifiersNoQualifierClient.class })
-	protected static class QualifiersTestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @Import(NoSecurityConfiguration.class)
+    @EnableFeignClients(clients = {NoQualifiersClient.class, QualifiersClient.class,
+        EmptyQualifiersNoQualifierClient.class, WhitespaceQualifiersNoQualifierClient.class})
+    protected static class QualifiersTestConfig {
 
-	}
+    }
 
 }

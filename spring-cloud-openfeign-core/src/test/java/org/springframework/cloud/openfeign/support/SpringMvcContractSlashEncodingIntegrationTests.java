@@ -30,19 +30,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Ram Anaswara
  */
 @SpringBootTest(classes = SpringMvcContractSlashEncodingIntegrationTests.Config.class,
-		webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-		properties = { "spring.cloud.openfeign.client.decodeSlash=false" })
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+    properties = {"spring.cloud.openfeign.client.decodeSlash=false"})
 public class SpringMvcContractSlashEncodingIntegrationTests extends AbstractSpringMvcContractIntegrationTests {
 
-	@Autowired
-	private TestClient client;
+    @Autowired
+    private TestClient client;
 
-	@Test
-	public void feignClientShouldNotDecodeEncodedSlash() {
-		Response response = (Response) client.getMessage("https://www.google.com");
+    @Test
+    public void feignClientShouldNotDecodeEncodedSlash() {
+        Response response = (Response) client.getMessage("https://www.google.com");
 
-		String urlQueryParam = getUrlQueryParam(response);
-		assertThat(urlQueryParam).isEqualTo("https%3A%2F%2Fwww.google.com");
-	}
+        String urlQueryParam = getUrlQueryParam(response);
+        assertThat(urlQueryParam).isEqualTo("https%3A%2F%2Fwww.google.com");
+    }
 
 }

@@ -44,7 +44,7 @@ public class FeignClientBuilder {
 	}
 
 	public <T> Builder<T> forType(final Class<T> type, final FeignClientFactoryBean clientFactoryBean,
-			final String name) {
+								  final String name) {
 		return new Builder<>(this.applicationContext, clientFactoryBean, type, name);
 	}
 
@@ -62,7 +62,7 @@ public class FeignClientBuilder {
 		}
 
 		private Builder(final ApplicationContext applicationContext, final FeignClientFactoryBean clientFactoryBean,
-				final Class<T> type, final String name) {
+						final Class<T> type, final String name) {
 			this.feignClientFactoryBean = clientFactoryBean;
 
 			this.feignClientFactoryBean.setApplicationContext(applicationContext);
@@ -83,8 +83,9 @@ public class FeignClientBuilder {
 		/**
 		 * Applies a {@link FeignBuilderCustomizer} to the underlying
 		 * {@link Feign.Builder}. May be called multiple times.
+		 *
 		 * @param customizer applied in the same order as supplied here after applying
-		 * customizers found in the context.
+		 *                   customizers found in the context.
 		 * @return the {@link Builder} with the customizer added
 		 */
 		public Builder<T> customize(final FeignBuilderCustomizer customizer) {

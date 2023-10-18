@@ -43,55 +43,55 @@ import static org.mockito.Mockito.when;
  */
 class XForwardedHeadersTransformerTests {
 
-	private final LoadBalancerClientFactory loadBalancerClientFactory = mock(LoadBalancerClientFactory.class);
+    private final LoadBalancerClientFactory loadBalancerClientFactory = mock(LoadBalancerClientFactory.class);
 
-	private final LoadBalancerProperties loadBalancerProperties = new LoadBalancerProperties();
+    private final LoadBalancerProperties loadBalancerProperties = new LoadBalancerProperties();
 
-	private final ServiceInstance serviceInstance = new DefaultServiceInstance("test1", "test", "test.org", 8080,
-			false);
+    private final ServiceInstance serviceInstance = new DefaultServiceInstance("test1", "test", "test.org", 8080,
+        false);
 
-	private final Request request = testRequest();
+    private final Request request = testRequest();
 
-	private Request testRequest() {
-		return testRequest("spring.io");
-	}
+    private Request testRequest() {
+        return testRequest("spring.io");
+    }
 
-	private Request testRequest(String host) {
-		return Request.create(Request.HttpMethod.GET, "https://" + host + "/path", testHeaders(), "hello".getBytes(),
-				StandardCharsets.UTF_8, null);
-	}
+    private Request testRequest(String host) {
+        return Request.create(Request.HttpMethod.GET, "https://" + host + "/path", testHeaders(), "hello".getBytes(),
+            StandardCharsets.UTF_8, null);
+    }
 
-	private Map<String, Collection<String>> testHeaders() {
-		Map<String, Collection<String>> feignHeaders = new HashMap<>();
-		feignHeaders.put(HttpHeaders.CONTENT_TYPE, Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
-		return feignHeaders;
+    private Map<String, Collection<String>> testHeaders() {
+        Map<String, Collection<String>> feignHeaders = new HashMap<>();
+        feignHeaders.put(HttpHeaders.CONTENT_TYPE, Collections.singletonList(MediaType.APPLICATION_JSON_VALUE));
+        return feignHeaders;
 
-	}
+    }
 
-	@Test
-	void shouldAppendXForwardedHeadersIfEnabled() {
-		loadBalancerProperties.getXForwarded().setEnabled(true);
-		when(loadBalancerClientFactory.getProperties("test")).thenReturn(loadBalancerProperties);
-		XForwardedHeadersTransformer transformer = new XForwardedHeadersTransformer(loadBalancerClientFactory);
+    @Test
+    void shouldAppendXForwardedHeadersIfEnabled() {
+        loadBalancerProperties.getXForwarded().setEnabled(true);
+        when(loadBalancerClientFactory.getProperties("test")).thenReturn(loadBalancerProperties);
+        XForwardedHeadersTransformer transformer = new XForwardedHeadersTransformer(loadBalancerClientFactory);
 
-		Request newRequest = transformer.transformRequest(request, serviceInstance);
+        Request newRequest = transformer.transformRequest(request, serviceInstance);
 
-		assertThat(newRequest.headers()).containsKey("X-Forwarded-Host");
-		assertThat(newRequest.headers()).containsEntry("X-Forwarded-Host", Collections.singleton("spring.io"));
-		assertThat(newRequest.headers()).containsKey("X-Forwarded-Proto");
-		assertThat(newRequest.headers()).containsEntry("X-Forwarded-Proto", Collections.singleton("https"));
+        assertThat(newRequest.headers()).containsKey("X-Forwarded-Host");
+        assertThat(newRequest.headers()).containsEntry("X-Forwarded-Host", Collections.singleton("spring.io"));
+        assertThat(newRequest.headers()).containsKey("X-Forwarded-Proto");
+        assertThat(newRequest.headers()).containsEntry("X-Forwarded-Proto", Collections.singleton("https"));
 
-	}
+    }
 
-	@Test
-	void shouldNotAppendXForwardedHeadersIfDefault() {
-		when(loadBalancerClientFactory.getProperties("test")).thenReturn(loadBalancerProperties);
-		XForwardedHeadersTransformer transformer = new XForwardedHeadersTransformer(loadBalancerClientFactory);
+    @Test
+    void shouldNotAppendXForwardedHeadersIfDefault() {
+        when(loadBalancerClientFactory.getProperties("test")).thenReturn(loadBalancerProperties);
+        XForwardedHeadersTransformer transformer = new XForwardedHeadersTransformer(loadBalancerClientFactory);
 
-		Request newRequest = transformer.transformRequest(request, serviceInstance);
+        Request newRequest = transformer.transformRequest(request, serviceInstance);
 
-		assertThat(newRequest.headers()).doesNotContainKey("X-Forwarded-Host");
-		assertThat(newRequest.headers()).doesNotContainKey("X-Forwarded-Proto");
-	}
+        assertThat(newRequest.headers()).doesNotContainKey("X-Forwarded-Host");
+        assertThat(newRequest.headers()).doesNotContainKey("X-Forwarded-Proto");
+    }
 
 }

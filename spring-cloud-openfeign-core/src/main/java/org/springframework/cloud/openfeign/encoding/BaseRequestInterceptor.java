@@ -35,6 +35,7 @@ public abstract class BaseRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Creates new instance of {@link BaseRequestInterceptor}.
+	 *
 	 * @param properties the encoding properties
 	 */
 	protected BaseRequestInterceptor(FeignClientEncodingProperties properties) {
@@ -44,9 +45,10 @@ public abstract class BaseRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Adds the header if it wasn't yet specified.
+	 *
 	 * @param requestTemplate the request
-	 * @param name the header name
-	 * @param values the header values
+	 * @param name            the header name
+	 * @param values          the header values
 	 */
 	protected void addHeader(RequestTemplate requestTemplate, String name, String... values) {
 

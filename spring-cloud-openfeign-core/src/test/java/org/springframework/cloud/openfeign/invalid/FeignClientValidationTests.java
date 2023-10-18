@@ -39,7 +39,7 @@ class FeignClientValidationTests {
 	@Test
 	void testServiceIdAndValue() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				LoadBalancerAutoConfiguration.class, NameAndServiceIdConfiguration.class);
+			LoadBalancerAutoConfiguration.class, NameAndServiceIdConfiguration.class);
 		assertThat(context.getBean(NameAndServiceIdConfiguration.Client.class)).isNotNull();
 		context.close();
 	}
@@ -58,12 +58,12 @@ class FeignClientValidationTests {
 	@Test
 	void testNotLegalHostname() {
 		assertThatExceptionOfType(IllegalStateException.class)
-				.isThrownBy(() -> new AnnotationConfigApplicationContext(BadHostnameConfiguration.class))
-				.withMessage("Service id not legal hostname (foo_bar)");
+			.isThrownBy(() -> new AnnotationConfigApplicationContext(BadHostnameConfiguration.class))
+			.withMessage("Service id not legal hostname (foo_bar)");
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
+	@Import({FeignAutoConfiguration.class})
 	@EnableFeignClients(clients = NameAndServiceIdConfiguration.Client.class)
 	protected static class NameAndServiceIdConfiguration {
 
@@ -78,9 +78,9 @@ class FeignClientValidationTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
-	@EnableFeignClients(clients = { DuplicatedFeignClientNamesConfiguration.FooClient.class,
-			DuplicatedFeignClientNamesConfiguration.BarClient.class })
+	@Import({FeignAutoConfiguration.class})
+	@EnableFeignClients(clients = {DuplicatedFeignClientNamesConfiguration.FooClient.class,
+		DuplicatedFeignClientNamesConfiguration.BarClient.class})
 	protected static class DuplicatedFeignClientNamesConfiguration {
 
 		@FeignClient(contextId = "foo", name = "bar")

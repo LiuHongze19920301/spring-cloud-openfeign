@@ -36,6 +36,7 @@ public interface FeignClientConfigurer {
 	 * <code>configuration()</code>. Will still use parent instance of
 	 * {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, and
 	 * {@link feign.Contract} if none are provided.
+	 *
 	 * @return weather to inherit parent context for client configuration.
 	 */
 	default boolean inheritParentConfiguration() {

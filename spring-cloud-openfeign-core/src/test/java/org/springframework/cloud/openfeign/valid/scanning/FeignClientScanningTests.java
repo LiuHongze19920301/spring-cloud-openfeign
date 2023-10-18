@@ -45,7 +45,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = FeignClientScanningTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false" })
+	value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false"})
 @DirtiesContext
 class FeignClientScanningTests {
 
@@ -114,7 +114,7 @@ class FeignClientScanningTests {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+				new DefaultServiceInstance("local-1", "local", "localhost", port, false));
 		}
 
 	}

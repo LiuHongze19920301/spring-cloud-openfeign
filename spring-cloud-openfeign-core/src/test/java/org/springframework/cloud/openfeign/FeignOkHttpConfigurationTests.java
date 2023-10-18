@@ -39,52 +39,52 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FeignOkHttpConfigurationTests {
 
-	private ConfigurableApplicationContext context;
+    private ConfigurableApplicationContext context;
 
-	@BeforeEach
-	void setUp() {
-		this.context = new SpringApplicationBuilder()
-				.properties("debug=true", "spring.cloud.openfeign.httpclient.disableSslValidation=true",
-						"spring.cloud.openfeign.okhttp.enabled=true",
-						"spring.cloud.openfeign.httpclient.hc5.enabled=false",
-						"spring.cloud.openfeign.httpclient.okhttp.read-timeout=9s",
-						"spring.cloud.openfeign.httpclient.okhttp.protocols=H2_PRIOR_KNOWLEDGE")
-				.web(WebApplicationType.NONE).sources(FeignAutoConfiguration.class).run();
-	}
+    @BeforeEach
+    void setUp() {
+        this.context = new SpringApplicationBuilder()
+            .properties("debug=true", "spring.cloud.openfeign.httpclient.disableSslValidation=true",
+                "spring.cloud.openfeign.okhttp.enabled=true",
+                "spring.cloud.openfeign.httpclient.hc5.enabled=false",
+                "spring.cloud.openfeign.httpclient.okhttp.read-timeout=9s",
+                "spring.cloud.openfeign.httpclient.okhttp.protocols=H2_PRIOR_KNOWLEDGE")
+            .web(WebApplicationType.NONE).sources(FeignAutoConfiguration.class).run();
+    }
 
-	@AfterEach
-	void tearDown() {
-		if (context != null) {
-			context.close();
-		}
-	}
+    @AfterEach
+    void tearDown() {
+        if (context != null) {
+            context.close();
+        }
+    }
 
-	@Test
-	void disableSslTest() {
-		OkHttpClient httpClient = context.getBean(OkHttpClient.class);
-		HostnameVerifier hostnameVerifier = (HostnameVerifier) this.getField(httpClient, "hostnameVerifier");
-		assertThat(hostnameVerifier instanceof FeignAutoConfiguration.OkHttpFeignConfiguration.TrustAllHostnames)
-				.isTrue();
-	}
+    @Test
+    void disableSslTest() {
+        OkHttpClient httpClient = context.getBean(OkHttpClient.class);
+        HostnameVerifier hostnameVerifier = (HostnameVerifier) this.getField(httpClient, "hostnameVerifier");
+        assertThat(hostnameVerifier instanceof FeignAutoConfiguration.OkHttpFeignConfiguration.TrustAllHostnames)
+            .isTrue();
+    }
 
-	@Test
-	void shouldConfigureReadTimeout() {
-		OkHttpClient httpClient = context.getBean(OkHttpClient.class);
+    @Test
+    void shouldConfigureReadTimeout() {
+        OkHttpClient httpClient = context.getBean(OkHttpClient.class);
 
-		assertThat(httpClient.readTimeoutMillis()).isEqualTo(9000);
-	}
+        assertThat(httpClient.readTimeoutMillis()).isEqualTo(9000);
+    }
 
-	@Test
-	void shouldResolveProtocolFromProperties() {
-		OkHttpClient httpClient = context.getBean(OkHttpClient.class);
+    @Test
+    void shouldResolveProtocolFromProperties() {
+        OkHttpClient httpClient = context.getBean(OkHttpClient.class);
 
-		assertThat(httpClient.protocols()).containsExactly(Protocol.H2_PRIOR_KNOWLEDGE);
-	}
+        assertThat(httpClient.protocols()).containsExactly(Protocol.H2_PRIOR_KNOWLEDGE);
+    }
 
-	protected Object getField(Object target, String name) {
-		Field field = ReflectionUtils.findField(target.getClass(), name);
-		ReflectionUtils.makeAccessible(field);
-		return ReflectionUtils.getField(field, target);
-	}
+    protected Object getField(Object target, String name) {
+        Field field = ReflectionUtils.findField(target.getClass(), name);
+        ReflectionUtils.makeAccessible(field);
+        return ReflectionUtils.getField(field, target);
+    }
 
 }

@@ -47,49 +47,49 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Jakub Narloch
  */
 @SpringBootTest(classes = FeignContentEncodingTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.cloud.openfeign.compression.request.enabled=true" })
+    value = {"spring.cloud.openfeign.compression.request.enabled=true"})
 class FeignContentEncodingTests {
 
-	@Autowired
-	private InvoiceClient invoiceClient;
+    @Autowired
+    private InvoiceClient invoiceClient;
 
-	@Test
-	void compressedResponse() {
+    @Test
+    void compressedResponse() {
 
-		// given
-		final List<Invoice> invoices = Invoices.createInvoiceList(50);
+        // given
+        final List<Invoice> invoices = Invoices.createInvoiceList(50);
 
-		// when
-		final ResponseEntity<List<Invoice>> response = this.invoiceClient.saveInvoices(invoices);
+        // when
+        final ResponseEntity<List<Invoice>> response = this.invoiceClient.saveInvoices(invoices);
 
-		// then
-		assertThat(response).isNotNull();
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody()).isNotNull();
-		assertThat(response.getBody().size()).isEqualTo(invoices.size());
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(invoices.size());
 
-	}
+    }
 
-	@EnableFeignClients(clients = InvoiceClient.class)
-	@LoadBalancerClient(name = "local", configuration = LocalClientConfiguration.class)
-	@SpringBootApplication(scanBasePackages = "org.springframework.cloud.openfeign.encoding.app")
-	@Import(NoSecurityConfiguration.class)
-	public static class Application {
+    @EnableFeignClients(clients = InvoiceClient.class)
+    @LoadBalancerClient(name = "local", configuration = LocalClientConfiguration.class)
+    @SpringBootApplication(scanBasePackages = "org.springframework.cloud.openfeign.encoding.app")
+    @Import(NoSecurityConfiguration.class)
+    public static class Application {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class LocalClientConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class LocalClientConfiguration {
 
-		@LocalServerPort
-		private int port = 0;
+        @LocalServerPort
+        private int port = 0;
 
-		@Bean
-		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
-			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
-		}
+        @Bean
+        public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
+            return ServiceInstanceListSuppliers.from("local",
+                new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+        }
 
-	}
+    }
 
 }

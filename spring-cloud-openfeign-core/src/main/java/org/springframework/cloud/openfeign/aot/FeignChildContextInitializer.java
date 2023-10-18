@@ -65,13 +65,13 @@ public class FeignChildContextInitializer implements BeanRegistrationAotProcesso
 		ConfigurableApplicationContext context = ((ConfigurableApplicationContext) applicationContext);
 		BeanFactory applicationBeanFactory = context.getBeanFactory();
 		if (!((registeredBean.getBeanClass().equals(FeignClientFactory.class))
-				&& registeredBean.getBeanFactory().equals(applicationBeanFactory))) {
+			&& registeredBean.getBeanFactory().equals(applicationBeanFactory))) {
 			return null;
 		}
 		Set<String> contextIds = new HashSet<>(getContextIdsFromConfig());
 		Map<String, GenericApplicationContext> childContextAotContributions = contextIds.stream()
-				.map(contextId -> Map.entry(contextId, buildChildContext(contextId)))
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+			.map(contextId -> Map.entry(contextId, buildChildContext(contextId)))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 		return new AotContribution(childContextAotContributions);
 	}
 
@@ -92,8 +92,8 @@ public class FeignChildContextInitializer implements BeanRegistrationAotProcesso
 
 		AotContribution(Map<String, GenericApplicationContext> childContexts) {
 			this.childContexts = childContexts.entrySet().stream().filter(entry -> entry.getValue() != null)
-					.map(entry -> Map.entry(entry.getKey(), entry.getValue()))
-					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+				.map(entry -> Map.entry(entry.getKey(), entry.getValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 		}
 
 		@Override
@@ -103,21 +103,21 @@ public class FeignChildContextInitializer implements BeanRegistrationAotProcesso
 				name = name.replaceAll("[-]", "_");
 				GenerationContext childGenerationContext = generationContext.withName(name);
 				ClassName initializerClassName = new ApplicationContextAotGenerator()
-						.processAheadOfTime(entry.getValue(), childGenerationContext);
+					.processAheadOfTime(entry.getValue(), childGenerationContext);
 				return Map.entry(entry.getKey(), initializerClassName);
 			}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 			GeneratedMethod postProcessorMethod = beanRegistrationCode.getMethods()
-					.add("addFeignChildContextInitializer", method -> {
-						method.addJavadoc("Use AOT child context management initialization")
-								.addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-								.addParameter(RegisteredBean.class, "registeredBean")
-								.addParameter(FeignClientFactory.class, "instance").returns(FeignClientFactory.class)
-								.addStatement("$T<String, Object> initializers = new $T<>()", Map.class, HashMap.class);
-						generatedInitializerClassNames.keySet()
-								.forEach(contextId -> method.addStatement("initializers.put($S, new $L())", contextId,
-										generatedInitializerClassNames.get(contextId)));
-						method.addStatement("return instance.withApplicationContextInitializers(initializers)");
-					});
+				.add("addFeignChildContextInitializer", method -> {
+					method.addJavadoc("Use AOT child context management initialization")
+						.addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+						.addParameter(RegisteredBean.class, "registeredBean")
+						.addParameter(FeignClientFactory.class, "instance").returns(FeignClientFactory.class)
+						.addStatement("$T<String, Object> initializers = new $T<>()", Map.class, HashMap.class);
+					generatedInitializerClassNames.keySet()
+						.forEach(contextId -> method.addStatement("initializers.put($S, new $L())", contextId,
+							generatedInitializerClassNames.get(contextId)));
+					method.addStatement("return instance.withApplicationContextInitializers(initializers)");
+				});
 			beanRegistrationCode.addInstancePostProcessor(postProcessorMethod.toMethodReference());
 		}
 

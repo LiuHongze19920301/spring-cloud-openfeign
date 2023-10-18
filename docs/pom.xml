@@ -28,7 +28,8 @@
 		<micrometer-docs-generator.version>1.0.2</micrometer-docs-generator.version>
 		<micrometer-docs-generator.inputPath>${maven.multiModuleProjectDirectory}/</micrometer-docs-generator.inputPath>
 		<micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
-		<micrometer-docs-generator.outputPath>${maven.multiModuleProjectDirectory}/docs/modules/ROOT/partials/</micrometer-docs-generator.outputPath>
+		<micrometer-docs-generator.outputPath>${maven.multiModuleProjectDirectory}/docs/modules/ROOT/partials/
+		</micrometer-docs-generator.outputPath>
 	</properties>
 	<dependencies>
 		<dependency>

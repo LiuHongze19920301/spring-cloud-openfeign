@@ -43,8 +43,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Ryan Baxter
  */
 @SpringBootTest(classes = FeignClientEnvVarTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false",
-				"basepackage=org.springframework.cloud.openfeign.testclients" })
+	value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false",
+		"basepackage=org.springframework.cloud.openfeign.testclients"})
 @DirtiesContext
 class FeignClientEnvVarTests {
 
@@ -61,7 +61,7 @@ class FeignClientEnvVarTests {
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@RestController
-	@EnableFeignClients(basePackages = { "${basepackage}" })
+	@EnableFeignClients(basePackages = {"${basepackage}"})
 	@LoadBalancerClient(name = "localapp", configuration = LocalClientConfiguration.class)
 	@Import(NoSecurityConfiguration.class)
 	protected static class Application {
@@ -83,7 +83,7 @@ class FeignClientEnvVarTests {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("localapp",
-					new DefaultServiceInstance("localapp-1", "localapp", "localhost", port, false));
+				new DefaultServiceInstance("localapp-1", "localapp", "localhost", port, false));
 		}
 
 	}

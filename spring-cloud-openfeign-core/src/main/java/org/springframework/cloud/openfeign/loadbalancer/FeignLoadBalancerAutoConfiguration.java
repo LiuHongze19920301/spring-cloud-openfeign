@@ -45,16 +45,16 @@ import org.springframework.context.annotation.Import;
  * @since 2.2.0
  */
 @ConditionalOnClass(Feign.class)
-@ConditionalOnBean({ LoadBalancerClient.class, LoadBalancerClientFactory.class })
+@ConditionalOnBean({LoadBalancerClient.class, LoadBalancerClientFactory.class})
 @AutoConfigureBefore(FeignAutoConfiguration.class)
-@AutoConfigureAfter({ BlockingLoadBalancerClientAutoConfiguration.class, LoadBalancerAutoConfiguration.class })
+@AutoConfigureAfter({BlockingLoadBalancerClientAutoConfiguration.class, LoadBalancerAutoConfiguration.class})
 @EnableConfigurationProperties(FeignHttpClientProperties.class)
 @Configuration(proxyBeanMethods = false)
 // Order is important here, last should be the default, first should be optional
 // see
 // https://github.com/spring-cloud/spring-cloud-netflix/issues/2086#issuecomment-316281653
-@Import({ OkHttpFeignLoadBalancerConfiguration.class, HttpClient5FeignLoadBalancerConfiguration.class,
-		Http2ClientFeignLoadBalancerConfiguration.class, DefaultFeignLoadBalancerConfiguration.class })
+@Import({OkHttpFeignLoadBalancerConfiguration.class, HttpClient5FeignLoadBalancerConfiguration.class,
+	Http2ClientFeignLoadBalancerConfiguration.class, DefaultFeignLoadBalancerConfiguration.class})
 public class FeignLoadBalancerAutoConfiguration {
 
 	@Bean

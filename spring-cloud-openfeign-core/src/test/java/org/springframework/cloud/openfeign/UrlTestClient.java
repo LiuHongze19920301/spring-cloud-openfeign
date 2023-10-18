@@ -34,71 +34,70 @@ import feign.Response;
  */
 public class UrlTestClient implements Client {
 
-	protected static ObjectMapper mapper;
+    protected static ObjectMapper mapper;
 
-	static {
-		mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
+    static {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-	@Override
-	public Response execute(Request request, Request.Options options) {
-		return Response.builder().status(200).request(request).headers(headers()).body(prepareResponse(request))
-				.build();
-	}
+    @Override
+    public Response execute(Request request, Request.Options options) {
+        return Response.builder().status(200).request(request).headers(headers()).body(prepareResponse(request))
+            .build();
+    }
 
-	private Map<String, Collection<String>> headers() {
-		Map<String, Collection<String>> headers = new LinkedHashMap<>();
-		headers.put("Content-Type", Collections.singletonList("application/json"));
-		return headers;
-	}
+    private Map<String, Collection<String>> headers() {
+        Map<String, Collection<String>> headers = new LinkedHashMap<>();
+        headers.put("Content-Type", Collections.singletonList("application/json"));
+        return headers;
+    }
 
-	private byte[] prepareResponse(Request request) {
-		try {
-			UrlResponseForTests response = new UrlResponseForTests(request.url(),
-					request.requestTemplate().feignTarget().getClass());
-			return mapper.writeValueAsString(response).getBytes();
-		}
-		catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private byte[] prepareResponse(Request request) {
+        try {
+            UrlResponseForTests response = new UrlResponseForTests(request.url(),
+                request.requestTemplate().feignTarget().getClass());
+            return mapper.writeValueAsString(response).getBytes();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	static class UrlResponseForTests {
+    static class UrlResponseForTests {
 
-		private String url;
+        private String url;
 
-		private Class<?> targetType;
+        private Class<?> targetType;
 
-		UrlResponseForTests() {
-		}
+        UrlResponseForTests() {
+        }
 
-		UrlResponseForTests(String url, Class<?> targetType) {
-			this.url = url;
-			this.targetType = targetType;
-		}
+        UrlResponseForTests(String url, Class<?> targetType) {
+            this.url = url;
+            this.targetType = targetType;
+        }
 
-		void setUrl(String url) {
-			this.url = url;
-		}
+        void setUrl(String url) {
+            this.url = url;
+        }
 
-		public String getUrl() {
-			return url;
-		}
+        public String getUrl() {
+            return url;
+        }
 
-		public Class<?> getTargetType() {
-			return targetType;
-		}
+        public Class<?> getTargetType() {
+            return targetType;
+        }
 
-		public void setTargetType(Class<?> targetType) {
-			this.targetType = targetType;
-		}
+        public void setTargetType(Class<?> targetType) {
+            this.targetType = targetType;
+        }
 
-		@Override
-		public String toString() {
-			return "UrlResponseForTests{" + "url='" + url + '\'' + ", targetType=" + targetType + '}';
-		}
+        @Override
+        public String toString() {
+            return "UrlResponseForTests{" + "url='" + url + '\'' + ", targetType=" + targetType + '}';
+        }
 
-	}
+    }
 
 }

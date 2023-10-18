@@ -32,7 +32,7 @@ public class FeignClientEncodingProperties {
 	/**
 	 * The list of supported mime types.
 	 */
-	private String[] mimeTypes = new String[] { "text/xml", "application/xml", "application/json" };
+	private String[] mimeTypes = new String[]{"text/xml", "application/xml", "application/json"};
 
 	/**
 	 * The minimum threshold content size.
@@ -75,8 +75,8 @@ public class FeignClientEncodingProperties {
 	@Override
 	public String toString() {
 		return new StringBuilder("FeignClientEncodingProperties{").append("mimeTypes=")
-				.append(Arrays.toString(mimeTypes)).append(", ").append("minRequestSize=").append(minRequestSize)
-				.append("}").toString();
+			.append(Arrays.toString(mimeTypes)).append(", ").append("minRequestSize=").append(minRequestSize)
+			.append("}").toString();
 	}
 
 }

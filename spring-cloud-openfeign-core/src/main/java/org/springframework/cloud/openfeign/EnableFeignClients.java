@@ -45,6 +45,7 @@ public @interface EnableFeignClients {
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation
 	 * declarations e.g.: {@code @ComponentScan("org.my.pkg")} instead of
 	 * {@code @ComponentScan(basePackages="org.my.pkg")}.
+	 *
 	 * @return the array of 'basePackages'.
 	 */
 	String[] value() default {};
@@ -56,6 +57,7 @@ public @interface EnableFeignClients {
 	 * <p>
 	 * Use {@link #basePackageClasses()} for a type-safe alternative to String-based
 	 * package names.
+	 *
 	 * @return the array of 'basePackages'.
 	 */
 	String[] basePackages() default {};
@@ -66,6 +68,7 @@ public @interface EnableFeignClients {
 	 * <p>
 	 * Consider creating a special no-op marker class or interface in each package that
 	 * serves no purpose other than being referenced by this attribute.
+	 *
 	 * @return the array of 'basePackageClasses'.
 	 */
 	Class<?>[] basePackageClasses() default {};
@@ -75,14 +78,15 @@ public @interface EnableFeignClients {
 	 * <code>@Bean</code> definition for the pieces that make up the client, for instance
 	 * {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, {@link feign.Contract}.
 	 *
-	 * @see FeignClientsConfiguration for the defaults
 	 * @return list of default configurations
+	 * @see FeignClientsConfiguration for the defaults
 	 */
 	Class<?>[] defaultConfiguration() default {};
 
 	/**
 	 * List of classes annotated with @FeignClient. If not empty, disables classpath
 	 * scanning.
+	 *
 	 * @return list of FeignClient classes
 	 */
 	Class<?>[] clients() default {};

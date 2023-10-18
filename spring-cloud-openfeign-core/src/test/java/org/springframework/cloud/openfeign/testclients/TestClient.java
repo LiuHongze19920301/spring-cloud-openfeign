@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "localapp")
 public interface TestClient {
 
-	@GetMapping("/hello")
-	String getHello();
+    @GetMapping("/hello")
+    String getHello();
 
 }

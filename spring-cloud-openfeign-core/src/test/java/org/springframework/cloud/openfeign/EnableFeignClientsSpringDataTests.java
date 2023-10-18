@@ -33,18 +33,18 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class EnableFeignClientsSpringDataTests {
 
-	@Autowired
-	private FeignClientFactory feignClientFactory;
+    @Autowired
+    private FeignClientFactory feignClientFactory;
 
-	@Test
-	void encoderDefaultCorrect() {
-		PageableSpringEncoder.class.cast(this.feignClientFactory.getInstance("foo", Encoder.class));
-	}
+    @Test
+    void encoderDefaultCorrect() {
+        PageableSpringEncoder.class.cast(this.feignClientFactory.getInstance("foo", Encoder.class));
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	protected static class PlainConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    protected static class PlainConfiguration {
 
-	}
+    }
 
 }

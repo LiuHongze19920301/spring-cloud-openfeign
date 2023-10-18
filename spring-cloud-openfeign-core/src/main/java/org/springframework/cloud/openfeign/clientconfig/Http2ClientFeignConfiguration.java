@@ -36,10 +36,10 @@ public class Http2ClientFeignConfiguration {
 	@Bean
 	public HttpClient httpClient(FeignHttpClientProperties httpClientProperties) {
 		return HttpClient.newBuilder()
-				.followRedirects(httpClientProperties.isFollowRedirects() ? HttpClient.Redirect.ALWAYS
-						: HttpClient.Redirect.NEVER)
-				.version(HttpClient.Version.valueOf(httpClientProperties.getHttp2().getVersion()))
-				.connectTimeout(Duration.ofMillis(httpClientProperties.getConnectionTimeout())).build();
+			.followRedirects(httpClientProperties.isFollowRedirects() ? HttpClient.Redirect.ALWAYS
+				: HttpClient.Redirect.NEVER)
+			.version(HttpClient.Version.valueOf(httpClientProperties.getHttp2().getVersion()))
+			.connectTimeout(Duration.ofMillis(httpClientProperties.getConnectionTimeout())).build();
 	}
 
 }

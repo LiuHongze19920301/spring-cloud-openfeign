@@ -71,19 +71,19 @@ public class OAuth2AccessTokenInterceptor implements RequestInterceptor {
 	private final OAuth2AuthorizedClientManager authorizedClientManager;
 
 	private static final Authentication ANONYMOUS_AUTHENTICATION = new AnonymousAuthenticationToken("anonymous",
-			"anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
+		"anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
 
 	public OAuth2AccessTokenInterceptor(OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
 		this(null, oAuth2AuthorizedClientManager);
 	}
 
 	public OAuth2AccessTokenInterceptor(String clientRegistrationId,
-			OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
+										OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
 		this(BEARER, AUTHORIZATION, clientRegistrationId, oAuth2AuthorizedClientManager);
 	}
 
 	public OAuth2AccessTokenInterceptor(String tokenType, String header, String clientRegistrationId,
-			OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
+										OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
 		this.tokenType = tokenType;
 		this.header = header;
 		this.clientRegistrationId = clientRegistrationId;
@@ -127,7 +127,7 @@ public class OAuth2AccessTokenInterceptor implements RequestInterceptor {
 		}
 
 		OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistrationId)
-				.principal(principal).build();
+			.principal(principal).build();
 		OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
 		return Optional.ofNullable(authorizedClient).map(OAuth2AuthorizedClient::getAccessToken).orElse(null);
 	}

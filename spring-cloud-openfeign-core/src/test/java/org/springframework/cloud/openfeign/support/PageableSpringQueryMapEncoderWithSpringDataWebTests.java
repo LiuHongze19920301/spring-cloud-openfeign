@@ -29,24 +29,24 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @EnableConfigurationProperties(SpringDataWebProperties.class)
 @SpringBootTest(classes = SpringEncoderTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.application.name=springencodertest", "spring.jmx.enabled=false",
-				"spring.data.web.pageable.pageParameter=pageNo", "spring.data.web.pageable.sizeParameter=pageSize",
-				"spring.data.web.sort.sortParameter=orderBy" })
+    value = {"spring.application.name=springencodertest", "spring.jmx.enabled=false",
+        "spring.data.web.pageable.pageParameter=pageNo", "spring.data.web.pageable.sizeParameter=pageSize",
+        "spring.data.web.sort.sortParameter=orderBy"})
 public class PageableSpringQueryMapEncoderWithSpringDataWebTests extends PageableSpringQueryMapEncoderTests {
 
-	@Override
-	protected String getPageParameter() {
-		return "pageNo";
-	}
+    @Override
+    protected String getPageParameter() {
+        return "pageNo";
+    }
 
-	@Override
-	protected String getSizeParameter() {
-		return "pageSize";
-	}
+    @Override
+    protected String getSizeParameter() {
+        return "pageSize";
+    }
 
-	@Override
-	protected String getSortParameter() {
-		return "orderBy";
-	}
+    @Override
+    protected String getSortParameter() {
+        return "orderBy";
+    }
 
 }

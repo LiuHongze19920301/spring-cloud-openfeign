@@ -103,7 +103,7 @@ public class FeignClientProperties {
 		}
 		FeignClientProperties that = (FeignClientProperties) o;
 		return defaultToProperties == that.defaultToProperties && Objects.equals(defaultConfig, that.defaultConfig)
-				&& Objects.equals(config, that.config) && Objects.equals(decodeSlash, that.decodeSlash);
+			&& Objects.equals(config, that.config) && Objects.equals(decodeSlash, that.decodeSlash);
 	}
 
 	@Override
@@ -320,27 +320,27 @@ public class FeignClientProperties {
 			}
 			FeignClientConfiguration that = (FeignClientConfiguration) o;
 			return loggerLevel == that.loggerLevel && Objects.equals(connectTimeout, that.connectTimeout)
-					&& Objects.equals(readTimeout, that.readTimeout) && Objects.equals(retryer, that.retryer)
-					&& Objects.equals(errorDecoder, that.errorDecoder)
-					&& Objects.equals(requestInterceptors, that.requestInterceptors)
-					&& Objects.equals(responseInterceptor, that.responseInterceptor)
-					&& Objects.equals(dismiss404, that.dismiss404) && Objects.equals(encoder, that.encoder)
-					&& Objects.equals(decoder, that.decoder) && Objects.equals(contract, that.contract)
-					&& Objects.equals(exceptionPropagationPolicy, that.exceptionPropagationPolicy)
-					&& Objects.equals(defaultRequestHeaders, that.defaultRequestHeaders)
-					&& Objects.equals(defaultQueryParameters, that.defaultQueryParameters)
-					&& Objects.equals(capabilities, that.capabilities)
-					&& Objects.equals(queryMapEncoder, that.queryMapEncoder)
-					&& Objects.equals(micrometer, that.micrometer)
-					&& Objects.equals(followRedirects, that.followRedirects) && Objects.equals(url, that.url);
+				&& Objects.equals(readTimeout, that.readTimeout) && Objects.equals(retryer, that.retryer)
+				&& Objects.equals(errorDecoder, that.errorDecoder)
+				&& Objects.equals(requestInterceptors, that.requestInterceptors)
+				&& Objects.equals(responseInterceptor, that.responseInterceptor)
+				&& Objects.equals(dismiss404, that.dismiss404) && Objects.equals(encoder, that.encoder)
+				&& Objects.equals(decoder, that.decoder) && Objects.equals(contract, that.contract)
+				&& Objects.equals(exceptionPropagationPolicy, that.exceptionPropagationPolicy)
+				&& Objects.equals(defaultRequestHeaders, that.defaultRequestHeaders)
+				&& Objects.equals(defaultQueryParameters, that.defaultQueryParameters)
+				&& Objects.equals(capabilities, that.capabilities)
+				&& Objects.equals(queryMapEncoder, that.queryMapEncoder)
+				&& Objects.equals(micrometer, that.micrometer)
+				&& Objects.equals(followRedirects, that.followRedirects) && Objects.equals(url, that.url);
 		}
 
 		@Override
 		public int hashCode() {
 			return Objects.hash(loggerLevel, connectTimeout, readTimeout, retryer, errorDecoder, requestInterceptors,
-					responseInterceptor, dismiss404, encoder, decoder, contract, exceptionPropagationPolicy,
-					defaultQueryParameters, defaultRequestHeaders, capabilities, queryMapEncoder, micrometer,
-					followRedirects, url);
+				responseInterceptor, dismiss404, encoder, decoder, contract, exceptionPropagationPolicy,
+				defaultQueryParameters, defaultRequestHeaders, capabilities, queryMapEncoder, micrometer,
+				followRedirects, url);
 		}
 
 	}

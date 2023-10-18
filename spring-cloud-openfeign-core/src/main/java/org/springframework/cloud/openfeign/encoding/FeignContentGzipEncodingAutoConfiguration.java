@@ -46,7 +46,7 @@ public class FeignContentGzipEncodingAutoConfiguration {
 
 	@Bean
 	public FeignContentGzipEncodingInterceptor feignContentGzipEncodingInterceptor(
-			FeignClientEncodingProperties properties) {
+		FeignClientEncodingProperties properties) {
 		return new FeignContentGzipEncodingInterceptor(properties);
 	}
 

@@ -47,78 +47,78 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 @DirtiesContext
 public class FeignClientCacheTests {
 
-	private static final String CACHE_NAME = "foo-cache";
+    private static final String CACHE_NAME = "foo-cache";
 
-	@Autowired
-	private FooClient foo;
+    @Autowired
+    private FooClient foo;
 
-	@Test
-	void cacheExists(@Autowired CacheManager cacheManager) {
-		assertThat(cacheManager.getCache(CACHE_NAME)).isNotNull();
-	}
+    @Test
+    void cacheExists(@Autowired CacheManager cacheManager) {
+        assertThat(cacheManager.getCache(CACHE_NAME)).isNotNull();
+    }
 
-	@Test
-	void interceptedCallsReal() {
-		assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithCache)
-				.withRootCauseInstanceOf(UnknownHostException.class);
-	}
+    @Test
+    void interceptedCallsReal() {
+        assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithCache)
+            .withRootCauseInstanceOf(UnknownHostException.class);
+    }
 
-	@Test
-	void nonInterceptedCallsReal() {
-		assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithoutCache)
-				.withRootCauseInstanceOf(UnknownHostException.class);
-	}
+    @Test
+    void nonInterceptedCallsReal() {
+        assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithoutCache)
+            .withRootCauseInstanceOf(UnknownHostException.class);
+    }
 
-	@Nested
-	class givenCached {
+    @Nested
+    class givenCached {
 
-		String cachedValue = "cached";
+        String cachedValue = "cached";
 
-		@BeforeEach
-		void setUp(@Autowired CacheManager cacheManager) {
-			cacheManager.getCache(CACHE_NAME).put(SimpleKey.EMPTY, cachedValue);
-		}
+        @BeforeEach
+        void setUp(@Autowired CacheManager cacheManager) {
+            cacheManager.getCache(CACHE_NAME).put(SimpleKey.EMPTY, cachedValue);
+        }
 
-		@Test
-		void interceptedReturnsCached() {
-			assertThat(foo.getWithCache()).isSameAs(cachedValue);
-		}
+        @Test
+        void interceptedReturnsCached() {
+            assertThat(foo.getWithCache()).isSameAs(cachedValue);
+        }
 
-		@Test
-		void nonInterceptedCallsReal() {
-			assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithoutCache)
-					.withRootCauseInstanceOf(UnknownHostException.class);
-		}
+        @Test
+        void nonInterceptedCallsReal() {
+            assertThatExceptionOfType(RetryableException.class).isThrownBy(foo::getWithoutCache)
+                .withRootCauseInstanceOf(UnknownHostException.class);
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = FooClient.class)
-	@EnableAutoConfiguration
-	@EnableCaching
-	protected static class TestConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableFeignClients(clients = FooClient.class)
+    @EnableAutoConfiguration
+    @EnableCaching
+    protected static class TestConfiguration {
 
-	}
+    }
 
-	@FeignClient(name = "foo", url = "http://foo", configuration = FooConfiguration.class)
-	interface FooClient {
+    @FeignClient(name = "foo", url = "http://foo", configuration = FooConfiguration.class)
+    interface FooClient {
 
-		@RequestLine("GET /with-cache")
-		@Cacheable(cacheNames = CACHE_NAME)
-		String getWithCache();
+        @RequestLine("GET /with-cache")
+        @Cacheable(cacheNames = CACHE_NAME)
+        String getWithCache();
 
-		@RequestLine("GET /without-cache")
-		String getWithoutCache();
+        @RequestLine("GET /without-cache")
+        String getWithoutCache();
 
-	}
+    }
 
-	public static class FooConfiguration {
+    public static class FooConfiguration {
 
-		@Bean
-		Contract feignContract() {
-			return new Contract.Default();
-		}
+        @Bean
+        Contract feignContract() {
+            return new Contract.Default();
+        }
 
-	}
+    }
 
 }

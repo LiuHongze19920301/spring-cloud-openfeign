@@ -41,185 +41,185 @@ import static org.mockito.Mockito.when;
 /**
  * @author Jonatan Ivanov
  */
-@ExtendWith({ MockitoExtension.class })
+@ExtendWith({MockitoExtension.class})
 class FeignClientMicrometerEnabledConditionTests {
 
-	@Mock
-	private ConditionContext context;
+    @Mock
+    private ConditionContext context;
 
-	@Mock
-	private AnnotatedTypeMetadata metadata;
+    @Mock
+    private AnnotatedTypeMetadata metadata;
 
-	@Mock
-	private ConfigurableListableBeanFactory beanFactory;
+    @Mock
+    private ConfigurableListableBeanFactory beanFactory;
 
-	@Mock
-	private ObjectProvider<FeignClientProperties> beanProvider;
+    @Mock
+    private ObjectProvider<FeignClientProperties> beanProvider;
 
-	@Mock
-	private Environment environment;
+    @Mock
+    private Environment environment;
 
-	private final FeignClientMicrometerEnabledCondition condition = new FeignClientMicrometerEnabledCondition();
+    private final FeignClientMicrometerEnabledCondition condition = new FeignClientMicrometerEnabledCondition();
 
-	@BeforeEach
-	void setUp() {
-		when(context.getBeanFactory()).thenReturn(beanFactory);
-		when(beanFactory.getBeanProvider(FeignClientProperties.class)).thenReturn(beanProvider);
-	}
+    @BeforeEach
+    void setUp() {
+        when(context.getBeanFactory()).thenReturn(beanFactory);
+        when(beanFactory.getBeanProvider(FeignClientProperties.class)).thenReturn(beanProvider);
+    }
 
-	@AfterEach
-	void tearDown() {
-		verify(context).getBeanFactory();
-		verify(beanFactory).getBeanProvider(FeignClientProperties.class);
-		verify(beanProvider).getIfAvailable();
-	}
+    @AfterEach
+    void tearDown() {
+        verify(context).getBeanFactory();
+        verify(beanFactory).getBeanProvider(FeignClientProperties.class);
+        verify(beanProvider).getIfAvailable();
+    }
 
-	@Test
-	void shouldMatchWhenFeignClientPropertiesBeanIsMissing() {
-		when(beanProvider.getIfAvailable()).thenReturn(null);
+    @Test
+    void shouldMatchWhenFeignClientPropertiesBeanIsMissing() {
+        when(beanProvider.getIfAvailable()).thenReturn(null);
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment, never()).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment, never()).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenConfigMapIsMissing() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(feignClientProperties.getConfig()).thenReturn(null);
+    @Test
+    void shouldMatchWhenConfigMapIsMissing() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(feignClientProperties.getConfig()).thenReturn(null);
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment, never()).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment, never()).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenConfigMapDoesNotContainTheConfig() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
+    @Test
+    void shouldMatchWhenConfigMapDoesNotContainTheConfig() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenClientNameIsNull() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn(null);
-		when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
+    @Test
+    void shouldMatchWhenClientNameIsNull() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn(null);
+        when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenClientNameIsEmpty() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("");
-		when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
+    @Test
+    void shouldMatchWhenClientNameIsEmpty() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("");
+        when(feignClientProperties.getConfig()).thenReturn(new HashMap<>());
 
-		assertThat(condition.matches(context, metadata)).isTrue();
+        assertThat(condition.matches(context, metadata)).isTrue();
 
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenConfigMapContainsNullConfig() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", null));
+    @Test
+    void shouldMatchWhenConfigMapContainsNullConfig() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", null));
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenMicrometerConfigurationIsMissing() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
-				FeignClientProperties.FeignClientConfiguration.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
-		when(feignClientConfig.getMicrometer()).thenReturn(null);
+    @Test
+    void shouldMatchWhenMicrometerConfigurationIsMissing() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
+            FeignClientProperties.FeignClientConfiguration.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
+        when(feignClientConfig.getMicrometer()).thenReturn(null);
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenEnabledFlagIsNotSet() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
-				FeignClientProperties.FeignClientConfiguration.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
-		when(feignClientConfig.getMicrometer()).thenReturn(new FeignClientProperties.MicrometerProperties());
+    @Test
+    void shouldMatchWhenEnabledFlagIsNotSet() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
+            FeignClientProperties.FeignClientConfiguration.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
+        when(feignClientConfig.getMicrometer()).thenReturn(new FeignClientProperties.MicrometerProperties());
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenEnabledFlagIsNull() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
-				FeignClientProperties.FeignClientConfiguration.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
-		FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
-		micrometer.setEnabled(null);
-		when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
+    @Test
+    void shouldMatchWhenEnabledFlagIsNull() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
+            FeignClientProperties.FeignClientConfiguration.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
+        FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
+        micrometer.setEnabled(null);
+        when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldMatchWhenMicrometerConfigurationIsEnabled() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
-				FeignClientProperties.FeignClientConfiguration.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
-		FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
-		micrometer.setEnabled(true);
-		when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
+    @Test
+    void shouldMatchWhenMicrometerConfigurationIsEnabled() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
+            FeignClientProperties.FeignClientConfiguration.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
+        FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
+        micrometer.setEnabled(true);
+        when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
 
-		assertThat(condition.matches(context, metadata)).isTrue();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isTrue();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
-	@Test
-	void shouldNotMatchWhenMicrometerConfigurationIsEnabled() {
-		FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
-		FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
-				FeignClientProperties.FeignClientConfiguration.class);
-		when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
-		when(context.getEnvironment()).thenReturn(environment);
-		when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
-		when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
-		FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
-		micrometer.setEnabled(false);
-		when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
+    @Test
+    void shouldNotMatchWhenMicrometerConfigurationIsEnabled() {
+        FeignClientProperties feignClientProperties = mock(FeignClientProperties.class);
+        FeignClientProperties.FeignClientConfiguration feignClientConfig = mock(
+            FeignClientProperties.FeignClientConfiguration.class);
+        when(beanProvider.getIfAvailable()).thenReturn(feignClientProperties);
+        when(context.getEnvironment()).thenReturn(environment);
+        when(environment.getProperty("spring.cloud.openfeign.client.name")).thenReturn("foo");
+        when(feignClientProperties.getConfig()).thenReturn(Maps.newHashMap("foo", feignClientConfig));
+        FeignClientProperties.MicrometerProperties micrometer = new FeignClientProperties.MicrometerProperties();
+        micrometer.setEnabled(false);
+        when(feignClientConfig.getMicrometer()).thenReturn(micrometer);
 
-		assertThat(condition.matches(context, metadata)).isFalse();
-		verify(environment).getProperty("spring.cloud.openfeign.client.name");
-	}
+        assertThat(condition.matches(context, metadata)).isFalse();
+        verify(environment).getProperty("spring.cloud.openfeign.client.name");
+    }
 
 }

@@ -36,8 +36,8 @@ import org.springframework.hateoas.config.WebConverters;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
 @ConditionalOnClass(WebConverters.class)
-@AutoConfigureAfter({ JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
-		RepositoryRestMvcAutoConfiguration.class, HateoasConfiguration.class })
+@AutoConfigureAfter({JacksonAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class,
+	RepositoryRestMvcAutoConfiguration.class, HateoasConfiguration.class})
 public class FeignHalAutoConfiguration {
 
 	@Bean

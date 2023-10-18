@@ -34,57 +34,57 @@ import static org.springframework.cloud.openfeign.test.EqualsAndHashCodeAssert.a
  */
 class FeignClientPropertiesTests {
 
-	@Test
-	void shouldDefaultToValuesWhenFieldsNotSet() {
-		FeignClientProperties properties = new FeignClientProperties();
-		assertThat(properties.isDefaultToProperties()).isTrue();
-		assertThat(properties.getDefaultConfig()).isEqualTo("default");
-		assertThat(properties.getConfig()).isEmpty();
-		assertThat(properties.isDecodeSlash()).isTrue();
-	}
+    @Test
+    void shouldDefaultToValuesWhenFieldsNotSet() {
+        FeignClientProperties properties = new FeignClientProperties();
+        assertThat(properties.isDefaultToProperties()).isTrue();
+        assertThat(properties.getDefaultConfig()).isEqualTo("default");
+        assertThat(properties.getConfig()).isEmpty();
+        assertThat(properties.isDecodeSlash()).isTrue();
+    }
 
-	@Test
-	void shouldReturnValuesWhenSet() {
-		FeignClientProperties properties = new FeignClientProperties();
-		properties.setDefaultToProperties(false);
-		properties.setDefaultConfig("custom");
-		Map<String, FeignClientProperties.FeignClientConfiguration> configMap = Maps.newHashMap("foo", null);
-		properties.setConfig(configMap);
-		properties.setDecodeSlash(false);
+    @Test
+    void shouldReturnValuesWhenSet() {
+        FeignClientProperties properties = new FeignClientProperties();
+        properties.setDefaultToProperties(false);
+        properties.setDefaultConfig("custom");
+        Map<String, FeignClientProperties.FeignClientConfiguration> configMap = Maps.newHashMap("foo", null);
+        properties.setConfig(configMap);
+        properties.setDecodeSlash(false);
 
-		assertThat(properties.isDefaultToProperties()).isFalse();
-		assertThat(properties.getDefaultConfig()).isEqualTo("custom");
-		assertThat(properties.getConfig()).isSameAs(configMap);
-		assertThat(properties.isDecodeSlash()).isFalse();
-	}
+        assertThat(properties.isDefaultToProperties()).isFalse();
+        assertThat(properties.getDefaultConfig()).isEqualTo("custom");
+        assertThat(properties.getConfig()).isSameAs(configMap);
+        assertThat(properties.isDecodeSlash()).isFalse();
+    }
 
-	/**
-	 * Sanity-checks equals and hashCode contracts but does not check every variation of
-	 * the fields.
-	 */
-	@Test
-	void shouldHaveSomewhatValidEqualsAndHashCode() {
-		FeignClientProperties propsOne = new FeignClientProperties();
-		FeignClientProperties propsTwo = new FeignClientProperties();
-		FeignClientProperties propsThree = new FeignClientProperties();
-		FeignClientProperties differentProps = new FeignClientProperties();
-		differentProps.setDecodeSlash(false);
+    /**
+     * Sanity-checks equals and hashCode contracts but does not check every variation of
+     * the fields.
+     */
+    @Test
+    void shouldHaveSomewhatValidEqualsAndHashCode() {
+        FeignClientProperties propsOne = new FeignClientProperties();
+        FeignClientProperties propsTwo = new FeignClientProperties();
+        FeignClientProperties propsThree = new FeignClientProperties();
+        FeignClientProperties differentProps = new FeignClientProperties();
+        differentProps.setDecodeSlash(false);
 
-		assertEqualsReflexivity(propsOne);
+        assertEqualsReflexivity(propsOne);
 
-		assertEqualsSymmetricity(propsOne, propsTwo);
-		assertEqualsSymmetricity(propsOne, differentProps);
-		assertEqualsSymmetricity(propsOne, 42);
+        assertEqualsSymmetricity(propsOne, propsTwo);
+        assertEqualsSymmetricity(propsOne, differentProps);
+        assertEqualsSymmetricity(propsOne, 42);
 
-		assertEqualsTransitivity(propsOne, propsTwo, propsThree);
+        assertEqualsTransitivity(propsOne, propsTwo, propsThree);
 
-		assertEqualsConsistency(propsOne, propsTwo);
-		assertEqualsConsistency(propsOne, differentProps);
-		assertEqualsConsistency(propsOne, 42);
-		assertEqualsConsistency(propsOne, null);
+        assertEqualsConsistency(propsOne, propsTwo);
+        assertEqualsConsistency(propsOne, differentProps);
+        assertEqualsConsistency(propsOne, 42);
+        assertEqualsConsistency(propsOne, null);
 
-		assertHashCodeConsistency(propsOne);
-		assertEqualsAndHashCodeConsistency(propsOne, propsTwo);
-	}
+        assertHashCodeConsistency(propsOne);
+        assertEqualsAndHashCodeConsistency(propsOne, propsTwo);
+    }
 
 }

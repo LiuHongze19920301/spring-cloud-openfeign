@@ -43,86 +43,85 @@ import static org.mockito.Mockito.when;
  *
  * @author Dangzhicairang(小水牛)
  * @author Olga Maciaszek-Sharma
- *
  */
 class OAuth2AccessTokenInterceptorTests {
 
-	private final OAuth2AuthorizedClientManager mockOAuth2AuthorizedClientManager = mock(
-			OAuth2AuthorizedClientManager.class);
+    private final OAuth2AuthorizedClientManager mockOAuth2AuthorizedClientManager = mock(
+        OAuth2AuthorizedClientManager.class);
 
-	private OAuth2AccessTokenInterceptor oAuth2AccessTokenInterceptor;
+    private OAuth2AccessTokenInterceptor oAuth2AccessTokenInterceptor;
 
-	private RequestTemplate requestTemplate;
+    private RequestTemplate requestTemplate;
 
-	private static final String DEFAULT_CLIENT_REGISTRATION_ID = "feign-client";
+    private static final String DEFAULT_CLIENT_REGISTRATION_ID = "feign-client";
 
-	@BeforeEach
-	void setUp() {
-		requestTemplate = new RequestTemplate().method(HttpMethod.GET);
-		Target<?> feignTarget = mock(Target.class);
-		when(feignTarget.url()).thenReturn("http://test");
-		requestTemplate.feignTarget(feignTarget);
-	}
+    @BeforeEach
+    void setUp() {
+        requestTemplate = new RequestTemplate().method(HttpMethod.GET);
+        Target<?> feignTarget = mock(Target.class);
+        when(feignTarget.url()).thenReturn("http://test");
+        requestTemplate.feignTarget(feignTarget);
+    }
 
-	@Test
-	void shouldThrowExceptionWhenNoTokenAcquired() {
-		oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
-		when(mockOAuth2AuthorizedClientManager.authorize(any())).thenReturn(null);
+    @Test
+    void shouldThrowExceptionWhenNoTokenAcquired() {
+        oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
+        when(mockOAuth2AuthorizedClientManager.authorize(any())).thenReturn(null);
 
-		assertThatExceptionOfType(IllegalStateException.class)
-				.isThrownBy(() -> oAuth2AccessTokenInterceptor.apply(requestTemplate))
-				.withMessage("OAuth2 token has not been successfully acquired.");
-	}
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> oAuth2AccessTokenInterceptor.apply(requestTemplate))
+            .withMessage("OAuth2 token has not been successfully acquired.");
+    }
 
-	@Test
-	void shouldAcquireValidToken() {
-		oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
-		when(mockOAuth2AuthorizedClientManager.authorize(
-				argThat((OAuth2AuthorizeRequest request) -> ("test").equals(request.getClientRegistrationId()))))
-						.thenReturn(validTokenOAuth2AuthorizedClient());
+    @Test
+    void shouldAcquireValidToken() {
+        oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
+        when(mockOAuth2AuthorizedClientManager.authorize(
+            argThat((OAuth2AuthorizeRequest request) -> ("test").equals(request.getClientRegistrationId()))))
+            .thenReturn(validTokenOAuth2AuthorizedClient());
 
-		oAuth2AccessTokenInterceptor.apply(requestTemplate);
+        oAuth2AccessTokenInterceptor.apply(requestTemplate);
 
-		assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
-	}
+        assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
+    }
 
-	@Test
-	void shouldAcquireValidTokenFromServiceId() {
-		when(mockOAuth2AuthorizedClientManager.authorize(
-				argThat((OAuth2AuthorizeRequest request) -> ("test").equals(request.getClientRegistrationId()))))
-						.thenReturn(validTokenOAuth2AuthorizedClient());
-		oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
+    @Test
+    void shouldAcquireValidTokenFromServiceId() {
+        when(mockOAuth2AuthorizedClientManager.authorize(
+            argThat((OAuth2AuthorizeRequest request) -> ("test").equals(request.getClientRegistrationId()))))
+            .thenReturn(validTokenOAuth2AuthorizedClient());
+        oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(mockOAuth2AuthorizedClientManager);
 
-		oAuth2AccessTokenInterceptor.apply(requestTemplate);
+        oAuth2AccessTokenInterceptor.apply(requestTemplate);
 
-		assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
-	}
+        assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
+    }
 
-	@Test
-	void shouldAcquireValidTokenFromSpecifiedClientRegistrationId() {
-		oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(DEFAULT_CLIENT_REGISTRATION_ID,
-				mockOAuth2AuthorizedClientManager);
-		when(mockOAuth2AuthorizedClientManager
-				.authorize(argThat((OAuth2AuthorizeRequest request) -> (DEFAULT_CLIENT_REGISTRATION_ID)
-						.equals(request.getClientRegistrationId())))).thenReturn(validTokenOAuth2AuthorizedClient());
+    @Test
+    void shouldAcquireValidTokenFromSpecifiedClientRegistrationId() {
+        oAuth2AccessTokenInterceptor = new OAuth2AccessTokenInterceptor(DEFAULT_CLIENT_REGISTRATION_ID,
+            mockOAuth2AuthorizedClientManager);
+        when(mockOAuth2AuthorizedClientManager
+            .authorize(argThat((OAuth2AuthorizeRequest request) -> (DEFAULT_CLIENT_REGISTRATION_ID)
+                .equals(request.getClientRegistrationId())))).thenReturn(validTokenOAuth2AuthorizedClient());
 
-		oAuth2AccessTokenInterceptor.apply(requestTemplate);
+        oAuth2AccessTokenInterceptor.apply(requestTemplate);
 
-		assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
-	}
+        assertThat(requestTemplate.headers().get("Authorization")).contains("Bearer Valid Token");
+    }
 
-	private OAuth2AccessToken validToken() {
-		return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, "Valid Token", Instant.now(),
-				Instant.now().plusSeconds(60L));
-	}
+    private OAuth2AccessToken validToken() {
+        return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, "Valid Token", Instant.now(),
+            Instant.now().plusSeconds(60L));
+    }
 
-	private OAuth2AuthorizedClient validTokenOAuth2AuthorizedClient() {
-		return new OAuth2AuthorizedClient(defaultClientRegistration(), "anonymousUser", validToken());
-	}
+    private OAuth2AuthorizedClient validTokenOAuth2AuthorizedClient() {
+        return new OAuth2AuthorizedClient(defaultClientRegistration(), "anonymousUser", validToken());
+    }
 
-	private ClientRegistration defaultClientRegistration() {
-		return ClientRegistration.withRegistrationId(DEFAULT_CLIENT_REGISTRATION_ID).clientId("clientId")
-				.tokenUri("mock token uri").authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS).build();
-	}
+    private ClientRegistration defaultClientRegistration() {
+        return ClientRegistration.withRegistrationId(DEFAULT_CLIENT_REGISTRATION_ID).clientId("clientId")
+            .tokenUri("mock token uri").authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS).build();
+    }
 
 }

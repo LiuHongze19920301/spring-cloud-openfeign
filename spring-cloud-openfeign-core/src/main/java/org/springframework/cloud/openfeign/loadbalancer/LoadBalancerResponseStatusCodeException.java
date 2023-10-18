@@ -35,7 +35,7 @@ public class LoadBalancerResponseStatusCodeException extends RetryableStatusCode
 	public LoadBalancerResponseStatusCodeException(String serviceId, Response response, byte[] body, URI uri) {
 		super(serviceId, response.status(), response, uri);
 		this.response = Response.builder().body(new ByteArrayInputStream(body), body.length).headers(response.headers())
-				.reason(response.reason()).status(response.status()).request(response.request()).build();
+			.reason(response.reason()).status(response.status()).request(response.request()).build();
 	}
 
 	@Override

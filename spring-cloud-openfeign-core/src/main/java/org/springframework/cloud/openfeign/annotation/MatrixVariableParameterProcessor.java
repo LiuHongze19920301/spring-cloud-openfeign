@@ -31,7 +31,7 @@ import static feign.Util.emptyToNull;
 
 /**
  * {@link MatrixVariable} annotation processor.
- *
+ * <p>
  * Can expand maps or single objects. Values are assigned from the objects
  * {@code toString()} method.
  *
@@ -55,14 +55,13 @@ public class MatrixVariableParameterProcessor implements AnnotatedParameterProce
 		String name = ANNOTATION.cast(annotation).value();
 
 		checkState(emptyToNull(name) != null, "MatrixVariable annotation was empty on param %s.",
-				context.getParameterIndex());
+			context.getParameterIndex());
 
 		context.setParameterName(name);
 
 		if (Map.class.isAssignableFrom(parameterType)) {
 			data.indexToExpander().put(parameterIndex, this::expandMap);
-		}
-		else {
+		} else {
 			data.indexToExpander().put(parameterIndex, object -> ";" + name + "=" + object.toString());
 		}
 
@@ -74,7 +73,7 @@ public class MatrixVariableParameterProcessor implements AnnotatedParameterProce
 		Map<String, Object> paramMap = (Map) object;
 
 		return paramMap.keySet().stream().filter(key -> paramMap.get(key) != null)
-				.map(key -> ";" + key + "=" + paramMap.get(key).toString()).collect(Collectors.joining());
+			.map(key -> ";" + key + "=" + paramMap.get(key).toString()).collect(Collectors.joining());
 	}
 
 }

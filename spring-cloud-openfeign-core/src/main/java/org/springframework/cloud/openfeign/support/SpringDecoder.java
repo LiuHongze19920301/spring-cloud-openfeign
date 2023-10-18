@@ -59,7 +59,7 @@ public class SpringDecoder implements Decoder {
 	}
 
 	public SpringDecoder(ObjectFactory<HttpMessageConverters> messageConverters,
-			ObjectProvider<HttpMessageConverterCustomizer> customizers) {
+						 ObjectProvider<HttpMessageConverterCustomizer> customizers) {
 		this.messageConverters = messageConverters;
 		this.customizers = customizers;
 	}
@@ -69,13 +69,13 @@ public class SpringDecoder implements Decoder {
 		if (type instanceof Class || type instanceof ParameterizedType || type instanceof WildcardType) {
 			List<HttpMessageConverter<?>> converters = messageConverters.getObject().getConverters();
 			customizers.forEach(customizer -> customizer.accept(converters));
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings({"unchecked", "rawtypes"})
 			HttpMessageConverterExtractor<?> extractor = new HttpMessageConverterExtractor(type, converters);
 
 			return extractor.extractData(new FeignResponseAdapter(response));
 		}
 		throw new DecodeException(response.status(), "type is not an instance of Class or ParameterizedType: " + type,
-				response.request());
+			response.request());
 	}
 
 	private final class FeignResponseAdapter implements ClientHttpResponse {
@@ -105,8 +105,7 @@ public class SpringDecoder implements Decoder {
 		public void close() {
 			try {
 				response.body().close();
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				// Ignore exception on close...
 			}
 		}

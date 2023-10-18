@@ -29,31 +29,29 @@ import org.springframework.cloud.client.circuitbreaker.NoFallbackAvailableExcept
  */
 class MyCircuitBreaker implements CircuitBreaker {
 
-	AtomicBoolean runWasCalled = new AtomicBoolean();
+    AtomicBoolean runWasCalled = new AtomicBoolean();
 
-	@Override
-	public <T> T run(Supplier<T> toRun) {
-		try {
-			this.runWasCalled.set(true);
-			return toRun.get();
-		}
-		catch (Throwable throwable) {
-			throw new NoFallbackAvailableException("No fallback available.", throwable);
-		}
-	}
+    @Override
+    public <T> T run(Supplier<T> toRun) {
+        try {
+            this.runWasCalled.set(true);
+            return toRun.get();
+        } catch (Throwable throwable) {
+            throw new NoFallbackAvailableException("No fallback available.", throwable);
+        }
+    }
 
-	@Override
-	public <T> T run(Supplier<T> toRun, Function<Throwable, T> fallback) {
-		try {
-			return run(toRun);
-		}
-		catch (Throwable throwable) {
-			return fallback.apply(throwable);
-		}
-	}
+    @Override
+    public <T> T run(Supplier<T> toRun, Function<Throwable, T> fallback) {
+        try {
+            return run(toRun);
+        } catch (Throwable throwable) {
+            return fallback.apply(throwable);
+        }
+    }
 
-	public void clear() {
-		this.runWasCalled.set(false);
-	}
+    public void clear() {
+        this.runWasCalled.set(false);
+    }
 
 }

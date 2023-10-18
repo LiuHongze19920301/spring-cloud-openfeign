@@ -100,8 +100,8 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(Feign.class)
-@EnableConfigurationProperties({ FeignClientProperties.class, FeignHttpClientProperties.class,
-		FeignEncoderProperties.class })
+@EnableConfigurationProperties({FeignClientProperties.class, FeignHttpClientProperties.class,
+	FeignEncoderProperties.class})
 public class FeignAutoConfiguration {
 
 	private static final Log LOG = LogFactory.getLog(FeignAutoConfiguration.class);
@@ -123,13 +123,13 @@ public class FeignAutoConfiguration {
 
 	@Bean
 	static FeignChildContextInitializer feignChildContextInitializer(GenericApplicationContext parentContext,
-			FeignClientFactory feignClientFactory) {
+																	 FeignClientFactory feignClientFactory) {
 		return new FeignChildContextInitializer(parentContext, feignClientFactory);
 	}
 
 	@Bean
 	static FeignClientBeanFactoryInitializationAotProcessor feignClientBeanFactoryInitializationCodeGenerator(
-			GenericApplicationContext applicationContext, FeignClientFactory feignClientFactory) {
+		GenericApplicationContext applicationContext, FeignClientFactory feignClientFactory) {
 		return new FeignClientBeanFactoryInitializationAotProcessor(applicationContext, feignClientFactory);
 	}
 
@@ -141,9 +141,9 @@ public class FeignAutoConfiguration {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnClass({ Module.class, Page.class, Sort.class })
+	@ConditionalOnClass({Module.class, Page.class, Sort.class})
 	@ConditionalOnProperty(value = "spring.cloud.openfeign.autoconfiguration.jackson.enabled", havingValue = "true",
-			matchIfMissing = true)
+		matchIfMissing = true)
 	protected static class FeignJacksonConfiguration {
 
 		@Bean
@@ -186,7 +186,7 @@ public class FeignAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean(CircuitBreakerNameResolver.class)
 		@ConditionalOnProperty(value = "spring.cloud.openfeign.circuitbreaker.alphanumeric-ids.enabled",
-				havingValue = "false")
+			havingValue = "false")
 		public CircuitBreakerNameResolver circuitBreakerNameResolver() {
 			return new DefaultCircuitBreakerNameResolver();
 		}
@@ -194,7 +194,7 @@ public class FeignAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean(CircuitBreakerNameResolver.class)
 		@ConditionalOnProperty(value = "spring.cloud.openfeign.circuitbreaker.alphanumeric-ids.enabled",
-				havingValue = "true", matchIfMissing = true)
+			havingValue = "true", matchIfMissing = true)
 		public CircuitBreakerNameResolver alphanumericCircuitBreakerNameResolver() {
 			return new AlphanumericCircuitBreakerNameResolver();
 		}
@@ -204,10 +204,10 @@ public class FeignAutoConfiguration {
 		@ConditionalOnMissingBean
 		@ConditionalOnBean(CircuitBreakerFactory.class)
 		public Targeter circuitBreakerFeignTargeter(CircuitBreakerFactory circuitBreakerFactory,
-				@Value("${spring.cloud.openfeign.circuitbreaker.group.enabled:false}") boolean circuitBreakerGroupEnabled,
-				CircuitBreakerNameResolver circuitBreakerNameResolver) {
+													@Value("${spring.cloud.openfeign.circuitbreaker.group.enabled:false}") boolean circuitBreakerGroupEnabled,
+													CircuitBreakerNameResolver circuitBreakerNameResolver) {
 			return new FeignCircuitBreakerTargeter(circuitBreakerFactory, circuitBreakerGroupEnabled,
-					circuitBreakerNameResolver);
+				circuitBreakerNameResolver);
 		}
 
 		static class DefaultCircuitBreakerNameResolver implements CircuitBreakerNameResolver {
@@ -259,19 +259,19 @@ public class FeignAutoConfiguration {
 
 		@Bean
 		public okhttp3.OkHttpClient okHttpClient(okhttp3.OkHttpClient.Builder builder, ConnectionPool connectionPool,
-				FeignHttpClientProperties httpClientProperties) {
+												 FeignHttpClientProperties httpClientProperties) {
 			boolean followRedirects = httpClientProperties.isFollowRedirects();
 			int connectTimeout = httpClientProperties.getConnectionTimeout();
 			boolean disableSslValidation = httpClientProperties.isDisableSslValidation();
 			Duration readTimeout = httpClientProperties.getOkHttp().getReadTimeout();
 			List<Protocol> protocols = httpClientProperties.getOkHttp().getProtocols().stream().map(Protocol::valueOf)
-					.collect(Collectors.toList());
+				.collect(Collectors.toList());
 			if (disableSslValidation) {
 				disableSsl(builder);
 			}
 			this.okHttpClient = builder.connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-					.followRedirects(followRedirects).readTimeout(readTimeout).connectionPool(connectionPool)
-					.protocols(protocols).build();
+				.followRedirects(followRedirects).readTimeout(readTimeout).connectionPool(connectionPool)
+				.protocols(protocols).build();
 			return this.okHttpClient;
 		}
 
@@ -285,8 +285,7 @@ public class FeignAutoConfiguration {
 				SSLSocketFactory disabledSSLSocketFactory = sslContext.getSocketFactory();
 				builder.sslSocketFactory(disabledSSLSocketFactory, disabledTrustManager);
 				builder.hostnameVerifier(new TrustAllHostnames());
-			}
-			catch (NoSuchAlgorithmException | KeyManagementException e) {
+			} catch (NoSuchAlgorithmException | KeyManagementException e) {
 				LOG.warn("Error setting SSLSocketFactory in OKHttpClient", e);
 			}
 		}
@@ -347,7 +346,7 @@ public class FeignAutoConfiguration {
 	@ConditionalOnClass(ApacheHttp5Client.class)
 	@ConditionalOnMissingBean(org.apache.hc.client5.http.impl.classic.CloseableHttpClient.class)
 	@ConditionalOnProperty(value = "spring.cloud.openfeign.httpclient.hc5.enabled", havingValue = "true",
-			matchIfMissing = true)
+		matchIfMissing = true)
 	@Import(org.springframework.cloud.openfeign.clientconfig.HttpClient5FeignConfiguration.class)
 	protected static class HttpClient5FeignConfiguration {
 
@@ -365,21 +364,21 @@ public class FeignAutoConfiguration {
 	protected static class Oauth2FeignConfiguration {
 
 		@Bean
-		@ConditionalOnBean({ OAuth2AuthorizedClientService.class, ClientRegistrationRepository.class })
+		@ConditionalOnBean({OAuth2AuthorizedClientService.class, ClientRegistrationRepository.class})
 		@ConditionalOnMissingBean
 		OAuth2AuthorizedClientManager feignOAuth2AuthorizedClientManager(
-				ClientRegistrationRepository clientRegistrationRepository,
-				OAuth2AuthorizedClientService oAuth2AuthorizedClientService) {
+			ClientRegistrationRepository clientRegistrationRepository,
+			OAuth2AuthorizedClientService oAuth2AuthorizedClientService) {
 			return new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository,
-					oAuth2AuthorizedClientService);
+				oAuth2AuthorizedClientService);
 
 		}
 
 		@Bean
 		@ConditionalOnBean(OAuth2AuthorizedClientManager.class)
 		public OAuth2AccessTokenInterceptor defaultOAuth2AccessTokenInterceptor(
-				@Value("${spring.cloud.openfeign.oauth2.clientRegistrationId:}") String clientRegistrationId,
-				OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
+			@Value("${spring.cloud.openfeign.oauth2.clientRegistrationId:}") String clientRegistrationId,
+			OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
 			return new OAuth2AccessTokenInterceptor(clientRegistrationId, oAuth2AuthorizedClientManager);
 		}
 
@@ -390,7 +389,7 @@ public class FeignAutoConfiguration {
 	// see corresponding configurations in FeignLoadBalancerAutoConfiguration
 	// for load-balanced clients.
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnClass({ Http2Client.class, HttpClient.class })
+	@ConditionalOnClass({Http2Client.class, HttpClient.class})
 	@ConditionalOnMissingBean(HttpClient.class)
 	@ConditionalOnProperty("spring.cloud.openfeign.http2client.enabled")
 	@Import(org.springframework.cloud.openfeign.clientconfig.Http2ClientFeignConfiguration.class)
@@ -414,8 +413,8 @@ class FeignHints implements RuntimeHintsRegistrar {
 			return;
 		}
 		hints.reflection().registerType(TypeReference.of(FeignClientFactoryBean.class),
-				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
-						MemberCategory.INVOKE_DECLARED_METHODS, MemberCategory.DECLARED_FIELDS));
+			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+				MemberCategory.INVOKE_DECLARED_METHODS, MemberCategory.DECLARED_FIELDS));
 	}
 
 }

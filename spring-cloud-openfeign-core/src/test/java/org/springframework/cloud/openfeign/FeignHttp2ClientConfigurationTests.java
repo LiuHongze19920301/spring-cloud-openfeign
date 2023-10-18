@@ -35,36 +35,36 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FeignHttp2ClientConfigurationTests {
 
-	private ConfigurableApplicationContext context;
+    private ConfigurableApplicationContext context;
 
-	@BeforeEach
-	void setUp() {
-		context = new SpringApplicationBuilder()
-				.properties("debug=true", "spring.cloud.openfeign.http2client.enabled=true",
-						"spring.cloud.openfeign.httpclient.http2.version=HTTP_1_1",
-						"spring.cloud.openfeign.httpclient.connectionTimeout=15")
-				.web(WebApplicationType.NONE).sources(FeignAutoConfiguration.class).run();
-	}
+    @BeforeEach
+    void setUp() {
+        context = new SpringApplicationBuilder()
+            .properties("debug=true", "spring.cloud.openfeign.http2client.enabled=true",
+                "spring.cloud.openfeign.httpclient.http2.version=HTTP_1_1",
+                "spring.cloud.openfeign.httpclient.connectionTimeout=15")
+            .web(WebApplicationType.NONE).sources(FeignAutoConfiguration.class).run();
+    }
 
-	@AfterEach
-	void tearDown() {
-		if (context != null) {
-			context.close();
-		}
-	}
+    @AfterEach
+    void tearDown() {
+        if (context != null) {
+            context.close();
+        }
+    }
 
-	@Test
-	void shouldConfigureConnectTimeout() {
-		HttpClient httpClient = context.getBean(HttpClient.class);
+    @Test
+    void shouldConfigureConnectTimeout() {
+        HttpClient httpClient = context.getBean(HttpClient.class);
 
-		assertThat(httpClient.connectTimeout()).isEqualTo(Optional.ofNullable(Duration.ofMillis(15)));
-	}
+        assertThat(httpClient.connectTimeout()).isEqualTo(Optional.ofNullable(Duration.ofMillis(15)));
+    }
 
-	@Test
-	void shouldResolveVersionFromProperties() {
-		HttpClient httpClient = context.getBean(HttpClient.class);
+    @Test
+    void shouldResolveVersionFromProperties() {
+        HttpClient httpClient = context.getBean(HttpClient.class);
 
-		assertThat(httpClient.version()).isEqualTo(HttpClient.Version.HTTP_1_1);
-	}
+        assertThat(httpClient.version()).isEqualTo(HttpClient.Version.HTTP_1_1);
+    }
 
 }

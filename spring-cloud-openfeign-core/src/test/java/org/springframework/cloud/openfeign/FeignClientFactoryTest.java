@@ -32,89 +32,89 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class FeignClientFactoryTest {
 
-	@Test
-	void getInstanceWithoutAncestors_verifyNullForMissing() {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		parent.refresh();
+    @Test
+    void getInstanceWithoutAncestors_verifyNullForMissing() {
+        AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
+        parent.refresh();
 
-		FeignClientFactory feignClientFactory = new FeignClientFactory();
-		feignClientFactory.setApplicationContext(parent);
-		feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("empty", null, EmptyConfiguration.class)));
+        FeignClientFactory feignClientFactory = new FeignClientFactory();
+        feignClientFactory.setApplicationContext(parent);
+        feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("empty", null, EmptyConfiguration.class)));
 
-		Logger.Level level = feignClientFactory.getInstanceWithoutAncestors("empty", Logger.Level.class);
+        Logger.Level level = feignClientFactory.getInstanceWithoutAncestors("empty", Logger.Level.class);
 
-		assertThat(level).as("Logger was not null").isNull();
-	}
+        assertThat(level).as("Logger was not null").isNull();
+    }
 
-	private FeignClientSpecification getSpec(String name, String className, Class<?> configClass) {
-		return new FeignClientSpecification(name, className, new Class[] { configClass });
-	}
+    private FeignClientSpecification getSpec(String name, String className, Class<?> configClass) {
+        return new FeignClientSpecification(name, className, new Class[]{configClass});
+    }
 
-	@Test
-	void getInstancesWithoutAncestors_verifyEmptyForMissing() {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		parent.refresh();
+    @Test
+    void getInstancesWithoutAncestors_verifyEmptyForMissing() {
+        AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
+        parent.refresh();
 
-		FeignClientFactory feignClientFactory = new FeignClientFactory();
-		feignClientFactory.setApplicationContext(parent);
-		feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("empty", null, EmptyConfiguration.class)));
+        FeignClientFactory feignClientFactory = new FeignClientFactory();
+        feignClientFactory.setApplicationContext(parent);
+        feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("empty", null, EmptyConfiguration.class)));
 
-		Collection<RequestInterceptor> interceptors = feignClientFactory
-				.getInstancesWithoutAncestors("empty", RequestInterceptor.class).values();
+        Collection<RequestInterceptor> interceptors = feignClientFactory
+            .getInstancesWithoutAncestors("empty", RequestInterceptor.class).values();
 
-		assertThat(interceptors).as("Interceptors is not empty").isEmpty();
-	}
+        assertThat(interceptors).as("Interceptors is not empty").isEmpty();
+    }
 
-	@Test
-	void getInstanceWithoutAncestors() {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		parent.refresh();
+    @Test
+    void getInstanceWithoutAncestors() {
+        AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
+        parent.refresh();
 
-		FeignClientFactory feignClientFactory = new FeignClientFactory();
-		feignClientFactory.setApplicationContext(parent);
-		feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("demo", null, DemoConfiguration.class)));
+        FeignClientFactory feignClientFactory = new FeignClientFactory();
+        feignClientFactory.setApplicationContext(parent);
+        feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("demo", null, DemoConfiguration.class)));
 
-		Logger.Level level = feignClientFactory.getInstanceWithoutAncestors("demo", Logger.Level.class);
+        Logger.Level level = feignClientFactory.getInstanceWithoutAncestors("demo", Logger.Level.class);
 
-		assertThat(level).isEqualTo(Logger.Level.FULL);
-	}
+        assertThat(level).isEqualTo(Logger.Level.FULL);
+    }
 
-	@Test
-	void getInstancesWithoutAncestors() {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		parent.refresh();
+    @Test
+    void getInstancesWithoutAncestors() {
+        AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
+        parent.refresh();
 
-		FeignClientFactory feignClientFactory = new FeignClientFactory();
-		feignClientFactory.setApplicationContext(parent);
-		feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("demo", null, DemoConfiguration.class)));
+        FeignClientFactory feignClientFactory = new FeignClientFactory();
+        feignClientFactory.setApplicationContext(parent);
+        feignClientFactory.setConfigurations(Lists.newArrayList(getSpec("demo", null, DemoConfiguration.class)));
 
-		Collection<RequestInterceptor> interceptors = feignClientFactory
-				.getInstancesWithoutAncestors("demo", RequestInterceptor.class).values();
+        Collection<RequestInterceptor> interceptors = feignClientFactory
+            .getInstancesWithoutAncestors("demo", RequestInterceptor.class).values();
 
-		assertThat(interceptors.size()).isEqualTo(1);
-	}
+        assertThat(interceptors.size()).isEqualTo(1);
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import(FeignClientsConfiguration.class)
-	protected static class EmptyConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @Import(FeignClientsConfiguration.class)
+    protected static class EmptyConfiguration {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import(FeignClientsConfiguration.class)
-	protected static class DemoConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @Import(FeignClientsConfiguration.class)
+    protected static class DemoConfiguration {
 
-		@Bean
-		public Logger.Level loggerLevel() {
-			return Logger.Level.FULL;
-		}
+        @Bean
+        public Logger.Level loggerLevel() {
+            return Logger.Level.FULL;
+        }
 
-		@Bean
-		public RequestInterceptor requestInterceptor() {
-			return (requestTemplate) -> {
-			};
-		}
+        @Bean
+        public RequestInterceptor requestInterceptor() {
+            return (requestTemplate) -> {
+            };
+        }
 
-	}
+    }
 
 }

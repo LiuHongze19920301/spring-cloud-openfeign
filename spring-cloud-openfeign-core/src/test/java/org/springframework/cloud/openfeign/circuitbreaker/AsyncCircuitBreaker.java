@@ -33,28 +33,27 @@ import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
  */
 class AsyncCircuitBreaker implements CircuitBreaker {
 
-	final Duration timeout;
+    final Duration timeout;
 
-	final ExecutorService executorService;
+    final ExecutorService executorService;
 
-	AsyncCircuitBreaker(Duration timeout) {
-		this(timeout, Executors.newCachedThreadPool());
-	}
+    AsyncCircuitBreaker(Duration timeout) {
+        this(timeout, Executors.newCachedThreadPool());
+    }
 
-	AsyncCircuitBreaker(Duration timeout, ExecutorService executorService) {
-		this.timeout = timeout;
-		this.executorService = executorService;
-	}
+    AsyncCircuitBreaker(Duration timeout, ExecutorService executorService) {
+        this.timeout = timeout;
+        this.executorService = executorService;
+    }
 
-	@Override
-	public <T> T run(Supplier<T> toRun, Function<Throwable, T> fallback) {
-		Future<T> future = executorService.submit(toRun::get);
-		try {
-			return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-		}
-		catch (Throwable t) {
-			return fallback.apply(t);
-		}
-	}
+    @Override
+    public <T> T run(Supplier<T> toRun, Function<Throwable, T> fallback) {
+        Future<T> future = executorService.submit(toRun::get);
+        try {
+            return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (Throwable t) {
+            return fallback.apply(t);
+        }
+    }
 
 }

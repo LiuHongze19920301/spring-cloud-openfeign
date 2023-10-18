@@ -43,17 +43,16 @@ public class FeignClientFactory extends NamedContextFactory<FeignClientSpecifica
 	}
 
 	public FeignClientFactory(
-			Map<String, ApplicationContextInitializer<GenericApplicationContext>> applicationContextInitializers) {
+		Map<String, ApplicationContextInitializer<GenericApplicationContext>> applicationContextInitializers) {
 		super(FeignClientsConfiguration.class, "spring.cloud.openfeign", "spring.cloud.openfeign.client.name",
-				applicationContextInitializers);
+			applicationContextInitializers);
 	}
 
 	@Nullable
 	public <T> T getInstanceWithoutAncestors(String name, Class<T> type) {
 		try {
 			return BeanFactoryUtils.beanOfType(getContext(name), type);
-		}
-		catch (BeansException ex) {
+		} catch (BeansException ex) {
 			return null;
 		}
 	}
@@ -71,9 +70,9 @@ public class FeignClientFactory extends NamedContextFactory<FeignClientSpecifica
 	public FeignClientFactory withApplicationContextInitializers(Map<String, Object> applicationContextInitializers) {
 		Map<String, ApplicationContextInitializer<GenericApplicationContext>> convertedInitializers = new HashMap<>();
 		applicationContextInitializers.keySet()
-				.forEach(contextId -> convertedInitializers.put(contextId,
-						(ApplicationContextInitializer<GenericApplicationContext>) applicationContextInitializers
-								.get(contextId)));
+			.forEach(contextId -> convertedInitializers.put(contextId,
+				(ApplicationContextInitializer<GenericApplicationContext>) applicationContextInitializers
+					.get(contextId)));
 		return new FeignClientFactory(convertedInitializers);
 	}
 

@@ -52,104 +52,104 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = CircuitBreakerWithNoFallbackTests.Application.class,
-		webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-		value = { "spring.application.name=springcircuittest", "spring.jmx.enabled=false",
-				"spring.cloud.openfeign.circuitbreaker.enabled=true" })
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+    value = {"spring.application.name=springcircuittest", "spring.jmx.enabled=false",
+        "spring.cloud.openfeign.circuitbreaker.enabled=true"})
 @DirtiesContext
 public class CircuitBreakerWithNoFallbackTests {
 
-	@Autowired
-	MyCircuitBreaker myCircuitBreaker;
+    @Autowired
+    MyCircuitBreaker myCircuitBreaker;
 
-	@Autowired
-	CircuitBreakerTestClient testClient;
+    @Autowired
+    CircuitBreakerTestClient testClient;
 
-	@BeforeAll
-	public static void beforeClass() {
-		System.setProperty("server.port", String.valueOf(TestSocketUtils.findAvailableTcpPort()));
-	}
+    @BeforeAll
+    public static void beforeClass() {
+        System.setProperty("server.port", String.valueOf(TestSocketUtils.findAvailableTcpPort()));
+    }
 
-	@AfterAll
-	public static void afterClass() {
-		System.clearProperty("server.port");
-	}
+    @AfterAll
+    public static void afterClass() {
+        System.clearProperty("server.port");
+    }
 
-	@BeforeEach
-	public void setup() {
-		this.myCircuitBreaker.clear();
-	}
+    @BeforeEach
+    public void setup() {
+        this.myCircuitBreaker.clear();
+    }
 
-	@Test
-	public void testSimpleTypeWithFallback() {
-		Hello hello = testClient.getHello();
+    @Test
+    public void testSimpleTypeWithFallback() {
+        Hello hello = testClient.getHello();
 
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-		assertThat(myCircuitBreaker.runWasCalled).as("Circuit Breaker was called").isTrue();
-	}
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+        assertThat(myCircuitBreaker.runWasCalled).as("Circuit Breaker was called").isTrue();
+    }
 
-	@Test
-	public void test404WithoutFallback() {
-		assertThatThrownBy(() -> testClient.getException()).isInstanceOf(NoFallbackAvailableException.class);
-	}
+    @Test
+    public void test404WithoutFallback() {
+        assertThatThrownBy(() -> testClient.getException()).isInstanceOf(NoFallbackAvailableException.class);
+    }
 
-	@FeignClient(name = "test", url = "http://localhost:${server.port}/")
-	protected interface CircuitBreakerTestClient {
+    @FeignClient(name = "test", url = "http://localhost:${server.port}/")
+    protected interface CircuitBreakerTestClient {
 
-		@GetMapping("/hello")
-		Hello getHello();
+        @GetMapping("/hello")
+        Hello getHello();
 
-		@GetMapping("/hellonotfound")
-		String getException();
+        @GetMapping("/hellonotfound")
+        String getException();
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@RestController
-	@EnableFeignClients(clients = { CircuitBreakerTestClient.class })
-	@Import(NoSecurityConfiguration.class)
-	protected static class Application implements CircuitBreakerTestClient {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @RestController
+    @EnableFeignClients(clients = {CircuitBreakerTestClient.class})
+    @Import(NoSecurityConfiguration.class)
+    protected static class Application implements CircuitBreakerTestClient {
 
-		static final Log log = LogFactory.getLog(Application.class);
+        static final Log log = LogFactory.getLog(Application.class);
 
-		@Bean
-		MyCircuitBreaker myCircuitBreaker() {
-			return new MyCircuitBreaker();
-		}
+        @Bean
+        MyCircuitBreaker myCircuitBreaker() {
+            return new MyCircuitBreaker();
+        }
 
-		@SuppressWarnings("rawtypes")
-		@Bean
-		CircuitBreakerFactory circuitBreakerFactory(MyCircuitBreaker myCircuitBreaker) {
-			return new CircuitBreakerFactory() {
-				@Override
-				public CircuitBreaker create(String id) {
-					log.info("Creating a circuit breaker with id [" + id + "]");
-					return myCircuitBreaker;
-				}
+        @SuppressWarnings("rawtypes")
+        @Bean
+        CircuitBreakerFactory circuitBreakerFactory(MyCircuitBreaker myCircuitBreaker) {
+            return new CircuitBreakerFactory() {
+                @Override
+                public CircuitBreaker create(String id) {
+                    log.info("Creating a circuit breaker with id [" + id + "]");
+                    return myCircuitBreaker;
+                }
 
-				@Override
-				protected ConfigBuilder configBuilder(String id) {
-					return Object::new;
-				}
+                @Override
+                protected ConfigBuilder configBuilder(String id) {
+                    return Object::new;
+                }
 
-				@Override
-				public void configureDefault(Function defaultConfiguration) {
+                @Override
+                public void configureDefault(Function defaultConfiguration) {
 
-				}
-			};
-		}
+                }
+            };
+        }
 
-		@Override
-		public Hello getHello() {
-			return new Hello("hello world 1");
-		}
+        @Override
+        public Hello getHello() {
+            return new Hello("hello world 1");
+        }
 
-		@Override
-		public String getException() {
-			throw new IllegalStateException("BOOM!");
-		}
+        @Override
+        public String getException() {
+            throw new IllegalStateException("BOOM!");
+        }
 
-	}
+    }
 
 }

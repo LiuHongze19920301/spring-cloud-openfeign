@@ -35,13 +35,13 @@ import static feign.Request.HttpMethod.POST;
 @ClassPathExclusions("protobuf-*.jar")
 class ProtobufNotInClasspathTest {
 
-	@Test
-	void testEncodeWhenProtobufNotInClasspath() {
-		ObjectFactory<HttpMessageConverters> converters = () -> new HttpMessageConverters(
-				new StringHttpMessageConverter());
-		RequestTemplate requestTemplate = new RequestTemplate();
-		requestTemplate.method(POST);
-		new SpringEncoder(converters).encode("a=b", String.class, requestTemplate);
-	}
+    @Test
+    void testEncodeWhenProtobufNotInClasspath() {
+        ObjectFactory<HttpMessageConverters> converters = () -> new HttpMessageConverters(
+            new StringHttpMessageConverter());
+        RequestTemplate requestTemplate = new RequestTemplate();
+        requestTemplate.method(POST);
+        new SpringEncoder(converters).encode("a=b", String.class, requestTemplate);
+    }
 
 }

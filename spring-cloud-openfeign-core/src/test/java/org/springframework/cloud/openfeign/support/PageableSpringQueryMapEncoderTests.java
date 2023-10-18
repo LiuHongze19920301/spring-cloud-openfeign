@@ -39,86 +39,86 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Yanming Zhou
  */
 @SpringBootTest(classes = SpringEncoderTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.application.name=springencodertest", "spring.jmx.enabled=false" })
+    value = {"spring.application.name=springencodertest", "spring.jmx.enabled=false"})
 @DirtiesContext
 class PageableSpringQueryMapEncoderTests {
 
-	public static final int PAGE = 1;
+    public static final int PAGE = 1;
 
-	public static final int SIZE = 10;
+    public static final int SIZE = 10;
 
-	public static final String SORT_2 = "sort2";
+    public static final String SORT_2 = "sort2";
 
-	public static final String SORT_1 = "sort1";
+    public static final String SORT_1 = "sort1";
 
-	@Autowired
-	private FeignClientFactory context;
+    @Autowired
+    private FeignClientFactory context;
 
-	protected String getPageParameter() {
-		return "page";
-	}
+    protected String getPageParameter() {
+        return "page";
+    }
 
-	protected String getSizeParameter() {
-		return "size";
-	}
+    protected String getSizeParameter() {
+        return "size";
+    }
 
-	protected String getSortParameter() {
-		return "sort";
-	}
+    protected String getSortParameter() {
+        return "sort";
+    }
 
-	@Test
-	void testPaginationAndSortingRequest() {
-		QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
-		assertThat(encoder).isNotNull();
+    @Test
+    void testPaginationAndSortingRequest() {
+        QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
+        assertThat(encoder).isNotNull();
 
-		Map<String, Object> map = encoder.encode(createPageAndSortRequest());
-		assertThat(map).hasSize(3);
-		assertThat((Integer) map.get(getPageParameter())).isEqualTo(PAGE);
-		assertThat((Integer) map.get(getSizeParameter())).isEqualTo(SIZE);
-		assertThat((List<?>) map.get(getSortParameter())).hasSize(2);
-	}
+        Map<String, Object> map = encoder.encode(createPageAndSortRequest());
+        assertThat(map).hasSize(3);
+        assertThat((Integer) map.get(getPageParameter())).isEqualTo(PAGE);
+        assertThat((Integer) map.get(getSizeParameter())).isEqualTo(SIZE);
+        assertThat((List<?>) map.get(getSortParameter())).hasSize(2);
+    }
 
-	private Pageable createPageAndSortRequest() {
-		return PageRequest.of(PAGE, SIZE, Sort.Direction.ASC, SORT_1, SORT_2);
-	}
+    private Pageable createPageAndSortRequest() {
+        return PageRequest.of(PAGE, SIZE, Sort.Direction.ASC, SORT_1, SORT_2);
+    }
 
-	@Test
-	void testPaginationRequest() {
-		QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
-		assertThat(encoder).isNotNull();
+    @Test
+    void testPaginationRequest() {
+        QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
+        assertThat(encoder).isNotNull();
 
-		Map<String, Object> map = encoder.encode(createPageAndRequest());
-		assertThat(map).hasSize(2);
-		assertThat((Integer) map.get(getPageParameter())).isEqualTo(PAGE);
-		assertThat((Integer) map.get(getSizeParameter())).isEqualTo(SIZE);
-		assertThat(map).doesNotContainKey(getSortParameter());
-	}
+        Map<String, Object> map = encoder.encode(createPageAndRequest());
+        assertThat(map).hasSize(2);
+        assertThat((Integer) map.get(getPageParameter())).isEqualTo(PAGE);
+        assertThat((Integer) map.get(getSizeParameter())).isEqualTo(SIZE);
+        assertThat(map).doesNotContainKey(getSortParameter());
+    }
 
-	private Pageable createPageAndRequest() {
-		return PageRequest.of(PAGE, SIZE);
-	}
+    private Pageable createPageAndRequest() {
+        return PageRequest.of(PAGE, SIZE);
+    }
 
-	@Test
-	void testSortingRequest() {
-		QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
-		assertThat(encoder).isNotNull();
+    @Test
+    void testSortingRequest() {
+        QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
+        assertThat(encoder).isNotNull();
 
-		Map<String, Object> map = encoder.encode(createSort());
-		assertThat(map).hasSize(1);
-		assertThat((List<?>) map.get(getSortParameter())).hasSize(2);
-	}
+        Map<String, Object> map = encoder.encode(createSort());
+        assertThat(map).hasSize(1);
+        assertThat((List<?>) map.get(getSortParameter())).hasSize(2);
+    }
 
-	private Sort createSort() {
-		return Sort.by(SORT_1, SORT_2).ascending();
-	}
+    private Sort createSort() {
+        return Sort.by(SORT_1, SORT_2).ascending();
+    }
 
-	@Test
-	void testUnpagedRequest() {
-		QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
-		assertThat(encoder).isNotNull();
+    @Test
+    void testUnpagedRequest() {
+        QueryMapEncoder encoder = this.context.getInstance("foo", QueryMapEncoder.class);
+        assertThat(encoder).isNotNull();
 
-		Map<String, Object> map = encoder.encode(Pageable.unpaged());
-		assertThat(map).isEmpty();
-	}
+        Map<String, Object> map = encoder.encode(Pageable.unpaged());
+        assertThat(map).isEmpty();
+    }
 
 }

@@ -72,7 +72,7 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
  * @author Szymon Linowski
  */
 @SpringBootTest(classes = SpringEncoderTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=springencodertest", "spring.jmx.enabled=false" })
+	value = {"spring.application.name=springencodertest", "spring.jmx.enabled=false"})
 @DirtiesContext
 class SpringEncoderTests {
 
@@ -143,7 +143,7 @@ class SpringEncoderTests {
 		encoder.encode("hi".getBytes(), null, request);
 
 		assertThat(((List) request.headers().get(CONTENT_TYPE)).get(0)).as("Request Content-Type is not octet-stream")
-				.isEqualTo(APPLICATION_OCTET_STREAM_VALUE);
+			.isEqualTo(APPLICATION_OCTET_STREAM_VALUE);
 	}
 
 	@Test
@@ -155,7 +155,7 @@ class SpringEncoderTests {
 		MultipartFile multipartFile = new MockMultipartFile("test_multipart_file", "hi".getBytes());
 
 		Assertions.assertThatExceptionOfType(EncodeException.class)
-				.isThrownBy(() -> encoder.encode(multipartFile, MultipartFile.class, request));
+			.isThrownBy(() -> encoder.encode(multipartFile, MultipartFile.class, request));
 	}
 
 	// gh-105, gh-107
@@ -171,14 +171,14 @@ class SpringEncoderTests {
 		encoder.encode(multipartFile, MultipartFile.class, request);
 
 		assertThat((String) ((List) request.headers().get(CONTENT_TYPE)).get(0))
-				.as("Request Content-Type is not multipart/form-data")
-				.contains("multipart/form-data; charset=UTF-8; boundary=");
+			.as("Request Content-Type is not multipart/form-data")
+			.contains("multipart/form-data; charset=UTF-8; boundary=");
 		assertThat(request.headers().get(CONTENT_TYPE).size()).as("There is more than one Content-Type request header")
-				.isEqualTo(1);
+			.isEqualTo(1);
 		assertThat(((List) request.headers().get(ACCEPT)).get(0)).as("Request Accept header is not multipart/form-data")
-				.isEqualTo(MULTIPART_FORM_DATA_VALUE);
+			.isEqualTo(MULTIPART_FORM_DATA_VALUE);
 		assertThat(((List) request.headers().get(CONTENT_LENGTH)).get(0))
-				.as("Request Content-Length is not equal to 186").isEqualTo("186");
+			.as("Request Content-Length is not equal to 186").isEqualTo("186");
 		assertThat(new String(request.body())).as("Body content cannot be decoded").contains("hi");
 	}
 
@@ -280,19 +280,19 @@ class SpringEncoderTests {
 
 			@Override
 			protected void writeInternal(Object o, Type type, HttpOutputMessage outputMessage)
-					throws HttpMessageNotWritableException {
+				throws HttpMessageNotWritableException {
 
 			}
 
 			@Override
 			protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage)
-					throws HttpMessageNotReadableException {
+				throws HttpMessageNotReadableException {
 				return null;
 			}
 
 			@Override
 			public Object read(Type type, Class<?> contextClass, HttpInputMessage inputMessage)
-					throws HttpMessageNotReadableException {
+				throws HttpMessageNotReadableException {
 				return null;
 			}
 
@@ -307,9 +307,8 @@ class SpringEncoderTests {
 			private boolean isStringList(Type type) {
 				if (type instanceof ParameterizedType parameterizedType) {
 					return parameterizedType.getRawType() == List.class
-							&& parameterizedType.getActualTypeArguments()[0] == String.class;
-				}
-				else {
+						&& parameterizedType.getActualTypeArguments()[0] == String.class;
+				} else {
 					return false;
 				}
 			}
@@ -331,19 +330,19 @@ class SpringEncoderTests {
 
 			@Override
 			protected void writeInternal(Object o, Type type, HttpOutputMessage outputMessage)
-					throws HttpMessageNotWritableException {
+				throws HttpMessageNotWritableException {
 
 			}
 
 			@Override
 			public Object read(Type type, Class<?> contextClass, HttpInputMessage inputMessage)
-					throws HttpMessageNotReadableException {
+				throws HttpMessageNotReadableException {
 				return null;
 			}
 
 			@Override
 			protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage)
-					throws HttpMessageNotReadableException {
+				throws HttpMessageNotReadableException {
 				return null;
 			}
 

@@ -38,7 +38,8 @@ public interface LoadBalancerFeignRequestTransformer {
 	/**
 	 * Allows transforming load-balanced requests based on the provided
 	 * {@link ServiceInstance}.
-	 * @param request Original request.
+	 *
+	 * @param request  Original request.
 	 * @param instance ServiceInstance returned from LoadBalancer.
 	 * @return New request or original request
 	 */

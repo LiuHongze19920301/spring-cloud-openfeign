@@ -55,7 +55,7 @@ public class XForwardedHeadersTransformer implements LoadBalancerFeignRequestTra
 			headers.put("X-Forwarded-Host", Collections.singleton(xForwardedHost));
 			headers.put("X-Forwarded-Proto", Collections.singleton(xForwardedProto));
 			request = Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset(),
-					request.requestTemplate());
+				request.requestTemplate());
 		}
 		return request;
 	}

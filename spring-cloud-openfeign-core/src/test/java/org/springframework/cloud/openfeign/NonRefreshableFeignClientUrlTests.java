@@ -40,78 +40,78 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 class NonRefreshableFeignClientUrlTests {
 
-	@Autowired
-	private Application.FeignClientWithFixUrl feignClientWithFixUrl;
+    @Autowired
+    private Application.FeignClientWithFixUrl feignClientWithFixUrl;
 
-	@Autowired
-	private Application.ConfigBasedClient configBasedClient;
+    @Autowired
+    private Application.ConfigBasedClient configBasedClient;
 
-	@Autowired
-	private Application.NameBasedUrlClient nameBasedUrlClient;
+    @Autowired
+    private Application.NameBasedUrlClient nameBasedUrlClient;
 
-	@Test
-	void shouldInstantiateFeignClientWhenUrlFromFeignClientUrl() {
-		UrlTestClient.UrlResponseForTests response = feignClientWithFixUrl.fixPath();
-		assertThat(response.getUrl()).isEqualTo("http://localhost:8081/fixPath");
-		assertThat(response.getTargetType()).isEqualTo(Target.HardCodedTarget.class);
-	}
+    @Test
+    void shouldInstantiateFeignClientWhenUrlFromFeignClientUrl() {
+        UrlTestClient.UrlResponseForTests response = feignClientWithFixUrl.fixPath();
+        assertThat(response.getUrl()).isEqualTo("http://localhost:8081/fixPath");
+        assertThat(response.getTargetType()).isEqualTo(Target.HardCodedTarget.class);
+    }
 
-	@Test
-	void shouldInstantiateFeignClientWhenUrlFromFeignClientUrlGivenPreferenceOverProperties() {
-		UrlTestClient.UrlResponseForTests response = feignClientWithFixUrl.fixPath();
-		assertThat(response.getUrl()).isEqualTo("http://localhost:8081/fixPath");
-	}
+    @Test
+    void shouldInstantiateFeignClientWhenUrlFromFeignClientUrlGivenPreferenceOverProperties() {
+        UrlTestClient.UrlResponseForTests response = feignClientWithFixUrl.fixPath();
+        assertThat(response.getUrl()).isEqualTo("http://localhost:8081/fixPath");
+    }
 
-	@Test
-	public void shouldInstantiateFeignClientWhenUrlFromProperties() {
-		UrlTestClient.UrlResponseForTests response = configBasedClient.test();
-		assertThat(response.getUrl()).isEqualTo("http://localhost:9999/test");
-		assertThat(response.getTargetType()).isEqualTo(PropertyBasedTarget.class);
-	}
+    @Test
+    public void shouldInstantiateFeignClientWhenUrlFromProperties() {
+        UrlTestClient.UrlResponseForTests response = configBasedClient.test();
+        assertThat(response.getUrl()).isEqualTo("http://localhost:9999/test");
+        assertThat(response.getTargetType()).isEqualTo(PropertyBasedTarget.class);
+    }
 
-	@Test
-	void shouldInstantiateFeignClientWhenUrlFromFeignClientName() {
-		UrlTestClient.UrlResponseForTests response = nameBasedUrlClient.test();
-		assertThat(response.getUrl()).isEqualTo("http://nameBasedClient/test");
-		assertThat(response.getTargetType()).isEqualTo(Target.HardCodedTarget.class);
-	}
+    @Test
+    void shouldInstantiateFeignClientWhenUrlFromFeignClientName() {
+        UrlTestClient.UrlResponseForTests response = nameBasedUrlClient.test();
+        assertThat(response.getUrl()).isEqualTo("http://nameBasedClient/test");
+        assertThat(response.getTargetType()).isEqualTo(Target.HardCodedTarget.class);
+    }
 
-	@Configuration
-	@EnableAutoConfiguration
-	@EnableConfigurationProperties(FeignClientProperties.class)
-	@EnableFeignClients(clients = { Application.FeignClientWithFixUrl.class, Application.ConfigBasedClient.class,
-			Application.NameBasedUrlClient.class })
-	protected static class Application {
+    @Configuration
+    @EnableAutoConfiguration
+    @EnableConfigurationProperties(FeignClientProperties.class)
+    @EnableFeignClients(clients = {Application.FeignClientWithFixUrl.class, Application.ConfigBasedClient.class,
+        Application.NameBasedUrlClient.class})
+    protected static class Application {
 
-		@Bean
-		UrlTestClient client() {
-			return new UrlTestClient();
-		}
+        @Bean
+        UrlTestClient client() {
+            return new UrlTestClient();
+        }
 
-		@FeignClient(name = "feignClientWithFixUrl", url = "http://localhost:8081")
-		protected interface FeignClientWithFixUrl {
+        @FeignClient(name = "feignClientWithFixUrl", url = "http://localhost:8081")
+        protected interface FeignClientWithFixUrl {
 
-			@GetMapping("/fixPath")
-			UrlTestClient.UrlResponseForTests fixPath();
+            @GetMapping("/fixPath")
+            UrlTestClient.UrlResponseForTests fixPath();
 
-		}
+        }
 
-		@FeignClient(name = "configBasedClient")
-		protected interface ConfigBasedClient {
+        @FeignClient(name = "configBasedClient")
+        protected interface ConfigBasedClient {
 
-			@GetMapping("/test")
-			UrlTestClient.UrlResponseForTests test();
+            @GetMapping("/test")
+            UrlTestClient.UrlResponseForTests test();
 
-		}
+        }
 
-		@FeignClient(name = "nameBasedClient")
-		protected interface NameBasedUrlClient {
+        @FeignClient(name = "nameBasedClient")
+        protected interface NameBasedUrlClient {
 
-			@GetMapping("/test")
-			UrlTestClient.UrlResponseForTests test();
+            @GetMapping("/test")
+            UrlTestClient.UrlResponseForTests test();
 
-		}
+        }
 
-	}
+    }
 
 }

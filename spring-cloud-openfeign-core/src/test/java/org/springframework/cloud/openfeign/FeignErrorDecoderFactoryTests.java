@@ -32,88 +32,88 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FeignErrorDecoderFactoryTests {
 
-	@Test
-	void testNoDefaultFactory() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration1.class);
-		String[] beanNamesForType = context.getBeanNamesForType(FeignErrorDecoderFactory.class);
-		assertThat(beanNamesForType).isEmpty();
-		context.close();
-	}
+    @Test
+    void testNoDefaultFactory() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration1.class);
+        String[] beanNamesForType = context.getBeanNamesForType(FeignErrorDecoderFactory.class);
+        assertThat(beanNamesForType).isEmpty();
+        context.close();
+    }
 
-	@Test
-	void testCustomErrorDecoderFactory() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration2.class);
-		FeignErrorDecoderFactory errorDecoderFactory = context.getBean(FeignErrorDecoderFactory.class);
-		assertThat(errorDecoderFactory).isNotNull();
-		ErrorDecoder errorDecoder = errorDecoderFactory.create(Object.class);
-		assertThat(errorDecoder).isNotNull();
-		assertThat(errorDecoder instanceof ErrorDecoderImpl).isTrue();
-		context.close();
-	}
+    @Test
+    void testCustomErrorDecoderFactory() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration2.class);
+        FeignErrorDecoderFactory errorDecoderFactory = context.getBean(FeignErrorDecoderFactory.class);
+        assertThat(errorDecoderFactory).isNotNull();
+        ErrorDecoder errorDecoder = errorDecoderFactory.create(Object.class);
+        assertThat(errorDecoder).isNotNull();
+        assertThat(errorDecoder instanceof ErrorDecoderImpl).isTrue();
+        context.close();
+    }
 
-	@Test
-	void testCustomErrorDecoderFactoryNotOverwritingErrorDecoder() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration3.class);
-		FeignErrorDecoderFactory errorDecoderFactory = context.getBean(FeignErrorDecoderFactory.class);
-		assertThat(errorDecoderFactory).isNotNull();
-		ErrorDecoder errorDecoderFromFactory = errorDecoderFactory.create(Object.class);
-		assertThat(errorDecoderFromFactory).isNotNull();
-		assertThat(errorDecoderFromFactory instanceof ErrorDecoderImpl).isTrue();
-		ErrorDecoder errorDecoder = context.getBean(ErrorDecoder.class);
-		assertThat(errorDecoder).isNotNull();
-		assertThat(errorDecoder instanceof ErrorDecoder.Default).isTrue();
-		context.close();
-	}
+    @Test
+    void testCustomErrorDecoderFactoryNotOverwritingErrorDecoder() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration3.class);
+        FeignErrorDecoderFactory errorDecoderFactory = context.getBean(FeignErrorDecoderFactory.class);
+        assertThat(errorDecoderFactory).isNotNull();
+        ErrorDecoder errorDecoderFromFactory = errorDecoderFactory.create(Object.class);
+        assertThat(errorDecoderFromFactory).isNotNull();
+        assertThat(errorDecoderFromFactory instanceof ErrorDecoderImpl).isTrue();
+        ErrorDecoder errorDecoder = context.getBean(ErrorDecoder.class);
+        assertThat(errorDecoder).isNotNull();
+        assertThat(errorDecoder instanceof ErrorDecoder.Default).isTrue();
+        context.close();
+    }
 
-	@Configuration
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration1 {
+    @Configuration
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration1 {
 
-	}
+    }
 
-	@Configuration
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration2 {
+    @Configuration
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration2 {
 
-		@Bean
-		public FeignErrorDecoderFactory errorDecoderFactory() {
-			return new ErrorDecoderFactoryImpl();
-		}
+        @Bean
+        public FeignErrorDecoderFactory errorDecoderFactory() {
+            return new ErrorDecoderFactoryImpl();
+        }
 
-	}
+    }
 
-	@Configuration
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration3 {
+    @Configuration
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration3 {
 
-		@Bean
-		public FeignErrorDecoderFactory errorDecoderFactory() {
-			return new ErrorDecoderFactoryImpl();
-		}
+        @Bean
+        public FeignErrorDecoderFactory errorDecoderFactory() {
+            return new ErrorDecoderFactoryImpl();
+        }
 
-		@Bean
-		public ErrorDecoder errorDecoder() {
-			return new ErrorDecoder.Default();
-		}
+        @Bean
+        public ErrorDecoder errorDecoder() {
+            return new ErrorDecoder.Default();
+        }
 
-	}
+    }
 
-	static class ErrorDecoderFactoryImpl implements FeignErrorDecoderFactory {
+    static class ErrorDecoderFactoryImpl implements FeignErrorDecoderFactory {
 
-		@Override
-		public ErrorDecoder create(final Class<?> type) {
-			return new ErrorDecoderImpl();
-		}
+        @Override
+        public ErrorDecoder create(final Class<?> type) {
+            return new ErrorDecoderImpl();
+        }
 
-	}
+    }
 
-	static class ErrorDecoderImpl implements ErrorDecoder {
+    static class ErrorDecoderImpl implements ErrorDecoder {
 
-		@Override
-		public Exception decode(final String methodKey, final Response response) {
-			return null;
-		}
+        @Override
+        public Exception decode(final String methodKey, final Response response) {
+            return null;
+        }
 
-	}
+    }
 
 }

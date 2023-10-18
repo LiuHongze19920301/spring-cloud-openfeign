@@ -78,13 +78,11 @@ public class PageableSpringQueryMapEncoder extends BeanQueryMapEncoder {
 				if (pageable.getSort() != null) {
 					applySort(queryMap, pageable.getSort());
 				}
-			}
-			else if (object instanceof Sort sort) {
+			} else if (object instanceof Sort sort) {
 				applySort(queryMap, sort);
 			}
 			return queryMap;
-		}
-		else {
+		} else {
 			return super.encode(object);
 		}
 	}

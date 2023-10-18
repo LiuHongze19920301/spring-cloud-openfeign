@@ -48,47 +48,47 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Jakub Narloch
  */
 @SpringBootTest(classes = FeignAcceptEncodingTests.Application.class, webEnvironment = RANDOM_PORT,
-		value = { "spring.cloud.openfeign.compression.response.enabled=true" })
+    value = {"spring.cloud.openfeign.compression.response.enabled=true"})
 @DirtiesContext
 class FeignAcceptEncodingTests {
 
-	@Autowired
-	private InvoiceClient invoiceClient;
+    @Autowired
+    private InvoiceClient invoiceClient;
 
-	@Test
-	void compressedResponse() {
+    @Test
+    void compressedResponse() {
 
-		// when
-		final ResponseEntity<List<Invoice>> invoices = this.invoiceClient.getInvoices();
+        // when
+        final ResponseEntity<List<Invoice>> invoices = this.invoiceClient.getInvoices();
 
-		// then
-		assertThat(invoices).isNotNull();
-		assertThat(invoices.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(invoices.getBody()).isNotNull();
-		assertThat(invoices.getBody().size()).isEqualTo(100);
+        // then
+        assertThat(invoices).isNotNull();
+        assertThat(invoices.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(invoices.getBody()).isNotNull();
+        assertThat(invoices.getBody().size()).isEqualTo(100);
 
-	}
+    }
 
-	@EnableFeignClients(clients = InvoiceClient.class)
-	@LoadBalancerClient(name = "local", configuration = LocalClientConfiguration.class)
-	@SpringBootApplication(scanBasePackages = "org.springframework.cloud.openfeign.encoding.app")
-	@Import(NoSecurityConfiguration.class)
-	public static class Application {
+    @EnableFeignClients(clients = InvoiceClient.class)
+    @LoadBalancerClient(name = "local", configuration = LocalClientConfiguration.class)
+    @SpringBootApplication(scanBasePackages = "org.springframework.cloud.openfeign.encoding.app")
+    @Import(NoSecurityConfiguration.class)
+    public static class Application {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	static class LocalClientConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    static class LocalClientConfiguration {
 
-		@LocalServerPort
-		private int port = 0;
+        @LocalServerPort
+        private int port = 0;
 
-		@Bean
-		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
-			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
-		}
+        @Bean
+        public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
+            return ServiceInstanceListSuppliers.from("local",
+                new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+        }
 
-	}
+    }
 
 }

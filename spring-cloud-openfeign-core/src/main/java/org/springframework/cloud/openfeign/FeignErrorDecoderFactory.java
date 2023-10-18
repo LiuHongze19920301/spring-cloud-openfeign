@@ -28,8 +28,9 @@ public interface FeignErrorDecoderFactory {
 	/**
 	 * Factory method to provide a {@link feign.codec.ErrorDecoder} for a given
 	 * {@link Class}.
+	 *
 	 * @param type the {@link Class} for which a {@link feign.codec.ErrorDecoder} instance
-	 * is to be created
+	 *             is to be created
 	 * @return a {@link feign.codec.ErrorDecoder} instance
 	 */
 	ErrorDecoder create(Class<?> type);

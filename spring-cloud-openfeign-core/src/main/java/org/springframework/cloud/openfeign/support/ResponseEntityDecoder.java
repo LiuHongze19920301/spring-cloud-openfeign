@@ -53,11 +53,9 @@ public class ResponseEntityDecoder implements Decoder {
 			Object decodedObject = this.decoder.decode(response, type);
 
 			return createResponse(decodedObject, response);
-		}
-		else if (isHttpEntity(type)) {
+		} else if (isHttpEntity(type)) {
 			return createResponse(null, response);
-		}
-		else {
+		} else {
 			return this.decoder.decode(response, type);
 		}
 	}

@@ -45,141 +45,141 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class FeignClientWithRefreshableOptionsTest {
 
-	@Autowired
-	private ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationContext applicationContext;
 
-	@Autowired
-	private RefreshScope refreshScope;
+    @Autowired
+    private RefreshScope refreshScope;
 
-	@Autowired
-	private Application.RefreshableClient refreshableClient;
+    @Autowired
+    private Application.RefreshableClient refreshableClient;
 
-	@Autowired
-	private Application.ReadTimeoutClient readTimeoutClient;
+    @Autowired
+    private Application.ReadTimeoutClient readTimeoutClient;
 
-	@Autowired
-	private Application.ConnectTimeoutClient connectTimeoutClient;
+    @Autowired
+    private Application.ConnectTimeoutClient connectTimeoutClient;
 
-	@Autowired
-	private Application.OverrideOptionsClient overrideOptionsClient;
+    @Autowired
+    private Application.OverrideOptionsClient overrideOptionsClient;
 
-	@Autowired
-	private FeignClientProperties clientProperties;
+    @Autowired
+    private FeignClientProperties clientProperties;
 
-	@Test
-	public void overriddenOptionsBeanShouldBePresentInsteadOfRefreshable() {
-		OptionsTestClient.OptionsResponseForTests options = overrideOptionsClient.override();
-		assertConnectionAndReadTimeout(options, 1, 1);
-	}
+    @Test
+    public void overriddenOptionsBeanShouldBePresentInsteadOfRefreshable() {
+        OptionsTestClient.OptionsResponseForTests options = overrideOptionsClient.override();
+        assertConnectionAndReadTimeout(options, 1, 1);
+    }
 
-	@Test
-	public void refreshScopeBeanDefinitionShouldBePresent() {
-		BeanDefinition beanDefinition = ((GenericWebApplicationContext) applicationContext)
-				.getBeanDefinition(Request.Options.class.getCanonicalName() + "-" + "refreshableClient");
-		BeanDefinition originBeanDefinition = beanDefinition.getOriginatingBeanDefinition();
-		assertThat(originBeanDefinition.getBeanClassName()).isEqualTo(OptionsFactoryBean.class.getCanonicalName());
-		assertThat(originBeanDefinition.getScope()).isEqualTo("refresh");
-	}
+    @Test
+    public void refreshScopeBeanDefinitionShouldBePresent() {
+        BeanDefinition beanDefinition = ((GenericWebApplicationContext) applicationContext)
+            .getBeanDefinition(Request.Options.class.getCanonicalName() + "-" + "refreshableClient");
+        BeanDefinition originBeanDefinition = beanDefinition.getOriginatingBeanDefinition();
+        assertThat(originBeanDefinition.getBeanClassName()).isEqualTo(OptionsFactoryBean.class.getCanonicalName());
+        assertThat(originBeanDefinition.getScope()).isEqualTo("refresh");
+    }
 
-	@Test
-	public void withConfigDefaultConnectTimeoutAndReadTimeout() {
-		OptionsTestClient.OptionsResponseForTests options = refreshableClient.refreshable();
-		assertConnectionAndReadTimeout(options, 5000, 5000);
-	}
+    @Test
+    public void withConfigDefaultConnectTimeoutAndReadTimeout() {
+        OptionsTestClient.OptionsResponseForTests options = refreshableClient.refreshable();
+        assertConnectionAndReadTimeout(options, 5000, 5000);
+    }
 
-	@Test
-	public void readTimeoutShouldWorkWhenConnectTimeoutNotSet() {
-		OptionsTestClient.OptionsResponseForTests options = readTimeoutClient.readTimeout();
-		assertConnectionAndReadTimeout(options, 5000, 2000);
-	}
+    @Test
+    public void readTimeoutShouldWorkWhenConnectTimeoutNotSet() {
+        OptionsTestClient.OptionsResponseForTests options = readTimeoutClient.readTimeout();
+        assertConnectionAndReadTimeout(options, 5000, 2000);
+    }
 
-	@Test
-	public void connectTimeoutShouldWorkWhenReadTimeoutNotSet() {
-		OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
-		assertConnectionAndReadTimeout(options, 2000, 5000);
-	}
+    @Test
+    public void connectTimeoutShouldWorkWhenReadTimeoutNotSet() {
+        OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
+        assertConnectionAndReadTimeout(options, 2000, 5000);
+    }
 
-	@Test
-	public void connectTimeoutShouldNotChangeWithoutContextRefresh() {
-		OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
-		assertConnectionAndReadTimeout(options, 2000, 5000);
+    @Test
+    public void connectTimeoutShouldNotChangeWithoutContextRefresh() {
+        OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
+        assertConnectionAndReadTimeout(options, 2000, 5000);
 
-		clientProperties.getConfig().get("connectTimeout").setConnectTimeout(5000);
-		options = connectTimeoutClient.connectTimeout();
-		assertConnectionAndReadTimeout(options, 2000, 5000);
-	}
+        clientProperties.getConfig().get("connectTimeout").setConnectTimeout(5000);
+        options = connectTimeoutClient.connectTimeout();
+        assertConnectionAndReadTimeout(options, 2000, 5000);
+    }
 
-	@Test
-	public void connectTimeoutShouldChangeAfterContextRefresh() {
-		OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
-		assertConnectionAndReadTimeout(options, 2000, 5000);
+    @Test
+    public void connectTimeoutShouldChangeAfterContextRefresh() {
+        OptionsTestClient.OptionsResponseForTests options = connectTimeoutClient.connectTimeout();
+        assertConnectionAndReadTimeout(options, 2000, 5000);
 
-		clientProperties.getConfig().get("connectTimeout").setConnectTimeout(5000);
-		refreshScope.refreshAll();
-		options = connectTimeoutClient.connectTimeout();
-		assertConnectionAndReadTimeout(options, 5000, 5000);
-	}
+        clientProperties.getConfig().get("connectTimeout").setConnectTimeout(5000);
+        refreshScope.refreshAll();
+        options = connectTimeoutClient.connectTimeout();
+        assertConnectionAndReadTimeout(options, 5000, 5000);
+    }
 
-	private void assertConnectionAndReadTimeout(OptionsTestClient.OptionsResponseForTests options,
-			int expectedConnectTimeoutInMillis, int expectedReadTimeoutInMillis) {
-		assertThat(options.connectTimeout()).isEqualTo(expectedConnectTimeoutInMillis);
-		assertThat(options.readTimeout()).isEqualTo(expectedReadTimeoutInMillis);
-	}
+    private void assertConnectionAndReadTimeout(OptionsTestClient.OptionsResponseForTests options,
+                                                int expectedConnectTimeoutInMillis, int expectedReadTimeoutInMillis) {
+        assertThat(options.connectTimeout()).isEqualTo(expectedConnectTimeoutInMillis);
+        assertThat(options.readTimeout()).isEqualTo(expectedReadTimeoutInMillis);
+    }
 
-	@Configuration
-	@EnableAutoConfiguration
-	@EnableConfigurationProperties(FeignClientProperties.class)
-	@EnableFeignClients(clients = { Application.OverrideOptionsClient.class, Application.RefreshableClient.class,
-			Application.ReadTimeoutClient.class, Application.ConnectTimeoutClient.class })
-	protected static class Application {
+    @Configuration
+    @EnableAutoConfiguration
+    @EnableConfigurationProperties(FeignClientProperties.class)
+    @EnableFeignClients(clients = {Application.OverrideOptionsClient.class, Application.RefreshableClient.class,
+        Application.ReadTimeoutClient.class, Application.ConnectTimeoutClient.class})
+    protected static class Application {
 
-		@Bean
-		OptionsTestClient client() {
-			return new OptionsTestClient();
-		}
+        @Bean
+        OptionsTestClient client() {
+            return new OptionsTestClient();
+        }
 
-		@FeignClient(name = "overrideOptionsClient", configuration = OverrideConfig.class)
-		protected interface OverrideOptionsClient {
+        @FeignClient(name = "overrideOptionsClient", configuration = OverrideConfig.class)
+        protected interface OverrideOptionsClient {
 
-			@GetMapping("/override")
-			OptionsTestClient.OptionsResponseForTests override();
+            @GetMapping("/override")
+            OptionsTestClient.OptionsResponseForTests override();
 
-		}
+        }
 
-		@FeignClient(name = "refreshableClient")
-		protected interface RefreshableClient {
+        @FeignClient(name = "refreshableClient")
+        protected interface RefreshableClient {
 
-			@GetMapping("/refreshable")
-			OptionsTestClient.OptionsResponseForTests refreshable();
+            @GetMapping("/refreshable")
+            OptionsTestClient.OptionsResponseForTests refreshable();
 
-		}
+        }
 
-		@FeignClient(name = "readTimeout")
-		protected interface ReadTimeoutClient {
+        @FeignClient(name = "readTimeout")
+        protected interface ReadTimeoutClient {
 
-			@GetMapping("/readTimeout")
-			OptionsTestClient.OptionsResponseForTests readTimeout();
+            @GetMapping("/readTimeout")
+            OptionsTestClient.OptionsResponseForTests readTimeout();
 
-		}
+        }
 
-		@FeignClient(name = "connectTimeout")
-		protected interface ConnectTimeoutClient {
+        @FeignClient(name = "connectTimeout")
+        protected interface ConnectTimeoutClient {
 
-			@GetMapping("/connectTimeout")
-			OptionsTestClient.OptionsResponseForTests connectTimeout();
+            @GetMapping("/connectTimeout")
+            OptionsTestClient.OptionsResponseForTests connectTimeout();
 
-		}
+        }
 
-		@Configuration
-		protected static class OverrideConfig {
+        @Configuration
+        protected static class OverrideConfig {
 
-			@Bean
-			public Request.Options options() {
-				return new Request.Options(1, TimeUnit.MILLISECONDS, 1, TimeUnit.MILLISECONDS, true);
-			}
+            @Bean
+            public Request.Options options() {
+                return new Request.Options(1, TimeUnit.MILLISECONDS, 1, TimeUnit.MILLISECONDS, true);
+            }
 
-		}
+        }
 
-	}
+    }
 
 }

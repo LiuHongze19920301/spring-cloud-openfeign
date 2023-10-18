@@ -47,66 +47,66 @@ import org.springframework.web.bind.annotation.RestController;
  */
 public class AbstractSpringMvcContractIntegrationTests {
 
-	@BeforeAll
-	public static void beforeClass() {
-		System.setProperty("server.port", String.valueOf(TestSocketUtils.findAvailableTcpPort()));
-	}
+    @BeforeAll
+    public static void beforeClass() {
+        System.setProperty("server.port", String.valueOf(TestSocketUtils.findAvailableTcpPort()));
+    }
 
-	@AfterAll
-	public static void afterClass() {
-		System.clearProperty("server.port");
-	}
+    @AfterAll
+    public static void afterClass() {
+        System.clearProperty("server.port");
+    }
 
-	protected String getUrlQueryParam(Response response) {
-		return response.request().requestTemplate().queries().get("url").stream().findFirst()
-				.orElseThrow(IllegalStateException::new);
-	}
+    protected String getUrlQueryParam(Response response) {
+        return response.request().requestTemplate().queries().get("url").stream().findFirst()
+            .orElseThrow(IllegalStateException::new);
+    }
 
-	@FeignClient(name = "test", url = "http://localhost:${server.port}/",
-			configuration = NoCodecsFeignConfiguration.class)
-	interface TestClient {
+    @FeignClient(name = "test", url = "http://localhost:${server.port}/",
+        configuration = NoCodecsFeignConfiguration.class)
+    interface TestClient {
 
-		@PostMapping("/test")
-		Object sendMessage(@RequestBody String message, @RequestHeader(HttpHeaders.CONTENT_TYPE) String acceptHeader);
+        @PostMapping("/test")
+        Object sendMessage(@RequestBody String message, @RequestHeader(HttpHeaders.CONTENT_TYPE) String acceptHeader);
 
-		@GetMapping("/get")
-		Object getMessage(@RequestParam String url);
+        @GetMapping("/get")
+        Object getMessage(@RequestParam String url);
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = TestClient.class)
-	@EnableAutoConfiguration
-	@RestController
-	@Import(NoSecurityConfiguration.class)
-	protected static class Config {
+    @Configuration(proxyBeanMethods = false)
+    @EnableFeignClients(clients = TestClient.class)
+    @EnableAutoConfiguration
+    @RestController
+    @Import(NoSecurityConfiguration.class)
+    protected static class Config {
 
-		@PostMapping("/test")
-		Object sendMessage(@RequestBody String message, @RequestHeader(HttpHeaders.CONTENT_TYPE) String acceptHeader) {
-			return message;
-		}
+        @PostMapping("/test")
+        Object sendMessage(@RequestBody String message, @RequestHeader(HttpHeaders.CONTENT_TYPE) String acceptHeader) {
+            return message;
+        }
 
-		@GetMapping("/get")
-		Object getMessage(@RequestParam String url) {
-			return url;
-		}
+        @GetMapping("/get")
+        Object getMessage(@RequestParam String url) {
+            return url;
+        }
 
-	}
+    }
 
-	// Avoid feign.codec.EncodeException - this feature works for users that override
-	// Encoder
-	protected static class NoCodecsFeignConfiguration {
+    // Avoid feign.codec.EncodeException - this feature works for users that override
+    // Encoder
+    protected static class NoCodecsFeignConfiguration {
 
-		@Bean
-		public Decoder decoder() {
-			return (response, type) -> response;
-		}
+        @Bean
+        public Decoder decoder() {
+            return (response, type) -> response;
+        }
 
-		@Bean
-		public Encoder encoder() {
-			return (object, bodyType, request) -> request.body(object.toString().getBytes(), Charset.defaultCharset());
-		}
+        @Bean
+        public Encoder encoder() {
+            return (object, bodyType, request) -> request.body(object.toString().getBytes(), Charset.defaultCharset());
+        }
 
-	}
+    }
 
 }

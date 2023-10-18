@@ -32,93 +32,93 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FeignLoggerFactoryTests {
 
-	@Test
-	void testDefaultLogger() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration1.class);
-		FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
-		assertThat(loggerFactory).isNotNull();
-		Logger logger = loggerFactory.create(Object.class);
-		assertThat(logger).isNotNull();
-		assertThat(logger instanceof Slf4jLogger).isTrue();
-		context.close();
-	}
+    @Test
+    void testDefaultLogger() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration1.class);
+        FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
+        assertThat(loggerFactory).isNotNull();
+        Logger logger = loggerFactory.create(Object.class);
+        assertThat(logger).isNotNull();
+        assertThat(logger instanceof Slf4jLogger).isTrue();
+        context.close();
+    }
 
-	@Test
-	void testCustomLogger() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration2.class);
-		FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
-		assertThat(loggerFactory).isNotNull();
-		Logger logger = loggerFactory.create(Object.class);
-		assertThat(logger).isNotNull();
-		assertThat(logger instanceof LoggerImpl1).isTrue();
-		context.close();
-	}
+    @Test
+    void testCustomLogger() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration2.class);
+        FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
+        assertThat(loggerFactory).isNotNull();
+        Logger logger = loggerFactory.create(Object.class);
+        assertThat(logger).isNotNull();
+        assertThat(logger instanceof LoggerImpl1).isTrue();
+        context.close();
+    }
 
-	@Test
-	void testCustomLoggerFactory() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration3.class);
-		FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
-		assertThat(loggerFactory).isNotNull();
-		assertThat(loggerFactory instanceof LoggerFactoryImpl).isTrue();
-		Logger logger = loggerFactory.create(Object.class);
-		assertThat(logger).isNotNull();
-		assertThat(logger instanceof LoggerImpl2).isTrue();
-		context.close();
-	}
+    @Test
+    void testCustomLoggerFactory() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SampleConfiguration3.class);
+        FeignLoggerFactory loggerFactory = context.getBean(FeignLoggerFactory.class);
+        assertThat(loggerFactory).isNotNull();
+        assertThat(loggerFactory instanceof LoggerFactoryImpl).isTrue();
+        Logger logger = loggerFactory.create(Object.class);
+        assertThat(logger).isNotNull();
+        assertThat(logger instanceof LoggerImpl2).isTrue();
+        context.close();
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration1 {
+    @Configuration(proxyBeanMethods = false)
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration1 {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration2 {
+    @Configuration(proxyBeanMethods = false)
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration2 {
 
-		@Bean
-		public Logger logger() {
-			return new LoggerImpl1();
-		}
+        @Bean
+        public Logger logger() {
+            return new LoggerImpl1();
+        }
 
-	}
+    }
 
-	static class LoggerImpl1 extends Logger {
+    static class LoggerImpl1 extends Logger {
 
-		@Override
-		protected void log(String arg0, String arg1, Object... arg2) {
-			// noop
-		}
+        @Override
+        protected void log(String arg0, String arg1, Object... arg2) {
+            // noop
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import(FeignClientsConfiguration.class)
-	protected static class SampleConfiguration3 {
+    @Configuration(proxyBeanMethods = false)
+    @Import(FeignClientsConfiguration.class)
+    protected static class SampleConfiguration3 {
 
-		@Bean
-		public FeignLoggerFactory feignLoggerFactory() {
-			return new LoggerFactoryImpl();
-		}
+        @Bean
+        public FeignLoggerFactory feignLoggerFactory() {
+            return new LoggerFactoryImpl();
+        }
 
-	}
+    }
 
-	static class LoggerFactoryImpl implements FeignLoggerFactory {
+    static class LoggerFactoryImpl implements FeignLoggerFactory {
 
-		@Override
-		public Logger create(Class<?> type) {
-			return new LoggerImpl2();
-		}
+        @Override
+        public Logger create(Class<?> type) {
+            return new LoggerImpl2();
+        }
 
-	}
+    }
 
-	static class LoggerImpl2 extends Logger {
+    static class LoggerImpl2 extends Logger {
 
-		@Override
-		protected void log(String arg0, String arg1, Object... arg2) {
-			// noop
-		}
+        @Override
+        protected void log(String arg0, String arg1, Object... arg2) {
+            // noop
+        }
 
-	}
+    }
 
 }

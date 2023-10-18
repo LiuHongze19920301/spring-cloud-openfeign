@@ -43,47 +43,47 @@ import static org.hamcrest.Matchers.notNullValue;
 @ExtendWith(MockitoExtension.class)
 class SortJacksonModuleTests {
 
-	@Spy
-	private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper;
 
-	@BeforeEach
-	public void setup() {
-		objectMapper.registerModules(new PageJacksonModule());
-		objectMapper.registerModule(new SortJacksonModule());
-	}
+    @BeforeEach
+    public void setup() {
+        objectMapper.registerModules(new PageJacksonModule());
+        objectMapper.registerModule(new SortJacksonModule());
+    }
 
-	@Test
-	public void deserializePage() throws JsonProcessingException {
-		// Given
-		String pageJson = "{\"content\":[\"A name\"],\"number\":1,\"size\":2,\"totalElements\":3,\"sort\":[{\"direction\":\"ASC\",\"property\":\"field\",\"ignoreCase\":false,\"nullHandling\":\"NATIVE\",\"descending\":false,\"ascending\":true}]}";
-		// When
-		Page<?> result = objectMapper.readValue(pageJson, Page.class);
-		// Then
-		assertThat(result, notNullValue());
-		assertThat(result, hasProperty("totalElements", is(3L)));
-		assertThat(result.getContent(), hasSize(1));
-		assertThat(result.getPageable(), notNullValue());
-		assertThat(result.getPageable().getPageNumber(), is(1));
-		assertThat(result.getPageable().getPageSize(), is(2));
-		assertThat(result.getPageable().getSort(), notNullValue());
-		result.getPageable().getSort();
-		Optional<Sort.Order> optionalOrder = result.getPageable().getSort().get().findFirst();
-		if (optionalOrder.isPresent()) {
-			Sort.Order order = optionalOrder.get();
-			assertThat(order, hasProperty("property", is("field")));
-			assertThat(order, hasProperty("direction", is(Sort.Direction.ASC)));
-		}
-	}
+    @Test
+    public void deserializePage() throws JsonProcessingException {
+        // Given
+        String pageJson = "{\"content\":[\"A name\"],\"number\":1,\"size\":2,\"totalElements\":3,\"sort\":[{\"direction\":\"ASC\",\"property\":\"field\",\"ignoreCase\":false,\"nullHandling\":\"NATIVE\",\"descending\":false,\"ascending\":true}]}";
+        // When
+        Page<?> result = objectMapper.readValue(pageJson, Page.class);
+        // Then
+        assertThat(result, notNullValue());
+        assertThat(result, hasProperty("totalElements", is(3L)));
+        assertThat(result.getContent(), hasSize(1));
+        assertThat(result.getPageable(), notNullValue());
+        assertThat(result.getPageable().getPageNumber(), is(1));
+        assertThat(result.getPageable().getPageSize(), is(2));
+        assertThat(result.getPageable().getSort(), notNullValue());
+        result.getPageable().getSort();
+        Optional<Sort.Order> optionalOrder = result.getPageable().getSort().get().findFirst();
+        if (optionalOrder.isPresent()) {
+            Sort.Order order = optionalOrder.get();
+            assertThat(order, hasProperty("property", is("field")));
+            assertThat(order, hasProperty("direction", is(Sort.Direction.ASC)));
+        }
+    }
 
-	@Test
-	public void serializePage() throws IOException {
-		// Given
-		Sort sort = Sort.by(Sort.Order.by("fieldName"));
-		// When
-		String result = objectMapper.writeValueAsString(sort);
-		// Then
-		assertThat(result, containsString("\"direction\":\"ASC\""));
-		assertThat(result, containsString("\"property\":\"fieldName\""));
-	}
+    @Test
+    public void serializePage() throws IOException {
+        // Given
+        Sort sort = Sort.by(Sort.Order.by("fieldName"));
+        // When
+        String result = objectMapper.writeValueAsString(sort);
+        // Then
+        assertThat(result, containsString("\"direction\":\"ASC\""));
+        assertThat(result, containsString("\"property\":\"fieldName\""));
+    }
 
 }

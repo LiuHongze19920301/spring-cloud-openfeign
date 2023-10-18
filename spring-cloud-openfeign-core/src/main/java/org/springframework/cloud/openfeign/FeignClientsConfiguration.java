@@ -109,7 +109,7 @@ public class FeignClientsConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnMissingClass("org.springframework.data.domain.Pageable")
 	public Encoder feignEncoder(ObjectProvider<AbstractFormWriter> formWriterProvider,
-			ObjectProvider<HttpMessageConverterCustomizer> customizers) {
+								ObjectProvider<HttpMessageConverterCustomizer> customizers) {
 		return springEncoder(formWriterProvider, encoderProperties, customizers);
 	}
 
@@ -117,9 +117,9 @@ public class FeignClientsConfiguration {
 	@ConditionalOnClass(name = "org.springframework.data.domain.Pageable")
 	@ConditionalOnMissingBean
 	public Encoder feignEncoderPageable(ObjectProvider<AbstractFormWriter> formWriterProvider,
-			ObjectProvider<HttpMessageConverterCustomizer> customizers) {
+										ObjectProvider<HttpMessageConverterCustomizer> customizers) {
 		PageableSpringEncoder encoder = new PageableSpringEncoder(
-				springEncoder(formWriterProvider, encoderProperties, customizers));
+			springEncoder(formWriterProvider, encoderProperties, customizers));
 
 		if (springDataWebProperties != null) {
 			encoder.setPageParameter(springDataWebProperties.getPageable().getPageParameter());
@@ -178,14 +178,13 @@ public class FeignClientsConfiguration {
 	}
 
 	private Encoder springEncoder(ObjectProvider<AbstractFormWriter> formWriterProvider,
-			FeignEncoderProperties encoderProperties, ObjectProvider<HttpMessageConverterCustomizer> customizers) {
+								  FeignEncoderProperties encoderProperties, ObjectProvider<HttpMessageConverterCustomizer> customizers) {
 		AbstractFormWriter formWriter = formWriterProvider.getIfAvailable();
 
 		if (formWriter != null) {
 			return new SpringEncoder(new SpringPojoFormEncoder(formWriter), messageConverters, encoderProperties,
-					customizers);
-		}
-		else {
+				customizers);
+		} else {
 			return new SpringEncoder(new SpringFormEncoder(), messageConverters, encoderProperties, customizers);
 		}
 	}
@@ -221,7 +220,7 @@ public class FeignClientsConfiguration {
 
 		@Bean
 		@Scope("prototype")
-		@ConditionalOnMissingBean({ Feign.Builder.class, CircuitBreakerFactory.class })
+		@ConditionalOnMissingBean({Feign.Builder.class, CircuitBreakerFactory.class})
 		public Feign.Builder defaultFeignBuilder(Retryer retryer) {
 			return Feign.builder().retryer(retryer);
 		}
@@ -238,7 +237,7 @@ public class FeignClientsConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(name = "spring.cloud.openfeign.micrometer.enabled", matchIfMissing = true)
-	@ConditionalOnClass({ MicrometerObservationCapability.class, MicrometerCapability.class, MeterRegistry.class })
+	@ConditionalOnClass({MicrometerObservationCapability.class, MicrometerCapability.class, MeterRegistry.class})
 	@Conditional(FeignClientMicrometerEnabledCondition.class)
 	protected static class MicrometerConfiguration {
 
@@ -251,7 +250,7 @@ public class FeignClientsConfiguration {
 
 		@Bean
 		@ConditionalOnBean(type = "io.micrometer.core.instrument.MeterRegistry")
-		@ConditionalOnMissingBean({ MicrometerCapability.class, MicrometerObservationCapability.class })
+		@ConditionalOnMissingBean({MicrometerCapability.class, MicrometerObservationCapability.class})
 		public MicrometerCapability micrometerCapability(MeterRegistry registry) {
 			return new MicrometerCapability(registry);
 		}

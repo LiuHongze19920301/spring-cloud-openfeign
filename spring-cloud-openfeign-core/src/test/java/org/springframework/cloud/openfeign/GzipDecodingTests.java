@@ -40,133 +40,133 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = GzipDecodingTests.Application.class,
-		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=defaultGzipDecoderTests",
-				"spring.cloud.openfeign.compression.response.enabled=true",
-				"spring.cloud.openfeign.client.config.default.loggerLevel=none",
-				"spring.cloud.openfeign.micrometer.enabled=false",
-				"logging.level.org.springframework.cloud.openfeign=DEBUG" })
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    value = {"spring.application.name=defaultGzipDecoderTests",
+        "spring.cloud.openfeign.compression.response.enabled=true",
+        "spring.cloud.openfeign.client.config.default.loggerLevel=none",
+        "spring.cloud.openfeign.micrometer.enabled=false",
+        "logging.level.org.springframework.cloud.openfeign=DEBUG"})
 @DirtiesContext
 class GzipDecodingTests extends FeignClientFactoryBean {
 
-	@Autowired
-	FeignClientFactory context;
+    @Autowired
+    FeignClientFactory context;
 
-	@Value("${local.server.port}")
-	private int port = 0;
+    @Value("${local.server.port}")
+    private int port = 0;
 
-	GzipDecodingTests() {
-		setName("tests");
-		setContextId("test");
-	}
+    GzipDecodingTests() {
+        setName("tests");
+        setContextId("test");
+    }
 
-	public TestClient testClient() {
-		setType(this.getClass());
-		return feign(context).target(TestClient.class, "http://localhost:" + this.port);
-	}
+    public TestClient testClient() {
+        setType(this.getClass());
+        return feign(context).target(TestClient.class, "http://localhost:" + this.port);
+    }
 
-	@Test
-	void testBodyDecompress() {
-		ResponseEntity<Hello> response = testClient().getGzipResponse();
-		assertThat(response).as("response was null").isNotNull();
-		assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
-		Hello hello = response.getBody();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world via response"));
-	}
+    @Test
+    void testBodyDecompress() {
+        ResponseEntity<Hello> response = testClient().getGzipResponse();
+        assertThat(response).as("response was null").isNotNull();
+        assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
+        Hello hello = response.getBody();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world via response"));
+    }
 
-	@Test
-	void testNullBodyDecompress() {
-		ResponseEntity<Hello> response = testClient().getNullResponse();
-		assertThat(response).as("response was null").isNotNull();
-		assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
-		Hello hello = response.getBody();
-		assertThat(hello).as("hello was not null").isNull();
-		assertThat(hello).as("null hello didn't match").isEqualTo(null);
-	}
+    @Test
+    void testNullBodyDecompress() {
+        ResponseEntity<Hello> response = testClient().getNullResponse();
+        assertThat(response).as("response was null").isNotNull();
+        assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
+        Hello hello = response.getBody();
+        assertThat(hello).as("hello was not null").isNull();
+        assertThat(hello).as("null hello didn't match").isEqualTo(null);
+    }
 
-	@Test
-	void testCharsetDecompress() {
-		ResponseEntity<Hello> response = testClient().getUtf8Response();
-		assertThat(response).as("response was null").isNotNull();
-		assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
-		Hello hello = response.getBody();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("utf8 hello didn't match").isEqualTo(new Hello("안녕하세요 means Hello in Korean"));
-	}
+    @Test
+    void testCharsetDecompress() {
+        ResponseEntity<Hello> response = testClient().getUtf8Response();
+        assertThat(response).as("response was null").isNotNull();
+        assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
+        Hello hello = response.getBody();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("utf8 hello didn't match").isEqualTo(new Hello("안녕하세요 means Hello in Korean"));
+    }
 
-	private static class Hello {
+    private static class Hello {
 
-		private String message;
+        private String message;
 
-		Hello() {
-		}
+        Hello() {
+        }
 
-		Hello(String message) {
-			this.message = message;
-		}
+        Hello(String message) {
+            this.message = message;
+        }
 
-		public String getMessage() {
-			return message;
-		}
+        public String getMessage() {
+            return message;
+        }
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+        public void setMessage(String message) {
+            this.message = message;
+        }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
-			Hello that = (Hello) o;
-			return Objects.equals(message, that.message);
-		}
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Hello that = (Hello) o;
+            return Objects.equals(message, that.message);
+        }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(message);
-		}
+        @Override
+        public int hashCode() {
+            return Objects.hash(message);
+        }
 
-	}
+    }
 
-	protected interface TestClient {
+    protected interface TestClient {
 
-		@GetMapping("/helloGzipResponse")
-		ResponseEntity<Hello> getGzipResponse();
+        @GetMapping("/helloGzipResponse")
+        ResponseEntity<Hello> getGzipResponse();
 
-		@GetMapping("/nullGzipResponse")
-		ResponseEntity<Hello> getNullResponse();
+        @GetMapping("/nullGzipResponse")
+        ResponseEntity<Hello> getNullResponse();
 
-		@GetMapping("/utf8Response")
-		ResponseEntity<Hello> getUtf8Response();
+        @GetMapping("/utf8Response")
+        ResponseEntity<Hello> getUtf8Response();
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@RestController
-	@Import(NoSecurityConfiguration.class)
-	protected static class Application implements TestClient {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @RestController
+    @Import(NoSecurityConfiguration.class)
+    protected static class Application implements TestClient {
 
-		@Override
-		public ResponseEntity<Hello> getGzipResponse() {
-			return ResponseEntity.ok(new Hello("hello world via response"));
-		}
+        @Override
+        public ResponseEntity<Hello> getGzipResponse() {
+            return ResponseEntity.ok(new Hello("hello world via response"));
+        }
 
-		@Override
-		public ResponseEntity<Hello> getNullResponse() {
-			return ResponseEntity.ok(null);
-		}
+        @Override
+        public ResponseEntity<Hello> getNullResponse() {
+            return ResponseEntity.ok(null);
+        }
 
-		@Override
-		public ResponseEntity<Hello> getUtf8Response() {
-			return ResponseEntity.ok(new Hello("안녕하세요 means Hello in Korean"));
-		}
+        @Override
+        public ResponseEntity<Hello> getUtf8Response() {
+            return ResponseEntity.ok(new Hello("안녕하세요 means Hello in Korean"));
+        }
 
-	}
+    }
 
 }

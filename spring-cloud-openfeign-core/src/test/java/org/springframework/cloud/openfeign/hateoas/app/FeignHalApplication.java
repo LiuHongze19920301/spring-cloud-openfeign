@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Import;
  */
 @EnableFeignClients(clients = FeignHalClient.class)
 @SpringBootApplication(scanBasePackages = "org.springframework.cloud.openfeign.hateoas.app",
-		exclude = RepositoryRestMvcAutoConfiguration.class)
+	exclude = RepositoryRestMvcAutoConfiguration.class)
 @LoadBalancerClient(name = "local", configuration = LocalHalClientConfiguration.class)
 @Import(NoSecurityConfiguration.class)
 public class FeignHalApplication {
@@ -52,7 +52,7 @@ class LocalHalClientConfiguration {
 	@Bean
 	public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 		return ServiceInstanceListSuppliers.from("local",
-				new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+			new DefaultServiceInstance("local-1", "local", "localhost", port, false));
 	}
 
 }

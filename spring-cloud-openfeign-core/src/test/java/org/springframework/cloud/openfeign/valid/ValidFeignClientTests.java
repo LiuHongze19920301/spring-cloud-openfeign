@@ -96,9 +96,9 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = ValidFeignClientTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false",
-				"spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.openfeign.circuitbreaker.enabled=true",
-				"spring.cloud.loadbalancer.retry.enabled=false" })
+	value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.httpclient.hc5.enabled=false",
+		"spring.cloud.openfeign.okhttp.enabled=false", "spring.cloud.openfeign.circuitbreaker.enabled=true",
+		"spring.cloud.loadbalancer.retry.enabled=false"})
 @DirtiesContext
 class ValidFeignClientTests {
 
@@ -320,8 +320,8 @@ class ValidFeignClientTests {
 	@Test
 	void testRequestPartWithListOfMultipartFiles() {
 		List<MultipartFile> multipartFiles = Arrays.asList(
-				new MockMultipartFile("file1", "hello1.bin", null, "hello".getBytes()),
-				new MockMultipartFile("file2", "hello2.bin", null, "hello".getBytes()));
+			new MockMultipartFile("file1", "hello1.bin", null, "hello".getBytes()),
+			new MockMultipartFile("file2", "hello2.bin", null, "hello".getBytes()));
 		String partNames = multipartClient.requestPartListOfMultipartFilesReturnsPartNames(multipartFiles);
 		assertThat(partNames).isEqualTo("files,files");
 		String fileNames = multipartClient.requestPartListOfMultipartFilesReturnsFileNames(multipartFiles);
@@ -335,7 +335,7 @@ class ValidFeignClientTests {
 		MockMultipartFile file1 = new MockMultipartFile("file1", "hello1.bin", null, "hello".getBytes());
 		MockMultipartFile file2 = new MockMultipartFile("file2", "hello2.bin", null, "hello".getBytes());
 		String response = multipartClient.requestPartListOfPojosAndListOfMultipartFiles(Arrays.asList(pojo1, pojo2),
-				Arrays.asList(file1, file2));
+			Arrays.asList(file1, file2));
 		assertThat(response).isEqualTo("hello world 1oi terra 2hello1.binhello2.bin");
 	}
 
@@ -397,12 +397,12 @@ class ValidFeignClientTests {
 
 		@PostMapping(path = "/multipart", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String multipart(@RequestPart("hello") String hello, @RequestPart("world") String world,
-				@RequestPart("file") MultipartFile file);
+						 @RequestPart("file") MultipartFile file);
 
 		@PostMapping(path = "/multipartPojo", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String multipartPojo(@RequestPart("hello") String hello, @RequestPart("world") String world,
-				@RequestPart("pojo1") Hello pojo1, @RequestPart("pojo2") Hello pojo2,
-				@RequestPart("file") MultipartFile file);
+							 @RequestPart("pojo1") Hello pojo1, @RequestPart("pojo2") Hello pojo2,
+							 @RequestPart("file") MultipartFile file);
 
 		@PostMapping(path = "/multipartNames", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String requestPartListOfMultipartFilesReturnsPartNames(@RequestPart("files") List<MultipartFile> files);
@@ -412,7 +412,7 @@ class ValidFeignClientTests {
 
 		@PostMapping(path = "/multipartPojosFiles", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String requestPartListOfPojosAndListOfMultipartFiles(@RequestPart("pojos") List<Hello> pojos,
-				@RequestPart("files") List<MultipartFile> files);
+															 @RequestPart("files") List<MultipartFile> files);
 
 		@PostMapping(path = "/multipartNames", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String requestBodyListOfMultipartFiles(@RequestBody List<MultipartFile> files);
@@ -424,7 +424,7 @@ class ValidFeignClientTests {
 		String requestBodyMap(@RequestBody Map<String, ?> form);
 
 		@PostMapping(path = "/invalid", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE,
-				produces = TEXT_PLAIN_VALUE)
+			produces = TEXT_PLAIN_VALUE)
 		String invalid(@RequestBody MultipartFile file);
 
 	}
@@ -451,7 +451,7 @@ class ValidFeignClientTests {
 		List<String> getHelloHeaders();
 
 		@GetMapping(path = "/helloheadersplaceholders",
-				headers = "myPlaceholderHeader=${feignClient.myPlaceholderHeader}")
+			headers = "myPlaceholderHeader=${feignClient.myPlaceholderHeader}")
 		String getHelloHeadersPlaceholders();
 
 		@GetMapping("/helloparams")
@@ -459,7 +459,7 @@ class ValidFeignClientTests {
 
 		@GetMapping("/formattedparams")
 		List<LocalDate> getFormattedParams(
-				@RequestParam("params") @DateTimeFormat(pattern = "dd-MM-yyyy") List<LocalDate> params);
+			@RequestParam("params") @DateTimeFormat(pattern = "dd-MM-yyyy") List<LocalDate> params);
 
 		@GetMapping("/noContent")
 		ResponseEntity<Void> noContent();
@@ -471,7 +471,7 @@ class ValidFeignClientTests {
 		HttpEntity<Hello> getHelloEntity();
 
 		@RequestMapping(method = RequestMethod.POST, consumes = "application/vnd.io.spring.cloud.test.v1+json",
-				produces = "application/vnd.io.spring.cloud.test.v1+json", path = "/complex")
+			produces = "application/vnd.io.spring.cloud.test.v1+json", path = "/complex")
 		String moreComplexContentType(String body);
 
 		@GetMapping("/tostring")
@@ -540,22 +540,22 @@ class ValidFeignClientTests {
 	@EnableAutoConfiguration
 	@RestController
 	@EnableFeignClients(
-			clients = { TestClientServiceId.class, TestClient.class, DecodingTestClient.class, MultipartClient.class },
-			defaultConfiguration = TestDefaultFeignConfig.class)
+		clients = {TestClientServiceId.class, TestClient.class, DecodingTestClient.class, MultipartClient.class},
+		defaultConfiguration = TestDefaultFeignConfig.class)
 	@LoadBalancerClients({
 
-			@LoadBalancerClient(name = "localapp", configuration = LocalLoadBalancerClientConfiguration.class),
+		@LoadBalancerClient(name = "localapp", configuration = LocalLoadBalancerClientConfiguration.class),
 
-			@LoadBalancerClient(name = "localapp1", configuration = LocalLoadBalancerClientConfiguration.class),
+		@LoadBalancerClient(name = "localapp1", configuration = LocalLoadBalancerClientConfiguration.class),
 
-			@LoadBalancerClient(name = "localapp2", configuration = LocalLoadBalancerClientConfiguration.class),
-			@LoadBalancerClient(name = "localapp8", configuration = LocalLoadBalancerClientConfiguration.class) })
+		@LoadBalancerClient(name = "localapp2", configuration = LocalLoadBalancerClientConfiguration.class),
+		@LoadBalancerClient(name = "localapp8", configuration = LocalLoadBalancerClientConfiguration.class)})
 	@Import(NoSecurityConfiguration.class)
 	protected static class Application {
 
 		public static void main(String[] args) {
 			new SpringApplicationBuilder(Application.class)
-					.properties("spring.application.name=feignclienttest", "management.contextPath=/admin").run(args);
+				.properties("spring.application.name=feignclienttest", "management.contextPath=/admin").run(args);
 		}
 
 		@Bean
@@ -608,7 +608,7 @@ class ValidFeignClientTests {
 
 		@GetMapping("/helloheaders")
 		public List<String> getHelloHeaders(@RequestHeader(MYHEADER1) String myheader1,
-				@RequestHeader(MYHEADER2) String myheader2) {
+											@RequestHeader(MYHEADER2) String myheader2) {
 			ArrayList<String> headers = new ArrayList<>();
 			headers.add(myheader1);
 			headers.add(myheader2);
@@ -627,7 +627,7 @@ class ValidFeignClientTests {
 
 		@GetMapping("/formattedparams")
 		public List<LocalDate> getFormattedParams(
-				@RequestParam("params") @DateTimeFormat(pattern = "dd-MM-yyyy") List<LocalDate> params) {
+			@RequestParam("params") @DateTimeFormat(pattern = "dd-MM-yyyy") List<LocalDate> params) {
 			return params;
 		}
 
@@ -652,7 +652,7 @@ class ValidFeignClientTests {
 		}
 
 		@RequestMapping(method = RequestMethod.POST, consumes = "application/vnd.io.spring.cloud.test.v1+json",
-				produces = "application/vnd.io.spring.cloud.test.v1+json", path = "/complex")
+			produces = "application/vnd.io.spring.cloud.test.v1+json", path = "/complex")
 		String complex(@RequestBody String body, @RequestHeader("Content-Length") int contentLength) {
 			if (contentLength <= 0) {
 				throw new IllegalArgumentException("Invalid Content-Length " + contentLength);
@@ -691,14 +691,14 @@ class ValidFeignClientTests {
 
 		@PostMapping(path = "/multipart", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String multipart(@RequestPart("hello") String hello, @RequestPart("world") String world,
-				@RequestPart("file") MultipartFile file) {
+						 @RequestPart("file") MultipartFile file) {
 			return hello + world + file.getOriginalFilename();
 		}
 
 		@PostMapping(path = "/multipartPojo", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String multipartPojo(@RequestPart("hello") String hello, @RequestPart("world") String world,
-				@RequestPart("pojo1") Hello pojo1, @RequestPart("pojo2") Hello pojo2,
-				@RequestPart("file") MultipartFile file) {
+							 @RequestPart("pojo1") Hello pojo1, @RequestPart("pojo2") Hello pojo2,
+							 @RequestPart("file") MultipartFile file) {
 			return hello + world + pojo1.getMessage() + pojo2.getMessage() + file.getOriginalFilename();
 		}
 
@@ -714,7 +714,7 @@ class ValidFeignClientTests {
 
 		@PostMapping(path = "/multipartPojosFiles", consumes = MULTIPART_FORM_DATA_VALUE, produces = TEXT_PLAIN_VALUE)
 		String requestPartListOfPojosAndListOfMultipartFiles(@RequestPart("pojos") List<Hello> pojos,
-				@RequestPart("files") List<MultipartFile> files) {
+															 @RequestPart("files") List<MultipartFile> files) {
 			StringBuilder result = new StringBuilder();
 
 			for (Hello pojo : pojos) {
@@ -793,7 +793,7 @@ class ValidFeignClientTests {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+				new DefaultServiceInstance("local-1", "local", "localhost", port, false));
 		}
 
 	}

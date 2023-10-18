@@ -50,14 +50,14 @@ public class PathVariableParameterProcessor implements AnnotatedParameterProcess
 	public boolean processArgument(AnnotatedParameterContext context, Annotation annotation, Method method) {
 		String name = ANNOTATION.cast(annotation).value();
 		checkState(emptyToNull(name) != null, "PathVariable annotation was empty on param %s.",
-				context.getParameterIndex());
+			context.getParameterIndex());
 		context.setParameterName(name);
 
 		MethodMetadata data = context.getMethodMetadata();
 		String varName = '{' + name + '}';
 		String varNameRegex = ".*\\{" + name + "(:[^}]+)?\\}.*";
 		if (!data.template().url().matches(varNameRegex) && !containsMapValues(data.template().queries(), varName)
-				&& !containsMapValues(data.template().headers(), varName)) {
+			&& !containsMapValues(data.template().headers(), varName)) {
 			data.formParams().add(name);
 		}
 		return true;

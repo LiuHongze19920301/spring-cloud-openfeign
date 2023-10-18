@@ -39,54 +39,54 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Spencer Gibb
  */
-@ClassPathExclusions({ "spring-data-commons-*.jar" })
+@ClassPathExclusions({"spring-data-commons-*.jar"})
 class EnableFeignClientsTests {
 
-	private ConfigurableApplicationContext context;
+    private ConfigurableApplicationContext context;
 
-	@BeforeEach
-	void setUp() {
-		context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
-				.properties("debug=true", "spring.cloud.openfeign.httpclient.hc5.enabled=false")
-				.sources(EnableFeignClientsTests.PlainConfiguration.class).run();
-	}
+    @BeforeEach
+    void setUp() {
+        context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
+            .properties("debug=true", "spring.cloud.openfeign.httpclient.hc5.enabled=false")
+            .sources(EnableFeignClientsTests.PlainConfiguration.class).run();
+    }
 
-	@AfterEach
-	void tearDown() {
-		if (context != null) {
-			context.close();
-		}
-	}
+    @AfterEach
+    void tearDown() {
+        if (context != null) {
+            context.close();
+        }
+    }
 
-	@Test
-	void decoderDefaultCorrect() {
-		OptionalDecoder.class.cast(this.context.getBeansOfType(Decoder.class).get(0));
-	}
+    @Test
+    void decoderDefaultCorrect() {
+        OptionalDecoder.class.cast(this.context.getBeansOfType(Decoder.class).get(0));
+    }
 
-	@Test
-	void encoderDefaultCorrect() {
-		SpringEncoder.class.cast(this.context.getBeansOfType(Encoder.class).get(0));
-	}
+    @Test
+    void encoderDefaultCorrect() {
+        SpringEncoder.class.cast(this.context.getBeansOfType(Encoder.class).get(0));
+    }
 
-	@Test
-	void loggerDefaultCorrect() {
-		Slf4jLogger.class.cast(this.context.getBeansOfType(Logger.class).get(0));
-	}
+    @Test
+    void loggerDefaultCorrect() {
+        Slf4jLogger.class.cast(this.context.getBeansOfType(Logger.class).get(0));
+    }
 
-	@Test
-	void contractDefaultCorrect() {
-		SpringMvcContract.class.cast(this.context.getBeansOfType(Contract.class).get(0));
-	}
+    @Test
+    void contractDefaultCorrect() {
+        SpringMvcContract.class.cast(this.context.getBeansOfType(Contract.class).get(0));
+    }
 
-	@Test
-	void builderDefaultCorrect() {
-		Feign.Builder.class.cast(this.context.getBeansOfType(Feign.Builder.class).get(0));
-	}
+    @Test
+    void builderDefaultCorrect() {
+        Feign.Builder.class.cast(this.context.getBeansOfType(Feign.Builder.class).get(0));
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
-	protected static class PlainConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @Import({FeignAutoConfiguration.class})
+    protected static class PlainConfiguration {
 
-	}
+    }
 
 }

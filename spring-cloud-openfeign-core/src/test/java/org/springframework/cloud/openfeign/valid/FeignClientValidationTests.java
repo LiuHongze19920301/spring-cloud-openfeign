@@ -45,7 +45,7 @@ class FeignClientValidationTests {
 	@Test
 	void validPlaceholder() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				PlaceholderUrlConfiguration.class);
+			PlaceholderUrlConfiguration.class);
 		assertThat(context.getBean(PlaceholderUrlConfiguration.Client.class)).isNotNull();
 		context.close();
 	}
@@ -53,15 +53,15 @@ class FeignClientValidationTests {
 	@Test
 	void validLoadBalanced() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				LoadBalancerAutoConfiguration.class,
-				org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration.class,
-				FeignLoadBalancerAutoConfiguration.class, GoodServiceIdConfiguration.class);
+			LoadBalancerAutoConfiguration.class,
+			org.springframework.cloud.loadbalancer.config.LoadBalancerAutoConfiguration.class,
+			FeignLoadBalancerAutoConfiguration.class, GoodServiceIdConfiguration.class);
 		assertThat(context.getBean(GoodServiceIdConfiguration.Client.class)).isNotNull();
 		context.close();
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
+	@Import({FeignAutoConfiguration.class})
 	@EnableFeignClients(clients = GoodUrlConfiguration.Client.class)
 	protected static class GoodUrlConfiguration {
 
@@ -77,7 +77,7 @@ class FeignClientValidationTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
+	@Import({FeignAutoConfiguration.class})
 	@EnableFeignClients(clients = PlaceholderUrlConfiguration.Client.class)
 	protected static class PlaceholderUrlConfiguration {
 
@@ -93,7 +93,7 @@ class FeignClientValidationTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Import({ FeignAutoConfiguration.class })
+	@Import({FeignAutoConfiguration.class})
 	@EnableFeignClients(clients = GoodServiceIdConfiguration.Client.class)
 	protected static class GoodServiceIdConfiguration {
 

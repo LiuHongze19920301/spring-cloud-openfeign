@@ -40,7 +40,7 @@ public class FeignCachingInvocationHandlerFactory implements InvocationHandlerFa
 	private final CacheInterceptor cacheInterceptor;
 
 	public FeignCachingInvocationHandlerFactory(InvocationHandlerFactory delegateFactory,
-			CacheInterceptor cacheInterceptor) {
+												CacheInterceptor cacheInterceptor) {
 		this.delegateFactory = delegateFactory;
 		this.cacheInterceptor = cacheInterceptor;
 	}

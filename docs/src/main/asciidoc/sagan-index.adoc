@@ -6,7 +6,6 @@ This project provides https://github.com/OpenFeign/feign[OpenFeign] integrations
 
 ## Getting Started
 
-
 ```java
 @SpringBootApplication
 @EnableFeignClients
@@ -27,7 +26,8 @@ public class WebApplication {
 
 ## Contributing
 
-We welcome contributions. You can read more on how to contribute to the project https://github.com/spring-cloud/spring-cloud-openfeign/blob/main/README.adoc#3-contributing[here].
+We welcome contributions.
+You can read more on how to contribute to the project https://github.com/spring-cloud/spring-cloud-openfeign/blob/main/README.adoc#3-contributing[here].
 
 ## Community Support
 

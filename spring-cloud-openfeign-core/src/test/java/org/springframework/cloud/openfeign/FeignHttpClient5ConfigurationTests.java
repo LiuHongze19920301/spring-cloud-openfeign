@@ -37,39 +37,39 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 class FeignHttpClient5ConfigurationTests {
 
-	private static void verifyHc5BeansAvailable(ConfigurableApplicationContext context) {
-		CloseableHttpClient httpClient = context.getBean(CloseableHttpClient.class);
-		assertThat(httpClient).isNotNull();
-		HttpClientConnectionManager connectionManager = context.getBean(HttpClientConnectionManager.class);
-		assertThat(connectionManager).isInstanceOf(PoolingHttpClientConnectionManager.class);
-		Client client = context.getBean(Client.class);
-		assertThat(client).isInstanceOf(ApacheHttp5Client.class);
-	}
+    private static void verifyHc5BeansAvailable(ConfigurableApplicationContext context) {
+        CloseableHttpClient httpClient = context.getBean(CloseableHttpClient.class);
+        assertThat(httpClient).isNotNull();
+        HttpClientConnectionManager connectionManager = context.getBean(HttpClientConnectionManager.class);
+        assertThat(connectionManager).isInstanceOf(PoolingHttpClientConnectionManager.class);
+        Client client = context.getBean(Client.class);
+        assertThat(client).isInstanceOf(ApacheHttp5Client.class);
+    }
 
-	@Test
-	void shouldInstantiateHttpClient5ByDefaultWhenDependenciesPresent() {
-		ConfigurableApplicationContext context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
-				.sources(FeignAutoConfiguration.class).run();
+    @Test
+    void shouldInstantiateHttpClient5ByDefaultWhenDependenciesPresent() {
+        ConfigurableApplicationContext context = new SpringApplicationBuilder().web(WebApplicationType.NONE)
+            .sources(FeignAutoConfiguration.class).run();
 
-		verifyHc5BeansAvailable(context);
+        verifyHc5BeansAvailable(context);
 
-		if (context != null) {
-			context.close();
-		}
-	}
+        if (context != null) {
+            context.close();
+        }
+    }
 
-	@Test
-	void shouldNotInstantiateHttpClient5ByWhenDependenciesPresentButPropertyDisabled() {
-		ConfigurableApplicationContext context = new SpringApplicationBuilder()
-				.properties("spring.cloud.openfeign.httpclient.hc5.enabled=false").web(WebApplicationType.NONE)
-				.sources(FeignAutoConfiguration.class).run();
+    @Test
+    void shouldNotInstantiateHttpClient5ByWhenDependenciesPresentButPropertyDisabled() {
+        ConfigurableApplicationContext context = new SpringApplicationBuilder()
+            .properties("spring.cloud.openfeign.httpclient.hc5.enabled=false").web(WebApplicationType.NONE)
+            .sources(FeignAutoConfiguration.class).run();
 
-		assertThatExceptionOfType(NoSuchBeanDefinitionException.class)
-				.isThrownBy(() -> context.getBean(CloseableHttpClient.class));
+        assertThatExceptionOfType(NoSuchBeanDefinitionException.class)
+            .isThrownBy(() -> context.getBean(CloseableHttpClient.class));
 
-		if (context != null) {
-			context.close();
-		}
-	}
+        if (context != null) {
+            context.close();
+        }
+    }
 
 }

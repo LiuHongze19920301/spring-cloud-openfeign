@@ -42,8 +42,8 @@ import org.springframework.context.annotation.Configuration;
  * @author changjin wei(魏昌进)
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnClass({ Http2Client.class, HttpClient.class })
-@ConditionalOnBean({ LoadBalancerClient.class, LoadBalancerClientFactory.class })
+@ConditionalOnClass({Http2Client.class, HttpClient.class})
+@ConditionalOnBean({LoadBalancerClient.class, LoadBalancerClientFactory.class})
 @ConditionalOnProperty("spring.cloud.openfeign.http2client.enabled")
 @EnableConfigurationProperties(LoadBalancerClientsProperties.class)
 class Http2ClientFeignLoadBalancerConfiguration {
@@ -52,11 +52,11 @@ class Http2ClientFeignLoadBalancerConfiguration {
 	@ConditionalOnMissingBean
 	@Conditional(OnRetryNotEnabledCondition.class)
 	public Client feignClient(LoadBalancerClient loadBalancerClient, HttpClient httpClient,
-			LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+							  LoadBalancerClientFactory loadBalancerClientFactory,
+							  List<LoadBalancerFeignRequestTransformer> transformers) {
 		Client delegate = new Http2Client(httpClient);
 		return new FeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancerClientFactory,
-				transformers);
+			transformers);
 	}
 
 	@Bean
@@ -64,13 +64,13 @@ class Http2ClientFeignLoadBalancerConfiguration {
 	@ConditionalOnClass(name = "org.springframework.retry.support.RetryTemplate")
 	@ConditionalOnBean(LoadBalancedRetryFactory.class)
 	@ConditionalOnProperty(value = "spring.cloud.loadbalancer.retry.enabled", havingValue = "true",
-			matchIfMissing = true)
+		matchIfMissing = true)
 	public Client feignRetryClient(LoadBalancerClient loadBalancerClient, HttpClient httpClient,
-			LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+								   LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
+								   List<LoadBalancerFeignRequestTransformer> transformers) {
 		Client delegate = new Http2Client(httpClient);
 		return new RetryableFeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancedRetryFactory,
-				loadBalancerClientFactory, transformers);
+			loadBalancerClientFactory, transformers);
 	}
 
 }

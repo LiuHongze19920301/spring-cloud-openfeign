@@ -36,7 +36,7 @@ class FeignCircuitBreakerTargeter implements Targeter {
 	private final CircuitBreakerNameResolver circuitBreakerNameResolver;
 
 	FeignCircuitBreakerTargeter(CircuitBreakerFactory circuitBreakerFactory, boolean circuitBreakerGroupEnabled,
-			CircuitBreakerNameResolver circuitBreakerNameResolver) {
+								CircuitBreakerNameResolver circuitBreakerNameResolver) {
 		this.circuitBreakerFactory = circuitBreakerFactory;
 		this.circuitBreakerGroupEnabled = circuitBreakerGroupEnabled;
 		this.circuitBreakerNameResolver = circuitBreakerNameResolver;
@@ -44,7 +44,7 @@ class FeignCircuitBreakerTargeter implements Targeter {
 
 	@Override
 	public <T> T target(FeignClientFactoryBean factory, Feign.Builder feign, FeignClientFactory context,
-			Target.HardCodedTarget<T> target) {
+						Target.HardCodedTarget<T> target) {
 		if (!(feign instanceof FeignCircuitBreaker.Builder builder)) {
 			return feign.target(target);
 		}
@@ -61,47 +61,45 @@ class FeignCircuitBreakerTargeter implements Targeter {
 	}
 
 	private <T> T targetWithFallbackFactory(String feignClientName, FeignClientFactory context,
-			Target.HardCodedTarget<T> target, FeignCircuitBreaker.Builder builder, Class<?> fallbackFactoryClass) {
+											Target.HardCodedTarget<T> target, FeignCircuitBreaker.Builder builder, Class<?> fallbackFactoryClass) {
 		FallbackFactory<? extends T> fallbackFactory = (FallbackFactory<? extends T>) getFromContext("fallbackFactory",
-				feignClientName, context, fallbackFactoryClass, FallbackFactory.class);
+			feignClientName, context, fallbackFactoryClass, FallbackFactory.class);
 		return builder(feignClientName, builder).target(target, fallbackFactory);
 	}
 
 	private <T> T targetWithFallback(String feignClientName, FeignClientFactory context,
-			Target.HardCodedTarget<T> target, FeignCircuitBreaker.Builder builder, Class<?> fallback) {
+									 Target.HardCodedTarget<T> target, FeignCircuitBreaker.Builder builder, Class<?> fallback) {
 		T fallbackInstance = getFromContext("fallback", feignClientName, context, fallback, target.type());
 		return builder(feignClientName, builder).target(target, fallbackInstance);
 	}
 
 	private <T> T getFromContext(String fallbackMechanism, String feignClientName, FeignClientFactory context,
-			Class<?> beanType, Class<T> targetType) {
+								 Class<?> beanType, Class<T> targetType) {
 		Object fallbackInstance = context.getInstance(feignClientName, beanType);
 		if (fallbackInstance == null) {
 			throw new IllegalStateException(
-					String.format("No " + fallbackMechanism + " instance of type %s found for feign client %s",
-							beanType, feignClientName));
+				String.format("No " + fallbackMechanism + " instance of type %s found for feign client %s",
+					beanType, feignClientName));
 		}
 
 		if (fallbackInstance instanceof FactoryBean<?> factoryBean) {
 			try {
 				fallbackInstance = factoryBean.getObject();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				throw new IllegalStateException(fallbackMechanism + " create fail", e);
 			}
 
 			if (!targetType.isAssignableFrom(fallbackInstance.getClass())) {
 				throw new IllegalStateException(String.format("Incompatible " + fallbackMechanism
 						+ " instance. Fallback/fallbackFactory of type %s is not assignable to %s for feign client %s",
-						fallbackInstance.getClass(), targetType, feignClientName));
+					fallbackInstance.getClass(), targetType, feignClientName));
 			}
 
-		}
-		else {
+		} else {
 			if (!targetType.isAssignableFrom(beanType)) {
 				throw new IllegalStateException(String.format("Incompatible " + fallbackMechanism
 						+ " instance. Fallback/fallbackFactory of type %s is not assignable to %s for feign client %s",
-						beanType, targetType, feignClientName));
+					beanType, targetType, feignClientName));
 			}
 		}
 		return (T) fallbackInstance;
@@ -109,8 +107,8 @@ class FeignCircuitBreakerTargeter implements Targeter {
 
 	private FeignCircuitBreaker.Builder builder(String feignClientName, FeignCircuitBreaker.Builder builder) {
 		return builder.circuitBreakerFactory(circuitBreakerFactory).feignClientName(feignClientName)
-				.circuitBreakerGroupEnabled(circuitBreakerGroupEnabled)
-				.circuitBreakerNameResolver(circuitBreakerNameResolver);
+			.circuitBreakerGroupEnabled(circuitBreakerGroupEnabled)
+			.circuitBreakerNameResolver(circuitBreakerNameResolver);
 	}
 
 }

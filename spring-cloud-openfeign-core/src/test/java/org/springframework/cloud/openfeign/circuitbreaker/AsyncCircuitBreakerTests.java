@@ -65,137 +65,137 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author John Niang
  */
 @SpringBootTest(classes = AsyncCircuitBreakerTests.Application.class, webEnvironment = RANDOM_PORT,
-		properties = { "spring.cloud.openfeign.circuitbreaker.enabled=true",
-				"spring.cloud.openfeign.lazy-attributes-resolution=true" })
+    properties = {"spring.cloud.openfeign.circuitbreaker.enabled=true",
+        "spring.cloud.openfeign.lazy-attributes-resolution=true"})
 @AutoConfigureMockMvc
 class AsyncCircuitBreakerTests {
 
-	@Autowired
-	MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
-	@Autowired
-	@Qualifier("asyncWorker")
-	ExecutorService asyncCircuitBreakerExecutor;
+    @Autowired
+    @Qualifier("asyncWorker")
+    ExecutorService asyncCircuitBreakerExecutor;
 
-	@Test
-	void shouldWorkNormally() throws Exception {
-		mvc.perform(get("/hello/proxy")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string("openfeign"));
-	}
+    @Test
+    void shouldWorkNormally() throws Exception {
+        mvc.perform(get("/hello/proxy")).andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string("openfeign"));
+    }
 
-	@Test
-	void shouldNotProxyAnyHeadersWithoutHeaderSet() throws Exception {
-		mvc.perform(get("/headers/" + HttpHeaders.AUTHORIZATION + "/proxy")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string(""));
-	}
+    @Test
+    void shouldNotProxyAnyHeadersWithoutHeaderSet() throws Exception {
+        mvc.perform(get("/headers/" + HttpHeaders.AUTHORIZATION + "/proxy")).andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string(""));
+    }
 
-	@Test
-	void shouldProxyHeaderWhenHeaderSet() throws Exception {
-		String authorization = UUID.randomUUID().toString();
-		mvc.perform(get("/headers/" + HttpHeaders.AUTHORIZATION + "/proxy").header(HttpHeaders.AUTHORIZATION,
-				authorization)).andDo(print()).andExpect(status().isOk()).andExpect(content().string(authorization));
-	}
+    @Test
+    void shouldProxyHeaderWhenHeaderSet() throws Exception {
+        String authorization = UUID.randomUUID().toString();
+        mvc.perform(get("/headers/" + HttpHeaders.AUTHORIZATION + "/proxy").header(HttpHeaders.AUTHORIZATION,
+            authorization)).andDo(print()).andExpect(status().isOk()).andExpect(content().string(authorization));
+    }
 
-	@Test
-	void shouldProxyHeaderWhenHeaderSetAndCleanRequestAttributesAfterReturn() throws Exception {
-		shouldNotProxyAnyHeadersWithoutHeaderSet();
-		Future<ServletRequestAttributes> future = asyncCircuitBreakerExecutor
-				.submit(() -> (ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
-		assertThat(future.get()).as("the RequestAttributes has been cleared").isNull();
-	}
+    @Test
+    void shouldProxyHeaderWhenHeaderSetAndCleanRequestAttributesAfterReturn() throws Exception {
+        shouldNotProxyAnyHeadersWithoutHeaderSet();
+        Future<ServletRequestAttributes> future = asyncCircuitBreakerExecutor
+            .submit(() -> (ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+        assertThat(future.get()).as("the RequestAttributes has been cleared").isNull();
+    }
 
-	@EnableAutoConfiguration
-	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = { TestClient.class })
-	@Import({ NoSecurityConfiguration.class, TestController.class })
-	static class Application {
+    @EnableAutoConfiguration
+    @Configuration(proxyBeanMethods = false)
+    @EnableFeignClients(clients = {TestClient.class})
+    @Import({NoSecurityConfiguration.class, TestController.class})
+    static class Application {
 
-		@Bean(name = "asyncWorker", destroyMethod = "shutdown")
-		ExecutorService asyncCircuitBreakerExecutor() {
-			return Executors.newSingleThreadExecutor(new CustomizableThreadFactory("async"));
-		}
+        @Bean(name = "asyncWorker", destroyMethod = "shutdown")
+        ExecutorService asyncCircuitBreakerExecutor() {
+            return Executors.newSingleThreadExecutor(new CustomizableThreadFactory("async"));
+        }
 
-		@Bean
-		CircuitBreakerFactory<Duration, ConfigBuilder<Duration>> circuitBreakerFactory(
-				@Qualifier("asyncWorker") ExecutorService asyncCircuitBreakerExecutor) {
-			return new CircuitBreakerFactory<>() {
+        @Bean
+        CircuitBreakerFactory<Duration, ConfigBuilder<Duration>> circuitBreakerFactory(
+            @Qualifier("asyncWorker") ExecutorService asyncCircuitBreakerExecutor) {
+            return new CircuitBreakerFactory<>() {
 
-				Function<String, Duration> defaultConfiguration = id -> Duration.ofMillis(1000);
+                Function<String, Duration> defaultConfiguration = id -> Duration.ofMillis(1000);
 
-				@Override
-				public CircuitBreaker create(String id) {
-					Duration timeout = super.getConfigurations().computeIfAbsent(id, defaultConfiguration);
-					return new AsyncCircuitBreaker(timeout, asyncCircuitBreakerExecutor);
-				}
+                @Override
+                public CircuitBreaker create(String id) {
+                    Duration timeout = super.getConfigurations().computeIfAbsent(id, defaultConfiguration);
+                    return new AsyncCircuitBreaker(timeout, asyncCircuitBreakerExecutor);
+                }
 
-				@Override
-				protected ConfigBuilder<Duration> configBuilder(String id) {
-					return () -> Duration.ofMillis(100);
-				}
+                @Override
+                protected ConfigBuilder<Duration> configBuilder(String id) {
+                    return () -> Duration.ofMillis(100);
+                }
 
-				@Override
-				public void configureDefault(Function<String, Duration> defaultConfiguration) {
-					this.defaultConfiguration = defaultConfiguration;
-				}
-			};
-		}
+                @Override
+                public void configureDefault(Function<String, Duration> defaultConfiguration) {
+                    this.defaultConfiguration = defaultConfiguration;
+                }
+            };
+        }
 
-		@Bean
-		RequestInterceptor proxyHeaderRequestInterceptor() {
-			return template -> {
-				ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
-						.getRequestAttributes();
-				String authorization = Objects.requireNonNull(requestAttributes).getRequest()
-						.getHeader(HttpHeaders.AUTHORIZATION);
-				if (authorization != null) {
-					// proxy authorization header
-					template.header(HttpHeaders.AUTHORIZATION, authorization);
-				}
-			};
-		}
+        @Bean
+        RequestInterceptor proxyHeaderRequestInterceptor() {
+            return template -> {
+                ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+                    .getRequestAttributes();
+                String authorization = Objects.requireNonNull(requestAttributes).getRequest()
+                    .getHeader(HttpHeaders.AUTHORIZATION);
+                if (authorization != null) {
+                    // proxy authorization header
+                    template.header(HttpHeaders.AUTHORIZATION, authorization);
+                }
+            };
+        }
 
-	}
+    }
 
-	@RestController
-	static class TestController {
+    @RestController
+    static class TestController {
 
-		final ObjectProvider<TestClient> testClient;
+        final ObjectProvider<TestClient> testClient;
 
-		TestController(ObjectProvider<TestClient> testClient) {
-			this.testClient = testClient;
-		}
+        TestController(ObjectProvider<TestClient> testClient) {
+            this.testClient = testClient;
+        }
 
-		@GetMapping("/hello")
-		String hello() {
-			return "openfeign";
-		}
+        @GetMapping("/hello")
+        String hello() {
+            return "openfeign";
+        }
 
-		@GetMapping("/hello/proxy")
-		String helloProxy() {
-			return testClient.getObject().hello();
-		}
+        @GetMapping("/hello/proxy")
+        String helloProxy() {
+            return testClient.getObject().hello();
+        }
 
-		@GetMapping("/headers/{headerName}")
-		String header(HttpServletRequest request, @PathVariable String headerName) {
-			return request.getHeader(headerName);
-		}
+        @GetMapping("/headers/{headerName}")
+        String header(HttpServletRequest request, @PathVariable String headerName) {
+            return request.getHeader(headerName);
+        }
 
-		@GetMapping("/headers/{headerName}/proxy")
-		String headerProxy(@PathVariable String headerName) {
-			return testClient.getObject().header(headerName);
-		}
+        @GetMapping("/headers/{headerName}/proxy")
+        String headerProxy(@PathVariable String headerName) {
+            return testClient.getObject().header(headerName);
+        }
 
-	}
+    }
 
-	@FeignClient(name = "async-circuit-breaker-test", url = "http://localhost:${local.server.port}")
-	interface TestClient {
+    @FeignClient(name = "async-circuit-breaker-test", url = "http://localhost:${local.server.port}")
+    interface TestClient {
 
-		@GetMapping("/hello")
-		String hello();
+        @GetMapping("/hello")
+        String hello();
 
-		@GetMapping("/headers/{headerName}")
-		String header(@PathVariable String headerName);
+        @GetMapping("/headers/{headerName}")
+        String header(@PathVariable String headerName);
 
-	}
+    }
 
 }

@@ -49,124 +49,124 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class FeignClientErrorDecoderTests {
 
-	@Autowired
-	private FeignClientFactory context;
+    @Autowired
+    private FeignClientFactory context;
 
-	@Autowired
-	private FooClient foo;
+    @Autowired
+    private FooClient foo;
 
-	@Autowired
-	private BarClient bar;
+    @Autowired
+    private BarClient bar;
 
-	@Test
-	public void clientsAvailable() {
-		assertThat(this.foo).isNotNull();
-		assertThat(this.bar).isNotNull();
-	}
+    @Test
+    public void clientsAvailable() {
+        assertThat(this.foo).isNotNull();
+        assertThat(this.bar).isNotNull();
+    }
 
-	@Test
-	public void errorDecoderInConfiguration() {
-		assertThat(this.context.getInstance("foo", ErrorDecoder.class)).isInstanceOf(ErrorDecoder.Default.class);
-		assertThat(this.context.getInstance("bar", ErrorDecoder.class)).isNull();
-	}
+    @Test
+    public void errorDecoderInConfiguration() {
+        assertThat(this.context.getInstance("foo", ErrorDecoder.class)).isInstanceOf(ErrorDecoder.Default.class);
+        assertThat(this.context.getInstance("bar", ErrorDecoder.class)).isNull();
+    }
 
-	@Test
-	@DisabledForJreRange(min = JRE.JAVA_16)
-	public void useConfiguredErrorDecoderWhenAlsoErrorDecoderFactoryIsAvailable() {
-		Object errorDecoder = getErrorDecoderFromClient(this.foo);
-		assertThat(errorDecoder).isInstanceOf(ErrorDecoder.Default.class);
-	}
+    @Test
+    @DisabledForJreRange(min = JRE.JAVA_16)
+    public void useConfiguredErrorDecoderWhenAlsoErrorDecoderFactoryIsAvailable() {
+        Object errorDecoder = getErrorDecoderFromClient(this.foo);
+        assertThat(errorDecoder).isInstanceOf(ErrorDecoder.Default.class);
+    }
 
-	@Test
-	@DisabledForJreRange(min = JRE.JAVA_16)
-	public void useErrorDecoderFromErrorDecoderFactory() {
-		Object errorDecoder = getErrorDecoderFromClient(this.bar);
-		assertThat(errorDecoder).isInstanceOf(ErrorDecoderImpl.class);
-	}
+    @Test
+    @DisabledForJreRange(min = JRE.JAVA_16)
+    public void useErrorDecoderFromErrorDecoderFactory() {
+        Object errorDecoder = getErrorDecoderFromClient(this.bar);
+        assertThat(errorDecoder).isInstanceOf(ErrorDecoderImpl.class);
+    }
 
-	@SuppressWarnings({ "unchecked", "ConstantConditions" })
-	private Object getErrorDecoderFromClient(final Object client) {
-		Object invocationHandlerLambda = ReflectionTestUtils.getField(client, "h");
-		Object invocationHandler = ReflectionTestUtils.getField(invocationHandlerLambda, "arg$2");
-		Map<Method, InvocationHandlerFactory.MethodHandler> dispatch = (Map<Method, InvocationHandlerFactory.MethodHandler>) ReflectionTestUtils
-				.getField(invocationHandler, "dispatch");
-		Method key = new ArrayList<>(dispatch.keySet()).get(0);
-		return ReflectionTestUtils.getField(ReflectionTestUtils.getField(dispatch.get(key), "asyncResponseHandler"),
-				"errorDecoder");
-	}
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    private Object getErrorDecoderFromClient(final Object client) {
+        Object invocationHandlerLambda = ReflectionTestUtils.getField(client, "h");
+        Object invocationHandler = ReflectionTestUtils.getField(invocationHandlerLambda, "arg$2");
+        Map<Method, InvocationHandlerFactory.MethodHandler> dispatch = (Map<Method, InvocationHandlerFactory.MethodHandler>) ReflectionTestUtils
+            .getField(invocationHandler, "dispatch");
+        Method key = new ArrayList<>(dispatch.keySet()).get(0);
+        return ReflectionTestUtils.getField(ReflectionTestUtils.getField(dispatch.get(key), "asyncResponseHandler"),
+            "errorDecoder");
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = { FooClient.class, BarClient.class })
-	@EnableAutoConfiguration
-	protected static class TestConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @EnableFeignClients(clients = {FooClient.class, BarClient.class})
+    @EnableAutoConfiguration
+    protected static class TestConfiguration {
 
-	}
+    }
 
-	@FeignClient(name = "foo", url = "http://foo", configuration = FooConfiguration.class)
-	interface FooClient {
+    @FeignClient(name = "foo", url = "http://foo", configuration = FooConfiguration.class)
+    interface FooClient {
 
-		@RequestLine("GET /")
-		String get();
+        @RequestLine("GET /")
+        String get();
 
-	}
+    }
 
-	public static class FooConfiguration {
+    public static class FooConfiguration {
 
-		@Bean
-		Contract feignContract() {
-			return new Contract.Default();
-		}
+        @Bean
+        Contract feignContract() {
+            return new Contract.Default();
+        }
 
-		@Bean
-		FeignErrorDecoderFactory errorDecoderFactory() {
-			return new FeignErrorDecoderFactoryImpl();
-		}
+        @Bean
+        FeignErrorDecoderFactory errorDecoderFactory() {
+            return new FeignErrorDecoderFactoryImpl();
+        }
 
-		@Bean
-		ErrorDecoder feignErrorDecoder() {
-			return new ErrorDecoder.Default();
-		}
+        @Bean
+        ErrorDecoder feignErrorDecoder() {
+            return new ErrorDecoder.Default();
+        }
 
-	}
+    }
 
-	@FeignClient(name = "bar", url = "http://bar", configuration = BarConfiguration.class)
-	interface BarClient {
+    @FeignClient(name = "bar", url = "http://bar", configuration = BarConfiguration.class)
+    interface BarClient {
 
-		@GetMapping("/")
-		String get();
+        @GetMapping("/")
+        String get();
 
-	}
+    }
 
-	public static class BarConfiguration {
+    public static class BarConfiguration {
 
-		@Bean
-		Contract feignContract() {
-			return new SpringMvcContract();
-		}
+        @Bean
+        Contract feignContract() {
+            return new SpringMvcContract();
+        }
 
-		@Bean
-		FeignErrorDecoderFactory errorDecoderFactory() {
-			return new FeignErrorDecoderFactoryImpl();
-		}
+        @Bean
+        FeignErrorDecoderFactory errorDecoderFactory() {
+            return new FeignErrorDecoderFactoryImpl();
+        }
 
-	}
+    }
 
-	public static class FeignErrorDecoderFactoryImpl implements FeignErrorDecoderFactory {
+    public static class FeignErrorDecoderFactoryImpl implements FeignErrorDecoderFactory {
 
-		@Override
-		public ErrorDecoder create(final Class<?> type) {
-			return new ErrorDecoderImpl();
-		}
+        @Override
+        public ErrorDecoder create(final Class<?> type) {
+            return new ErrorDecoderImpl();
+        }
 
-	}
+    }
 
-	public static class ErrorDecoderImpl implements ErrorDecoder {
+    public static class ErrorDecoderImpl implements ErrorDecoder {
 
-		@Override
-		public Exception decode(final String methodKey, final Response response) {
-			return null;
-		}
+        @Override
+        public Exception decode(final String methodKey, final Response response) {
+            return null;
+        }
 
-	}
+    }
 
 }

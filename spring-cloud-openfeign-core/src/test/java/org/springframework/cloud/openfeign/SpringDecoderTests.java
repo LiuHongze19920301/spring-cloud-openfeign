@@ -48,225 +48,225 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Szymon Linowski
  */
 @SpringBootTest(classes = SpringDecoderTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=springdecodertest", "spring.jmx.enabled=false" })
+    value = {"spring.application.name=springdecodertest", "spring.jmx.enabled=false"})
 @DirtiesContext
 class SpringDecoderTests extends FeignClientFactoryBean {
 
-	@Autowired
-	FeignClientFactory context;
+    @Autowired
+    FeignClientFactory context;
 
-	@LocalServerPort
-	private int port = 0;
+    @LocalServerPort
+    private int port = 0;
 
-	SpringDecoderTests() {
-		setName("test");
-		setContextId("test");
-	}
+    SpringDecoderTests() {
+        setName("test");
+        setContextId("test");
+    }
 
-	public TestClient testClient() {
-		return testClient(false);
-	}
+    public TestClient testClient() {
+        return testClient(false);
+    }
 
-	public TestClient testClient(boolean dismiss404) {
-		setType(this.getClass());
-		setDismiss404(dismiss404);
-		return feign(this.context).target(TestClient.class, "http://localhost:" + this.port);
-	}
+    public TestClient testClient(boolean dismiss404) {
+        setType(this.getClass());
+        setDismiss404(dismiss404);
+        return feign(this.context).target(TestClient.class, "http://localhost:" + this.port);
+    }
 
-	@Test
-	void testResponseEntity() {
-		ResponseEntity<Hello> response = testClient().getHelloResponse();
-		assertThat(response).as("response was null").isNotNull();
-		assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
-		Hello hello = response.getBody();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world via response"));
-	}
+    @Test
+    void testResponseEntity() {
+        ResponseEntity<Hello> response = testClient().getHelloResponse();
+        assertThat(response).as("response was null").isNotNull();
+        assertThat(response.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
+        Hello hello = response.getBody();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world via response"));
+    }
 
-	@Test
-	void testSimpleType() {
-		Hello hello = testClient().getHello();
-		assertThat(hello).as("hello was null").isNotNull();
-		assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-	}
+    @Test
+    void testSimpleType() {
+        Hello hello = testClient().getHello();
+        assertThat(hello).as("hello was null").isNotNull();
+        assertThat(hello).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+    }
 
-	@Test
-	void testUserParameterizedTypeDecode() {
-		List<Hello> hellos = testClient().getHellos();
-		assertThat(hellos).as("hellos was null").isNotNull();
-		assertThat(hellos.size()).as("hellos was not the right size").isEqualTo(2);
-		assertThat(hellos.get(0)).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
-	}
+    @Test
+    void testUserParameterizedTypeDecode() {
+        List<Hello> hellos = testClient().getHellos();
+        assertThat(hellos).as("hellos was null").isNotNull();
+        assertThat(hellos.size()).as("hellos was not the right size").isEqualTo(2);
+        assertThat(hellos.get(0)).as("first hello didn't match").isEqualTo(new Hello("hello world 1"));
+    }
 
-	@Test
-	void testSimpleParameterizedTypeDecode() {
-		List<String> hellos = testClient().getHelloStrings();
-		assertThat(hellos).as("hellos was null").isNotNull();
-		assertThat(hellos.size()).as("hellos was not the right size").isEqualTo(2);
-		assertThat(hellos.get(0)).as("first hello didn't match").isEqualTo("hello world 1");
-	}
+    @Test
+    void testSimpleParameterizedTypeDecode() {
+        List<String> hellos = testClient().getHelloStrings();
+        assertThat(hellos).as("hellos was null").isNotNull();
+        assertThat(hellos.size()).as("hellos was not the right size").isEqualTo(2);
+        assertThat(hellos.get(0)).as("first hello didn't match").isEqualTo("hello world 1");
+    }
 
-	@Test
-	@SuppressWarnings("unchecked")
-	void testWildcardTypeDecode() {
-		ResponseEntity<?> wildcard = testClient().getWildcard();
-		assertThat(wildcard).as("wildcard was null").isNotNull();
-		assertThat(wildcard.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
-		Object wildcardBody = wildcard.getBody();
-		assertThat(wildcardBody).as("wildcardBody was null").isNotNull();
-		assertThat(wildcardBody instanceof Map).as("wildcard not an instance of Map").isTrue();
-		Map<String, String> hello = (Map<String, String>) wildcardBody;
-		assertThat(hello.get("message")).as("first hello didn't match").isEqualTo("wildcard");
-	}
+    @Test
+    @SuppressWarnings("unchecked")
+    void testWildcardTypeDecode() {
+        ResponseEntity<?> wildcard = testClient().getWildcard();
+        assertThat(wildcard).as("wildcard was null").isNotNull();
+        assertThat(wildcard.getStatusCode()).as("wrong status code").isEqualTo(HttpStatus.OK);
+        Object wildcardBody = wildcard.getBody();
+        assertThat(wildcardBody).as("wildcardBody was null").isNotNull();
+        assertThat(wildcardBody instanceof Map).as("wildcard not an instance of Map").isTrue();
+        Map<String, String> hello = (Map<String, String>) wildcardBody;
+        assertThat(hello.get("message")).as("first hello didn't match").isEqualTo("wildcard");
+    }
 
-	@Test
-	void testResponseEntityVoid() {
-		ResponseEntity<Void> response = testClient().getHelloVoid();
-		assertThat(response).as("response was null").isNotNull();
-		List<String> headerVals = response.getHeaders().get("x-test-header");
-		assertThat(headerVals).as("headerVals was null").isNotNull();
-		assertThat(headerVals.size()).as("headerVals size was wrong").isEqualTo(1);
-		String header = headerVals.get(0);
-		assertThat(header).as("header was wrong").isEqualTo("myval");
-	}
+    @Test
+    void testResponseEntityVoid() {
+        ResponseEntity<Void> response = testClient().getHelloVoid();
+        assertThat(response).as("response was null").isNotNull();
+        List<String> headerVals = response.getHeaders().get("x-test-header");
+        assertThat(headerVals).as("headerVals was null").isNotNull();
+        assertThat(headerVals.size()).as("headerVals size was wrong").isEqualTo(1);
+        String header = headerVals.get(0);
+        assertThat(header).as("header was wrong").isEqualTo("myval");
+    }
 
-	@Test
-	void test404() {
-		Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> testClient().getNotFound());
-	}
+    @Test
+    void test404() {
+        Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> testClient().getNotFound());
+    }
 
-	@Test
-	void testDecodes404() {
-		final ResponseEntity<String> response = testClient(true).getNotFound();
-		assertThat(response).as("response was null").isNotNull();
-		assertThat(response.getBody()).as("response body was not null").isNull();
-	}
+    @Test
+    void testDecodes404() {
+        final ResponseEntity<String> response = testClient(true).getNotFound();
+        assertThat(response).as("response was null").isNotNull();
+        assertThat(response.getBody()).as("response body was not null").isNull();
+    }
 
-	@Test
-	// Issue: https://github.com/spring-cloud/spring-cloud-openfeign/issues/456
-	void testResponseEntityHeaders() {
-		ResponseEntity<String> response = testClient().getContentType();
-		assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-	}
+    @Test
+        // Issue: https://github.com/spring-cloud/spring-cloud-openfeign/issues/456
+    void testResponseEntityHeaders() {
+        ResponseEntity<String> response = testClient().getContentType();
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+    }
 
-	protected interface TestClient {
+    protected interface TestClient {
 
-		@GetMapping("/helloresponse")
-		ResponseEntity<Hello> getHelloResponse();
+        @GetMapping("/helloresponse")
+        ResponseEntity<Hello> getHelloResponse();
 
-		@GetMapping("/hellovoid")
-		ResponseEntity<Void> getHelloVoid();
+        @GetMapping("/hellovoid")
+        ResponseEntity<Void> getHelloVoid();
 
-		@GetMapping("/hello")
-		Hello getHello();
+        @GetMapping("/hello")
+        Hello getHello();
 
-		@GetMapping("/hellos")
-		List<Hello> getHellos();
+        @GetMapping("/hellos")
+        List<Hello> getHellos();
 
-		@GetMapping("/hellostrings")
-		List<String> getHelloStrings();
+        @GetMapping("/hellostrings")
+        List<String> getHelloStrings();
 
-		@GetMapping("/hellonotfound")
-		ResponseEntity<String> getNotFound();
+        @GetMapping("/hellonotfound")
+        ResponseEntity<String> getNotFound();
 
-		@GetMapping("/helloWildcard")
-		ResponseEntity<?> getWildcard();
+        @GetMapping("/helloWildcard")
+        ResponseEntity<?> getWildcard();
 
-		@GetMapping(path = "/contentType", produces = MediaType.APPLICATION_JSON_VALUE)
-		ResponseEntity<String> getContentType();
+        @GetMapping(path = "/contentType", produces = MediaType.APPLICATION_JSON_VALUE)
+        ResponseEntity<String> getContentType();
 
-	}
+    }
 
-	public static class Hello {
+    public static class Hello {
 
-		private String message;
+        private String message;
 
-		Hello() {
-		}
+        Hello() {
+        }
 
-		Hello(String message) {
-			this.message = message;
-		}
+        Hello(String message) {
+            this.message = message;
+        }
 
-		public String getMessage() {
-			return this.message;
-		}
+        public String getMessage() {
+            return this.message;
+        }
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+        public void setMessage(String message) {
+            this.message = message;
+        }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
-			Hello that = (Hello) o;
-			return Objects.equals(this.message, that.message);
-		}
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Hello that = (Hello) o;
+            return Objects.equals(this.message, that.message);
+        }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.message);
-		}
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.message);
+        }
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@RestController
-	@Import(NoSecurityConfiguration.class)
-	protected static class Application implements TestClient {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @RestController
+    @Import(NoSecurityConfiguration.class)
+    protected static class Application implements TestClient {
 
-		@Override
-		public ResponseEntity<Hello> getHelloResponse() {
-			return ResponseEntity.ok(new Hello("hello world via response"));
-		}
+        @Override
+        public ResponseEntity<Hello> getHelloResponse() {
+            return ResponseEntity.ok(new Hello("hello world via response"));
+        }
 
-		@Override
-		public ResponseEntity<Void> getHelloVoid() {
-			return ResponseEntity.noContent().header("X-test-header", "myval").build();
-		}
+        @Override
+        public ResponseEntity<Void> getHelloVoid() {
+            return ResponseEntity.noContent().header("X-test-header", "myval").build();
+        }
 
-		@Override
-		public Hello getHello() {
-			return new Hello("hello world 1");
-		}
+        @Override
+        public Hello getHello() {
+            return new Hello("hello world 1");
+        }
 
-		@Override
-		public List<Hello> getHellos() {
-			ArrayList<Hello> hellos = new ArrayList<>();
-			hellos.add(new Hello("hello world 1"));
-			hellos.add(new Hello("oi terra 2"));
-			return hellos;
-		}
+        @Override
+        public List<Hello> getHellos() {
+            ArrayList<Hello> hellos = new ArrayList<>();
+            hellos.add(new Hello("hello world 1"));
+            hellos.add(new Hello("oi terra 2"));
+            return hellos;
+        }
 
-		@Override
-		public List<String> getHelloStrings() {
-			ArrayList<String> hellos = new ArrayList<>();
-			hellos.add("hello world 1");
-			hellos.add("oi terra 2");
-			return hellos;
-		}
+        @Override
+        public List<String> getHelloStrings() {
+            ArrayList<String> hellos = new ArrayList<>();
+            hellos.add("hello world 1");
+            hellos.add("oi terra 2");
+            return hellos;
+        }
 
-		@Override
-		public ResponseEntity<String> getNotFound() {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		}
+        @Override
+        public ResponseEntity<String> getNotFound() {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
-		@Override
-		public ResponseEntity<?> getWildcard() {
-			return ResponseEntity.ok(new Hello("wildcard"));
-		}
+        @Override
+        public ResponseEntity<?> getWildcard() {
+            return ResponseEntity.ok(new Hello("wildcard"));
+        }
 
-		@Override
-		public ResponseEntity<String> getContentType() {
-			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).body("test");
-		}
+        @Override
+        public ResponseEntity<String> getContentType() {
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).body("test");
+        }
 
-	}
+    }
 
 }

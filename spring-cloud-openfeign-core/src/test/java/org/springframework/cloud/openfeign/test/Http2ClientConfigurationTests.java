@@ -37,8 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author changjin wei(魏昌进)
  */
-@SpringBootTest(properties = { "spring.cloud.openfeign.http2client.enabled= true",
-		"spring.cloud.openfeign.httpclient.hc5.enabled= false", "spring.cloud.loadbalancer.retry.enabled= false" })
+@SpringBootTest(properties = {"spring.cloud.openfeign.http2client.enabled= true",
+	"spring.cloud.openfeign.httpclient.hc5.enabled= false", "spring.cloud.loadbalancer.retry.enabled= false"})
 @DirtiesContext
 class Http2ClientConfigurationTests {
 

@@ -68,19 +68,19 @@ public class OptionsFactoryBean implements FactoryBean<Request.Options>, Applica
 	}
 
 	private Request.Options createOptionsWithApplicableValues(
-			FeignClientProperties.FeignClientConfiguration clientConfiguration, Request.Options options) {
+		FeignClientProperties.FeignClientConfiguration clientConfiguration, Request.Options options) {
 		if (Objects.isNull(clientConfiguration)) {
 			return options;
 		}
 
 		int connectTimeoutMillis = Objects.nonNull(clientConfiguration.getConnectTimeout())
-				? clientConfiguration.getConnectTimeout() : options.connectTimeoutMillis();
+			? clientConfiguration.getConnectTimeout() : options.connectTimeoutMillis();
 		int readTimeoutMillis = Objects.nonNull(clientConfiguration.getReadTimeout())
-				? clientConfiguration.getReadTimeout() : options.readTimeoutMillis();
+			? clientConfiguration.getReadTimeout() : options.readTimeoutMillis();
 		boolean followRedirects = Objects.nonNull(clientConfiguration.isFollowRedirects())
-				? clientConfiguration.isFollowRedirects() : options.isFollowRedirects();
+			? clientConfiguration.isFollowRedirects() : options.isFollowRedirects();
 		return new Request.Options(connectTimeoutMillis, TimeUnit.MILLISECONDS, readTimeoutMillis,
-				TimeUnit.MILLISECONDS, followRedirects);
+			TimeUnit.MILLISECONDS, followRedirects);
 	}
 
 }

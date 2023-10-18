@@ -41,39 +41,39 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author changjin wei(魏昌进)
  */
 @SpringBootTest(classes = FeignOkHttpProtocolsTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
-				"spring.cloud.openfeign.httpclient.hc5.enabled=false", "spring.cloud.openfeign.okhttp.enabled=true",
-				"spring.cloud.httpclientfactories.ok.enabled=true", "spring.cloud.loadbalancer.retry.enabled=false",
-				"server.http2.enabled=true", "spring.cloud.openfeign.httpclient.okhttp.protocols=H2_PRIOR_KNOWLEDGE" })
+    value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
+        "spring.cloud.openfeign.httpclient.hc5.enabled=false", "spring.cloud.openfeign.okhttp.enabled=true",
+        "spring.cloud.httpclientfactories.ok.enabled=true", "spring.cloud.loadbalancer.retry.enabled=false",
+        "server.http2.enabled=true", "spring.cloud.openfeign.httpclient.okhttp.protocols=H2_PRIOR_KNOWLEDGE"})
 @DirtiesContext
 class FeignOkHttpProtocolsTests {
 
-	@Autowired
-	private Client feignClient;
+    @Autowired
+    private Client feignClient;
 
-	@Test
-	void shouldCreateCorrectFeignClientBeanWithProtocolFromProperties() {
-		assertThat(feignClient).isInstanceOf(FeignBlockingLoadBalancerClient.class);
-		FeignBlockingLoadBalancerClient client = (FeignBlockingLoadBalancerClient) feignClient;
-		Client delegate = client.getDelegate();
-		assertThat(delegate).isInstanceOf(feign.okhttp.OkHttpClient.class);
-		okhttp3.OkHttpClient OkHttpClient = (okhttp3.OkHttpClient) getField(delegate, "delegate");
-		assertThat(OkHttpClient.protocols()).containsExactly(Protocol.H2_PRIOR_KNOWLEDGE);
-	}
+    @Test
+    void shouldCreateCorrectFeignClientBeanWithProtocolFromProperties() {
+        assertThat(feignClient).isInstanceOf(FeignBlockingLoadBalancerClient.class);
+        FeignBlockingLoadBalancerClient client = (FeignBlockingLoadBalancerClient) feignClient;
+        Client delegate = client.getDelegate();
+        assertThat(delegate).isInstanceOf(feign.okhttp.OkHttpClient.class);
+        okhttp3.OkHttpClient OkHttpClient = (okhttp3.OkHttpClient) getField(delegate, "delegate");
+        assertThat(OkHttpClient.protocols()).containsExactly(Protocol.H2_PRIOR_KNOWLEDGE);
+    }
 
-	protected Object getField(Object target, String name) {
-		Field field = ReflectionUtils.findField(target.getClass(), name);
-		ReflectionUtils.makeAccessible(field);
-		return ReflectionUtils.getField(field, target);
-	}
+    protected Object getField(Object target, String name) {
+        Field field = ReflectionUtils.findField(target.getClass(), name);
+        ReflectionUtils.makeAccessible(field);
+        return ReflectionUtils.getField(field, target);
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@RestController
-	@LoadBalancerClients
-	@Import(NoSecurityConfiguration.class)
-	protected static class Application {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @RestController
+    @LoadBalancerClients
+    @Import(NoSecurityConfiguration.class)
+    protected static class Application {
 
-	}
+    }
 
 }

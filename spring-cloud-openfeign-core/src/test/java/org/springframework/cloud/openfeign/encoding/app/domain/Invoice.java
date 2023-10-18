@@ -25,24 +25,24 @@ import java.math.BigDecimal;
  */
 public class Invoice {
 
-	private String title;
+    private String title;
 
-	private BigDecimal amount;
+    private BigDecimal amount;
 
-	public String getTitle() {
-		return this.title;
-	}
+    public String getTitle() {
+        return this.title;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public BigDecimal getAmount() {
-		return this.amount;
-	}
+    public BigDecimal getAmount() {
+        return this.amount;
+    }
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
 }

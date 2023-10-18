@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(OkHttpClient.class)
 @ConditionalOnProperty("spring.cloud.openfeign.okhttp.enabled")
-@ConditionalOnBean({ LoadBalancerClient.class, LoadBalancerClientFactory.class })
+@ConditionalOnBean({LoadBalancerClient.class, LoadBalancerClientFactory.class})
 @EnableConfigurationProperties(LoadBalancerClientsProperties.class)
 class OkHttpFeignLoadBalancerConfiguration {
 
@@ -53,11 +53,11 @@ class OkHttpFeignLoadBalancerConfiguration {
 	@ConditionalOnMissingBean
 	@Conditional(OnRetryNotEnabledCondition.class)
 	public Client feignClient(okhttp3.OkHttpClient okHttpClient, LoadBalancerClient loadBalancerClient,
-			LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+							  LoadBalancerClientFactory loadBalancerClientFactory,
+							  List<LoadBalancerFeignRequestTransformer> transformers) {
 		OkHttpClient delegate = new OkHttpClient(okHttpClient);
 		return new FeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancerClientFactory,
-				transformers);
+			transformers);
 	}
 
 	@Bean
@@ -65,13 +65,13 @@ class OkHttpFeignLoadBalancerConfiguration {
 	@ConditionalOnClass(name = "org.springframework.retry.support.RetryTemplate")
 	@ConditionalOnBean(LoadBalancedRetryFactory.class)
 	@ConditionalOnProperty(value = "spring.cloud.loadbalancer.retry.enabled", havingValue = "true",
-			matchIfMissing = true)
+		matchIfMissing = true)
 	public Client feignRetryClient(LoadBalancerClient loadBalancerClient, okhttp3.OkHttpClient okHttpClient,
-			LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+								   LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
+								   List<LoadBalancerFeignRequestTransformer> transformers) {
 		OkHttpClient delegate = new OkHttpClient(okHttpClient);
 		return new RetryableFeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancedRetryFactory,
-				loadBalancerClientFactory, transformers);
+			loadBalancerClientFactory, transformers);
 	}
 
 }

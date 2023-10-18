@@ -54,9 +54,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Olga Maciaszek-Sharma
  */
 @SpringBootTest(classes = FeignOkHttpTests.Application.class, webEnvironment = WebEnvironment.RANDOM_PORT,
-		value = { "spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
-				"spring.cloud.openfeign.httpclient.hc5.enabled=false", "spring.cloud.openfeign.okhttp.enabled=true",
-				"spring.cloud.httpclientfactories.ok.enabled=true", "spring.cloud.loadbalancer.retry.enabled=false" })
+	value = {"spring.application.name=feignclienttest", "spring.cloud.openfeign.circuitbreaker.enabled=false",
+		"spring.cloud.openfeign.httpclient.hc5.enabled=false", "spring.cloud.openfeign.okhttp.enabled=true",
+		"spring.cloud.httpclientfactories.ok.enabled=true", "spring.cloud.loadbalancer.retry.enabled=false"})
 @DirtiesContext
 class FeignOkHttpTests {
 
@@ -130,11 +130,11 @@ class FeignOkHttpTests {
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@RestController
-	@EnableFeignClients(clients = { TestClient.class, UserClient.class })
+	@EnableFeignClients(clients = {TestClient.class, UserClient.class})
 	@LoadBalancerClients({
-			@LoadBalancerClient(name = "localapp", configuration = FeignHttpClientTests.LocalClientConfiguration.class),
-			@LoadBalancerClient(name = "localapp1",
-					configuration = FeignHttpClientTests.LocalClientConfiguration.class) })
+		@LoadBalancerClient(name = "localapp", configuration = FeignHttpClientTests.LocalClientConfiguration.class),
+		@LoadBalancerClient(name = "localapp1",
+			configuration = FeignHttpClientTests.LocalClientConfiguration.class)})
 	@Import(NoSecurityConfiguration.class)
 	protected static class Application implements UserService {
 
@@ -145,7 +145,7 @@ class FeignOkHttpTests {
 
 		@PatchMapping("/hellop")
 		public ResponseEntity<Void> patchHello(@RequestBody Hello hello,
-				@RequestHeader("Content-Length") int contentLength) {
+											   @RequestHeader("Content-Length") int contentLength) {
 			if (contentLength <= 0) {
 				throw new IllegalArgumentException("Invalid Content-Length " + contentLength);
 			}
@@ -248,7 +248,7 @@ class FeignOkHttpTests {
 		@Bean
 		public ServiceInstanceListSupplier staticServiceInstanceListSupplier() {
 			return ServiceInstanceListSuppliers.from("local",
-					new DefaultServiceInstance("local-1", "local", "localhost", port, false));
+				new DefaultServiceInstance("local-1", "local", "localhost", port, false));
 		}
 
 	}

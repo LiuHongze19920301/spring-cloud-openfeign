@@ -37,24 +37,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient("local")
 public interface InvoiceClient {
 
-	@GetMapping(value = "invoicesPaged", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Page<Invoice>> getInvoicesPaged(org.springframework.data.domain.Pageable pageable);
+    @GetMapping(value = "invoicesPaged", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Page<Invoice>> getInvoicesPaged(org.springframework.data.domain.Pageable pageable);
 
-	@PostMapping(value = "invoicesPagedWithBody", consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Page<Invoice>> getInvoicesPagedWithBody(
-			@SpringQueryMap org.springframework.data.domain.Pageable pageable, @RequestBody String titlePrefix);
+    @PostMapping(value = "invoicesPagedWithBody", consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Page<Invoice>> getInvoicesPagedWithBody(
+        @SpringQueryMap org.springframework.data.domain.Pageable pageable, @RequestBody String titlePrefix);
 
-	@PostMapping(value = "invoicesSortedWithBody", consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Page<Invoice>> getInvoicesSortedWithBody(@SpringQueryMap org.springframework.data.domain.Sort sort,
-			@RequestBody String titlePrefix);
+    @PostMapping(value = "invoicesSortedWithBody", consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Page<Invoice>> getInvoicesSortedWithBody(@SpringQueryMap org.springframework.data.domain.Sort sort,
+                                                            @RequestBody String titlePrefix);
 
-	@GetMapping(value = "invoices", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<Invoice>> getInvoices();
+    @GetMapping(value = "invoices", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<Invoice>> getInvoices();
 
-	@PostMapping(value = "invoices", consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<Invoice>> saveInvoices(List<Invoice> invoices);
+    @PostMapping(value = "invoices", consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<Invoice>> saveInvoices(List<Invoice> invoices);
 
 }

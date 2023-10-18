@@ -47,9 +47,9 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ApacheHttp5Client.class)
-@ConditionalOnBean({ LoadBalancerClient.class, LoadBalancerClientFactory.class })
+@ConditionalOnBean({LoadBalancerClient.class, LoadBalancerClientFactory.class})
 @ConditionalOnProperty(value = "spring.cloud.openfeign.httpclient.hc5.enabled", havingValue = "true",
-		matchIfMissing = true)
+	matchIfMissing = true)
 @Import(HttpClient5FeignConfiguration.class)
 @EnableConfigurationProperties(LoadBalancerClientsProperties.class)
 class HttpClient5FeignLoadBalancerConfiguration {
@@ -58,11 +58,11 @@ class HttpClient5FeignLoadBalancerConfiguration {
 	@ConditionalOnMissingBean
 	@Conditional(OnRetryNotEnabledCondition.class)
 	public Client feignClient(LoadBalancerClient loadBalancerClient, HttpClient httpClient5,
-			LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+							  LoadBalancerClientFactory loadBalancerClientFactory,
+							  List<LoadBalancerFeignRequestTransformer> transformers) {
 		Client delegate = new ApacheHttp5Client(httpClient5);
 		return new FeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancerClientFactory,
-				transformers);
+			transformers);
 	}
 
 	@Bean
@@ -70,13 +70,13 @@ class HttpClient5FeignLoadBalancerConfiguration {
 	@ConditionalOnClass(name = "org.springframework.retry.support.RetryTemplate")
 	@ConditionalOnBean(LoadBalancedRetryFactory.class)
 	@ConditionalOnProperty(value = "spring.cloud.loadbalancer.retry.enabled", havingValue = "true",
-			matchIfMissing = true)
+		matchIfMissing = true)
 	public Client feignRetryClient(LoadBalancerClient loadBalancerClient, HttpClient httpClient5,
-			LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
-			List<LoadBalancerFeignRequestTransformer> transformers) {
+								   LoadBalancedRetryFactory loadBalancedRetryFactory, LoadBalancerClientFactory loadBalancerClientFactory,
+								   List<LoadBalancerFeignRequestTransformer> transformers) {
 		Client delegate = new ApacheHttp5Client(httpClient5);
 		return new RetryableFeignBlockingLoadBalancerClient(delegate, loadBalancerClient, loadBalancedRetryFactory,
-				loadBalancerClientFactory, transformers);
+			loadBalancerClientFactory, transformers);
 	}
 
 }

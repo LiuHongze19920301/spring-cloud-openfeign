@@ -40,20 +40,19 @@ public abstract class AbstractFormWriter extends AbstractWriter {
 	@Override
 	public boolean isApplicable(Object object) {
 		return !isTypeOrCollection(object, o -> o instanceof MultipartFile)
-				&& isTypeOrCollection(object, PojoUtil::isUserPojo);
+			&& isTypeOrCollection(object, PojoUtil::isUserPojo);
 	}
 
 	@Override
 	public void write(Output output, String key, Object object) throws EncodeException {
 		try {
 			String string = new StringBuilder().append("Content-Disposition: form-data; name=\"").append(key)
-					.append('"').append(CRLF).append("Content-Type: ").append(getContentType()).append("; charset=")
-					.append(output.getCharset().name()).append(CRLF).append(CRLF).append(writeAsString(object))
-					.toString();
+				.append('"').append(CRLF).append("Content-Type: ").append(getContentType()).append("; charset=")
+				.append(output.getCharset().name()).append(CRLF).append(CRLF).append(writeAsString(object))
+				.toString();
 
 			output.write(string);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new EncodeException(e.getMessage());
 		}
 	}
@@ -73,13 +72,11 @@ public abstract class AbstractFormWriter extends AbstractWriter {
 				return len > 1 && one != null && isType.test(one);
 			}
 			return false;
-		}
-		else if (object instanceof Iterable<?> iterable) {
+		} else if (object instanceof Iterable<?> iterable) {
 			Iterator<?> iterator = iterable.iterator();
 
 			return iterator.hasNext() && isType.test(iterator.next());
-		}
-		else {
+		} else {
 			return isType.test(object);
 		}
 	}

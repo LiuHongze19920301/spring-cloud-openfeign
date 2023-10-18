@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * @see org.springframework.cloud.openfeign.annotation.QueryMapParameterProcessor
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 public @interface SpringQueryMap {
 
 }

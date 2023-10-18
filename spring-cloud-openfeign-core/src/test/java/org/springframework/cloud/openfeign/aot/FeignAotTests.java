@@ -76,31 +76,31 @@ public class FeignAotTests {
 	@SuppressWarnings("unchecked")
 	void shouldStartFeignChildContextsFromAotContributions(CapturedOutput output) {
 		WebApplicationContextRunner contextRunner = new WebApplicationContextRunner(
-				AnnotationConfigServletWebApplicationContext::new)
-						.withConfiguration(AutoConfigurations.of(ServletWebServerFactoryAutoConfiguration.class,
-								FeignAutoConfiguration.class))
-						.withConfiguration(UserConfigurations.of(TestFeignConfiguration.class))
-						.withPropertyValues("logging.level.org.springframework.cloud=DEBUG");
+			AnnotationConfigServletWebApplicationContext::new)
+			.withConfiguration(AutoConfigurations.of(ServletWebServerFactoryAutoConfiguration.class,
+				FeignAutoConfiguration.class))
+			.withConfiguration(UserConfigurations.of(TestFeignConfiguration.class))
+			.withPropertyValues("logging.level.org.springframework.cloud=DEBUG");
 		contextRunner.prepare(context -> {
 			TestGenerationContext generationContext = new TestGenerationContext(TestTarget.class);
 			ClassName className = new ApplicationContextAotGenerator().processAheadOfTime(
-					(GenericApplicationContext) context.getSourceApplicationContext(), generationContext);
+				(GenericApplicationContext) context.getSourceApplicationContext(), generationContext);
 			generationContext.writeGeneratedContent();
 			TestCompiler compiler = TestCompiler.forSystem();
 			compiler.with(generationContext).compile(compiled -> {
 				ServletWebServerApplicationContext freshApplicationContext = new ServletWebServerApplicationContext();
 				ApplicationContextInitializer<GenericApplicationContext> initializer = compiled
-						.getInstance(ApplicationContextInitializer.class, className.toString());
+					.getInstance(ApplicationContextInitializer.class, className.toString());
 				initializer.initialize(freshApplicationContext);
 				assertThat(output).contains("Creating a FeignClientFactoryBean.");
 				assertThat(output).contains("Refreshing FeignClientFactory-test-with-config",
-						"Refreshing FeignClientFactory-test");
+					"Refreshing FeignClientFactory-test");
 				assertThat(output).doesNotContain("Instantiating bean from Test custom config",
-						"Instantiating bean from default custom config");
+					"Instantiating bean from default custom config");
 				TestPropertyValues.of(AotDetector.AOT_ENABLED + "=true")
-						.applyToSystemProperties(freshApplicationContext::refresh);
+					.applyToSystemProperties(freshApplicationContext::refresh);
 				assertThat(output).contains("Instantiating bean from Test custom config",
-						"Instantiating bean from default custom config");
+					"Instantiating bean from default custom config");
 				assertThat(freshApplicationContext.getBean(TestFeignClient.class)).isNotNull();
 				assertThat(freshApplicationContext.getBean(TestFeignClientWithConfig.class)).isNotNull();
 			});
@@ -112,8 +112,8 @@ public class FeignAotTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@EnableFeignClients(clients = { TestFeignClient.class, TestFeignClientWithConfig.class },
-			defaultConfiguration = DefaultConfiguration.class)
+	@EnableFeignClients(clients = {TestFeignClient.class, TestFeignClientWithConfig.class},
+		defaultConfiguration = DefaultConfiguration.class)
 	public static class TestFeignConfiguration {
 
 		@Autowired

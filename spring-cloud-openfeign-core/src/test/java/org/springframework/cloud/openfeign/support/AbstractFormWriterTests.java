@@ -26,37 +26,37 @@ import org.springframework.http.MediaType;
  */
 class AbstractFormWriterTests {
 
-	@Test
-	void shouldCorrectlyResolveIfApplicableForCollection() {
-		MockFormWriter formWriter = new MockFormWriter();
-		Object object = new Object();
-		Assertions.assertFalse(formWriter.isApplicable(object));
-		object = new Object[] { new Object(), new Object() };
-		Assertions.assertFalse(formWriter.isApplicable(object));
-		object = new UserPojo();
-		Assertions.assertTrue(formWriter.isApplicable(object));
-		object = new UserPojo[] { new UserPojo(), new UserPojo() };
-		Assertions.assertTrue(formWriter.isApplicable(object));
-		object = new byte[] { '1', '2' };
-		Assertions.assertFalse(formWriter.isApplicable(object));
-	}
+    @Test
+    void shouldCorrectlyResolveIfApplicableForCollection() {
+        MockFormWriter formWriter = new MockFormWriter();
+        Object object = new Object();
+        Assertions.assertFalse(formWriter.isApplicable(object));
+        object = new Object[]{new Object(), new Object()};
+        Assertions.assertFalse(formWriter.isApplicable(object));
+        object = new UserPojo();
+        Assertions.assertTrue(formWriter.isApplicable(object));
+        object = new UserPojo[]{new UserPojo(), new UserPojo()};
+        Assertions.assertTrue(formWriter.isApplicable(object));
+        object = new byte[]{'1', '2'};
+        Assertions.assertFalse(formWriter.isApplicable(object));
+    }
 
-	static class MockFormWriter extends AbstractFormWriter {
+    static class MockFormWriter extends AbstractFormWriter {
 
-		@Override
-		protected MediaType getContentType() {
-			return null;
-		}
+        @Override
+        protected MediaType getContentType() {
+            return null;
+        }
 
-		@Override
-		protected String writeAsString(Object object) {
-			return null;
-		}
+        @Override
+        protected String writeAsString(Object object) {
+            return null;
+        }
 
-	}
+    }
 
-	static class UserPojo {
+    static class UserPojo {
 
-	}
+    }
 
 }

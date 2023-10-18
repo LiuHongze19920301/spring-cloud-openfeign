@@ -45,6 +45,7 @@ public @interface FeignClient {
 	 * The name of the service with optional protocol prefix. Synonym for {@link #name()
 	 * name}. A name must be specified for all clients, whether or not a url is provided.
 	 * Can be specified as property key, eg: ${propertyKey}.
+	 *
 	 * @return the name of the service with optional protocol prefix
 	 */
 	@AliasFor("name")
@@ -53,6 +54,7 @@ public @interface FeignClient {
 	/**
 	 * This will be used as the bean name instead of name if present, but will not be used
 	 * as a service id.
+	 *
 	 * @return bean name instead of name if present
 	 */
 	String contextId() default "";
@@ -84,14 +86,15 @@ public @interface FeignClient {
 	 * <code>@Bean</code> definition for the pieces that make up the client, for instance
 	 * {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, {@link feign.Contract}.
 	 *
-	 * @see FeignClientsConfiguration for the defaults
 	 * @return list of configurations for feign client
+	 * @see FeignClientsConfiguration for the defaults
 	 */
 	Class<?>[] configuration() default {};
 
 	/**
 	 * Fallback class for the specified Feign client interface. The fallback class must
 	 * implement the interface annotated by this annotation and be a valid spring bean.
+	 *
 	 * @return fallback class for the specified Feign client interface
 	 */
 	Class<?> fallback() default void.class;
@@ -101,8 +104,8 @@ public @interface FeignClient {
 	 * factory must produce instances of fallback classes that implement the interface
 	 * annotated by {@link FeignClient}. The fallback factory must be a valid spring bean.
 	 *
-	 * @see FallbackFactory for details.
 	 * @return fallback factory for the specified Feign client interface
+	 * @see FallbackFactory for details.
 	 */
 	Class<?> fallbackFactory() default void.class;
 

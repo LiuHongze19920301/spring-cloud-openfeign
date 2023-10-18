@@ -57,6 +57,7 @@ public class PageableSpringEncoder implements Encoder {
 	 * Creates a new PageableSpringEncoder with the given delegate for fallback. If no
 	 * delegate is provided and this encoder cant handle the request, an EncodeException
 	 * is thrown.
+	 *
 	 * @param delegate The optional delegate.
 	 */
 	public PageableSpringEncoder(Encoder delegate) {
@@ -89,18 +90,15 @@ public class PageableSpringEncoder implements Encoder {
 				if (pageable.getSort() != null) {
 					applySort(template, pageable.getSort());
 				}
-			}
-			else if (object instanceof Sort sort) {
+			} else if (object instanceof Sort sort) {
 				applySort(template, sort);
 			}
-		}
-		else {
+		} else {
 			if (delegate != null) {
 				delegate.encode(object, bodyType, template);
-			}
-			else {
+			} else {
 				throw new EncodeException("PageableSpringEncoder does not support the given object " + object.getClass()
-						+ " and no delegate was provided for fallback!");
+					+ " and no delegate was provided for fallback!");
 			}
 		}
 	}

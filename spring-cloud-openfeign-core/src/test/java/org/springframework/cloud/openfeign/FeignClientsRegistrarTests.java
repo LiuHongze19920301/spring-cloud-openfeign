@@ -45,157 +45,157 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
  */
 class FeignClientsRegistrarTests {
 
-	@Test
-	void badNameHttpPrefix() {
-		assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("http://bad_hostname"));
-	}
+    @Test
+    void badNameHttpPrefix() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("http://bad_hostname"));
+    }
 
-	@Test
-	void badNameHttpsPrefix() {
-		assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("https://bad_hostname"));
-	}
+    @Test
+    void badNameHttpsPrefix() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("https://bad_hostname"));
+    }
 
-	@Test
-	void badName() {
-		assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("bad_hostname"));
-	}
+    @Test
+    void badName() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("bad_hostname"));
+    }
 
-	@Test
-	void badNameStartsWithHttp() {
-		assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("http_bad_hostname"));
-	}
+    @Test
+    void badNameStartsWithHttp() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> testGetName("http_bad_hostname"));
+    }
 
-	@Test
-	void goodName() {
-		String name = testGetName("good-name");
-		assertThat(name).as("name was wrong").isEqualTo("good-name");
-	}
+    @Test
+    void goodName() {
+        String name = testGetName("good-name");
+        assertThat(name).as("name was wrong").isEqualTo("good-name");
+    }
 
-	@Test
-	void goodNameHttpPrefix() {
-		String name = testGetName("https://good-name");
-		assertThat(name).as("name was wrong").isEqualTo("https://good-name");
-	}
+    @Test
+    void goodNameHttpPrefix() {
+        String name = testGetName("https://good-name");
+        assertThat(name).as("name was wrong").isEqualTo("https://good-name");
+    }
 
-	@Test
-	void goodNameHttpsPrefix() {
-		String name = testGetName("https://goodname");
-		assertThat(name).as("name was wrong").isEqualTo("https://goodname");
-	}
+    @Test
+    void goodNameHttpsPrefix() {
+        String name = testGetName("https://goodname");
+        assertThat(name).as("name was wrong").isEqualTo("https://goodname");
+    }
 
-	private String testGetName(String name) {
-		FeignClientsRegistrar registrar = new FeignClientsRegistrar();
-		registrar.setEnvironment(new MockEnvironment());
-		return registrar.getName(Collections.singletonMap("name", name));
-	}
+    private String testGetName(String name) {
+        FeignClientsRegistrar registrar = new FeignClientsRegistrar();
+        registrar.setEnvironment(new MockEnvironment());
+        return registrar.getName(Collections.singletonMap("name", name));
+    }
 
-	@Test
-	void testFallback() {
-		assertThatExceptionOfType(IllegalArgumentException.class)
-				.isThrownBy(() -> new AnnotationConfigApplicationContext(FallbackTestConfig.class));
-	}
+    @Test
+    void testFallback() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> new AnnotationConfigApplicationContext(FallbackTestConfig.class));
+    }
 
-	@Test
-	void testFallbackFactory() {
-		assertThatExceptionOfType(IllegalArgumentException.class)
-				.isThrownBy(() -> new AnnotationConfigApplicationContext(FallbackFactoryTestConfig.class));
-	}
+    @Test
+    void testFallbackFactory() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> new AnnotationConfigApplicationContext(FallbackFactoryTestConfig.class));
+    }
 
-	@Test
-	void shouldPassSubLevelFeignClient() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		((DefaultListableBeanFactory) context.getBeanFactory()).setAllowBeanDefinitionOverriding(false);
-		context.register(TopLevelSubLevelTestConfig.class);
-		assertThatCode(context::refresh)
-				.as("Case https://github.com/spring-cloud/spring-cloud-openfeign/issues/331 should be solved")
-				.doesNotThrowAnyException();
-	}
+    @Test
+    void shouldPassSubLevelFeignClient() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        ((DefaultListableBeanFactory) context.getBeanFactory()).setAllowBeanDefinitionOverriding(false);
+        context.register(TopLevelSubLevelTestConfig.class);
+        assertThatCode(context::refresh)
+            .as("Case https://github.com/spring-cloud/spring-cloud-openfeign/issues/331 should be solved")
+            .doesNotThrowAnyException();
+    }
 
-	@SuppressWarnings("unchecked")
-	@Test
-	@DisabledForJreRange(min = JRE.JAVA_16)
-	void shouldResolveNullUrl() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		context.register(NullUrlFeignClientTestConfig.class);
-		context.refresh();
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisabledForJreRange(min = JRE.JAVA_16)
+    void shouldResolveNullUrl() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.register(NullUrlFeignClientTestConfig.class);
+        context.refresh();
 
-		Object feignClientBean = context.getBean(NullUrlFeignClient.class);
+        Object feignClientBean = context.getBean(NullUrlFeignClient.class);
 
-		Object invocationHandlerLambda = ReflectionTestUtils.getField(feignClientBean, "h");
-		Target.HardCodedTarget<NullUrlFeignClient> target = (Target.HardCodedTarget<NullUrlFeignClient>) ReflectionTestUtils
-				.getField(invocationHandlerLambda, "arg$3");
-		assertThat(target.name()).isEqualTo("nullUrlFeignClient");
-		assertThat(target.url()).isEqualTo("http://nullUrlFeignClient");
-	}
+        Object invocationHandlerLambda = ReflectionTestUtils.getField(feignClientBean, "h");
+        Target.HardCodedTarget<NullUrlFeignClient> target = (Target.HardCodedTarget<NullUrlFeignClient>) ReflectionTestUtils
+            .getField(invocationHandlerLambda, "arg$3");
+        assertThat(target.name()).isEqualTo("nullUrlFeignClient");
+        assertThat(target.url()).isEqualTo("http://nullUrlFeignClient");
+    }
 
-	@Test
-	void shouldResolveAndValidateNullName() {
-		assertThatIllegalStateException().isThrownBy(() -> {
-			AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-			context.register(NullExpressionNameFeignClientTestConfig.class);
-			context.refresh();
-		});
-	}
+    @Test
+    void shouldResolveAndValidateNullName() {
+        assertThatIllegalStateException().isThrownBy(() -> {
+            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+            context.register(NullExpressionNameFeignClientTestConfig.class);
+            context.refresh();
+        });
+    }
 
-	@FeignClient(name = "fallbackTestClient", url = "http://localhost:8080/", fallback = FallbackClient.class)
-	protected interface FallbackClient {
+    @FeignClient(name = "fallbackTestClient", url = "http://localhost:8080/", fallback = FallbackClient.class)
+    protected interface FallbackClient {
 
-		@GetMapping("/hello")
-		String fallbackTest();
+        @GetMapping("/hello")
+        String fallbackTest();
 
-	}
+    }
 
-	@FeignClient(name = "fallbackFactoryTestClient", url = "http://localhost:8081/",
-			fallbackFactory = FallbackFactoryClient.class)
-	protected interface FallbackFactoryClient {
+    @FeignClient(name = "fallbackFactoryTestClient", url = "http://localhost:8081/",
+        fallbackFactory = FallbackFactoryClient.class)
+    protected interface FallbackFactoryClient {
 
-		@GetMapping("/hello")
-		String fallbackFactoryTest();
+        @GetMapping("/hello")
+        String fallbackFactoryTest();
 
-	}
+    }
 
-	@FeignClient(name = "nullUrlFeignClient", url = "${test.url:#{null}}", path = "${test.path:#{null}}")
-	protected interface NullUrlFeignClient {
+    @FeignClient(name = "nullUrlFeignClient", url = "${test.url:#{null}}", path = "${test.path:#{null}}")
+    protected interface NullUrlFeignClient {
 
-	}
+    }
 
-	@FeignClient(name = "${test.name:#{null}}")
-	protected interface NullExpressionNameFeignClient {
+    @FeignClient(name = "${test.name:#{null}}")
+    protected interface NullExpressionNameFeignClient {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@EnableFeignClients(clients = { FeignClientsRegistrarTests.FallbackClient.class })
-	protected static class FallbackTestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @EnableFeignClients(clients = {FeignClientsRegistrarTests.FallbackClient.class})
+    protected static class FallbackTestConfig {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@EnableFeignClients(clients = { FeignClientsRegistrarTests.FallbackFactoryClient.class })
-	protected static class FallbackFactoryTestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @EnableFeignClients(clients = {FeignClientsRegistrarTests.FallbackFactoryClient.class})
+    protected static class FallbackFactoryTestConfig {
 
-	}
+    }
 
-	@EnableFeignClients(clients = { org.springframework.cloud.openfeign.feignclientsregistrar.TopLevelClient.class,
-			org.springframework.cloud.openfeign.feignclientsregistrar.sub.SubLevelClient.class })
-	protected static class TopLevelSubLevelTestConfig {
+    @EnableFeignClients(clients = {org.springframework.cloud.openfeign.feignclientsregistrar.TopLevelClient.class,
+        org.springframework.cloud.openfeign.feignclientsregistrar.sub.SubLevelClient.class})
+    protected static class TopLevelSubLevelTestConfig {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@EnableFeignClients(clients = NullUrlFeignClient.class)
-	protected static class NullUrlFeignClientTestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @EnableFeignClients(clients = NullUrlFeignClient.class)
+    protected static class NullUrlFeignClientTestConfig {
 
-	}
+    }
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@EnableFeignClients(clients = NullExpressionNameFeignClient.class)
-	protected static class NullExpressionNameFeignClientTestConfig {
+    @Configuration(proxyBeanMethods = false)
+    @EnableAutoConfiguration
+    @EnableFeignClients(clients = NullExpressionNameFeignClient.class)
+    protected static class NullExpressionNameFeignClientTestConfig {
 
-	}
+    }
 
 }

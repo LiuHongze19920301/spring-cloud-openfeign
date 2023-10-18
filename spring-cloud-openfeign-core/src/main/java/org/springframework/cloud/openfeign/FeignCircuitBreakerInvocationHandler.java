@@ -63,8 +63,8 @@ class FeignCircuitBreakerInvocationHandler implements InvocationHandler {
 	private final CircuitBreakerNameResolver circuitBreakerNameResolver;
 
 	FeignCircuitBreakerInvocationHandler(CircuitBreakerFactory factory, String feignClientName, Target<?> target,
-			Map<Method, InvocationHandlerFactory.MethodHandler> dispatch, FallbackFactory<?> nullableFallbackFactory,
-			boolean circuitBreakerGroupEnabled, CircuitBreakerNameResolver circuitBreakerNameResolver) {
+										 Map<Method, InvocationHandlerFactory.MethodHandler> dispatch, FallbackFactory<?> nullableFallbackFactory,
+										 boolean circuitBreakerGroupEnabled, CircuitBreakerNameResolver circuitBreakerNameResolver) {
 		this.factory = factory;
 		this.feignClientName = feignClientName;
 		this.target = checkNotNull(target, "target");
@@ -83,29 +83,25 @@ class FeignCircuitBreakerInvocationHandler implements InvocationHandler {
 			try {
 				Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
 				return equals(otherHandler);
-			}
-			catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				return false;
 			}
-		}
-		else if ("hashCode".equals(method.getName())) {
+		} else if ("hashCode".equals(method.getName())) {
 			return hashCode();
-		}
-		else if ("toString".equals(method.getName())) {
+		} else if ("toString".equals(method.getName())) {
 			return toString();
 		}
 
 		String circuitName = circuitBreakerNameResolver.resolveCircuitBreakerName(feignClientName, target, method);
 		CircuitBreaker circuitBreaker = circuitBreakerGroupEnabled ? factory.create(circuitName, feignClientName)
-				: factory.create(circuitName);
+			: factory.create(circuitName);
 		Supplier<Object> supplier = asSupplier(method, args);
 		if (this.nullableFallbackFactory != null) {
 			Function<Throwable, Object> fallbackFunction = throwable -> {
 				Object fallback = this.nullableFallbackFactory.create(throwable);
 				try {
 					return this.fallbackMethodMap.get(method).invoke(fallback, args);
-				}
-				catch (Exception exception) {
+				} catch (Exception exception) {
 					unwrapAndRethrow(exception);
 				}
 				return null;
@@ -138,14 +134,11 @@ class FeignCircuitBreakerInvocationHandler implements InvocationHandler {
 					RequestContextHolder.setRequestAttributes(requestAttributes);
 				}
 				return dispatch.get(method).invoke(args);
-			}
-			catch (RuntimeException throwable) {
+			} catch (RuntimeException throwable) {
 				throw throwable;
-			}
-			catch (Throwable throwable) {
+			} catch (Throwable throwable) {
 				throw new RuntimeException(throwable);
-			}
-			finally {
+			} finally {
 				if (isAsync) {
 					RequestContextHolder.resetRequestAttributes();
 				}
@@ -160,6 +153,7 @@ class FeignCircuitBreakerInvocationHandler implements InvocationHandler {
 	 * access to dispatch method doesn't take effect to the method in
 	 * InvocationHandler.invoke. Use map to store a copy of method to invoke the fallback
 	 * to bypass this and reducing the count of reflection calls.
+	 *
 	 * @return cached methods map for fallback invoking
 	 */
 	static Map<Method, Method> toFallbackMethod(Map<Method, InvocationHandlerFactory.MethodHandler> dispatch) {

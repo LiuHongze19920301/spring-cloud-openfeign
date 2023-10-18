@@ -70,20 +70,18 @@ public class PageJacksonModule extends Module {
 		private final Page<T> delegate;
 
 		SimplePageImpl(@JsonProperty("content") List<T> content, @JsonProperty("number") int number,
-				@JsonProperty("size") int size, @JsonProperty("totalElements") @JsonAlias({ "total-elements",
-						"total_elements", "totalelements", "TotalElements" }) long totalElements,
-				@JsonProperty("sort") Sort sort) {
+					   @JsonProperty("size") int size, @JsonProperty("totalElements") @JsonAlias({"total-elements",
+			"total_elements", "totalelements", "TotalElements"}) long totalElements,
+					   @JsonProperty("sort") Sort sort) {
 			if (size > 0) {
 				PageRequest pageRequest;
 				if (sort != null) {
 					pageRequest = PageRequest.of(number, size, sort);
-				}
-				else {
+				} else {
 					pageRequest = PageRequest.of(number, size);
 				}
 				delegate = new PageImpl<>(content, pageRequest, totalElements);
-			}
-			else {
+			} else {
 				delegate = new PageImpl<>(content);
 			}
 		}

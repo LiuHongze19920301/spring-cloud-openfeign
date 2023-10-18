@@ -33,49 +33,49 @@ import static org.mockito.Mockito.when;
  */
 public class CircuitBreakerAutoConfigurationTests {
 
-	@SpringBootTest(classes = CircuitBreakerTests.Application.class,
-			webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-			value = { "spring.application.name=springcircuittest", "spring.jmx.enabled=false",
-					"spring.cloud.openfeign.circuitbreaker.enabled=true",
-					"spring.cloud.openfeign.circuitbreaker.alphanumeric-ids.enabled=false" })
-	@Nested
-	class DefaultNamingStrategy {
+    @SpringBootTest(classes = CircuitBreakerTests.Application.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        value = {"spring.application.name=springcircuittest", "spring.jmx.enabled=false",
+            "spring.cloud.openfeign.circuitbreaker.enabled=true",
+            "spring.cloud.openfeign.circuitbreaker.alphanumeric-ids.enabled=false"})
+    @Nested
+    class DefaultNamingStrategy {
 
-		@Autowired
-		CircuitBreakerNameResolver nameResolver;
+        @Autowired
+        CircuitBreakerNameResolver nameResolver;
 
-		@SuppressWarnings("rawtypes")
-		@Test
-		public void assertDefaultNamingStrategy() throws Exception {
-			Target target = mock(Target.class);
-			when(target.type()).thenReturn(CircuitBreakerTests.TestClientWithFactory.class);
-			assertThat(nameResolver.resolveCircuitBreakerName("foo", target,
-					CircuitBreakerTests.TestClientWithFactory.class.getMethod("getHello")))
-							.isEqualTo("TestClientWithFactory#getHello()");
-		}
+        @SuppressWarnings("rawtypes")
+        @Test
+        public void assertDefaultNamingStrategy() throws Exception {
+            Target target = mock(Target.class);
+            when(target.type()).thenReturn(CircuitBreakerTests.TestClientWithFactory.class);
+            assertThat(nameResolver.resolveCircuitBreakerName("foo", target,
+                CircuitBreakerTests.TestClientWithFactory.class.getMethod("getHello")))
+                .isEqualTo("TestClientWithFactory#getHello()");
+        }
 
-	}
+    }
 
-	@SpringBootTest(classes = CircuitBreakerTests.Application.class,
-			webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-			value = { "spring.application.name=springcircuittest", "spring.jmx.enabled=false",
-					"spring.cloud.openfeign.circuitbreaker.enabled=true" })
-	@Nested
-	class AlphanumericNamingStrategy {
+    @SpringBootTest(classes = CircuitBreakerTests.Application.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        value = {"spring.application.name=springcircuittest", "spring.jmx.enabled=false",
+            "spring.cloud.openfeign.circuitbreaker.enabled=true"})
+    @Nested
+    class AlphanumericNamingStrategy {
 
-		@Autowired
-		CircuitBreakerNameResolver nameResolver;
+        @Autowired
+        CircuitBreakerNameResolver nameResolver;
 
-		@SuppressWarnings("rawtypes")
-		@Test
-		public void assertAlphanumericNamingStrategy() throws Exception {
-			Target target = mock(Target.class);
-			when(target.type()).thenReturn(CircuitBreakerTests.TestClientWithFactory.class);
-			assertThat(nameResolver.resolveCircuitBreakerName("foo", target,
-					CircuitBreakerTests.TestClientWithFactory.class.getMethod("getHello")))
-							.isEqualTo("TestClientWithFactorygetHello");
-		}
+        @SuppressWarnings("rawtypes")
+        @Test
+        public void assertAlphanumericNamingStrategy() throws Exception {
+            Target target = mock(Target.class);
+            when(target.type()).thenReturn(CircuitBreakerTests.TestClientWithFactory.class);
+            assertThat(nameResolver.resolveCircuitBreakerName("foo", target,
+                CircuitBreakerTests.TestClientWithFactory.class.getMethod("getHello")))
+                .isEqualTo("TestClientWithFactorygetHello");
+        }
 
-	}
+    }
 
 }

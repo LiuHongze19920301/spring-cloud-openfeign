@@ -48,116 +48,116 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FeignClientFactoryTests {
 
-	@Test
-	public void testChildContexts() {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		parent.refresh();
-		FeignClientFactory context = new FeignClientFactory();
-		context.setApplicationContext(parent);
-		context.setConfigurations(
-				Arrays.asList(getSpec("foo", null, FooConfig.class), getSpec("bar", null, BarConfig.class)));
+    @Test
+    public void testChildContexts() {
+        AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
+        parent.refresh();
+        FeignClientFactory context = new FeignClientFactory();
+        context.setApplicationContext(parent);
+        context.setConfigurations(
+            Arrays.asList(getSpec("foo", null, FooConfig.class), getSpec("bar", null, BarConfig.class)));
 
-		Foo foo = context.getInstance("foo", Foo.class);
-		assertThat(foo).as("foo was null").isNotNull();
+        Foo foo = context.getInstance("foo", Foo.class);
+        assertThat(foo).as("foo was null").isNotNull();
 
-		Bar bar = context.getInstance("bar", Bar.class);
-		assertThat(bar).as("bar was null").isNotNull();
+        Bar bar = context.getInstance("bar", Bar.class);
+        assertThat(bar).as("bar was null").isNotNull();
 
-		Bar foobar = context.getInstance("foo", Bar.class);
-		assertThat(foobar).as("bar was not null").isNull();
-	}
+        Bar foobar = context.getInstance("foo", Bar.class);
+        assertThat(foobar).as("bar was not null").isNull();
+    }
 
-	@Test
-	@DisabledForJreRange(min = JRE.JAVA_16)
-	public void shouldRedirectToDelegateWhenUrlSet() {
-		new ApplicationContextRunner().withUserConfiguration(TestConfig.class).run(this::defaultClientUsed);
-	}
+    @Test
+    @DisabledForJreRange(min = JRE.JAVA_16)
+    public void shouldRedirectToDelegateWhenUrlSet() {
+        new ApplicationContextRunner().withUserConfiguration(TestConfig.class).run(this::defaultClientUsed);
+    }
 
-	@SuppressWarnings({ "unchecked", "ConstantConditions" })
-	private void defaultClientUsed(AssertableApplicationContext context) {
-		Proxy target = context.getBean(FeignClientFactoryBean.class).getTarget();
-		Object invocationHandler = ReflectionTestUtils.getField(target, "h");
-		Map<Method, InvocationHandlerFactory.MethodHandler> dispatch = (Map<Method, InvocationHandlerFactory.MethodHandler>) ReflectionTestUtils
-				.getField(invocationHandler, "dispatch");
-		Method key = new ArrayList<>(dispatch.keySet()).get(0);
-		Object client = ReflectionTestUtils.getField(dispatch.get(key), "client");
-		assertThat(client).isInstanceOf(Client.Default.class);
-	}
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    private void defaultClientUsed(AssertableApplicationContext context) {
+        Proxy target = context.getBean(FeignClientFactoryBean.class).getTarget();
+        Object invocationHandler = ReflectionTestUtils.getField(target, "h");
+        Map<Method, InvocationHandlerFactory.MethodHandler> dispatch = (Map<Method, InvocationHandlerFactory.MethodHandler>) ReflectionTestUtils
+            .getField(invocationHandler, "dispatch");
+        Method key = new ArrayList<>(dispatch.keySet()).get(0);
+        Object client = ReflectionTestUtils.getField(dispatch.get(key), "client");
+        assertThat(client).isInstanceOf(Client.Default.class);
+    }
 
-	private FeignClientSpecification getSpec(String name, String className, Class<?> configClass) {
-		return new FeignClientSpecification(name, className, new Class[] { configClass });
-	}
+    private FeignClientSpecification getSpec(String name, String className, Class<?> configClass) {
+        return new FeignClientSpecification(name, className, new Class[]{configClass});
+    }
 
-	interface TestType {
+    interface TestType {
 
-		@GetMapping("/")
-		String hello();
+        @GetMapping("/")
+        String hello();
 
-	}
+    }
 
-	@Configuration
-	static class TestConfig {
+    @Configuration
+    static class TestConfig {
 
-		@Bean
-		BlockingLoadBalancerClient loadBalancerClient() {
-			return new BlockingLoadBalancerClient(new LoadBalancerClientFactory(new LoadBalancerClientsProperties()));
-		}
+        @Bean
+        BlockingLoadBalancerClient loadBalancerClient() {
+            return new BlockingLoadBalancerClient(new LoadBalancerClientFactory(new LoadBalancerClientsProperties()));
+        }
 
-		@Bean
-		FeignClientFactory feignContext() {
-			FeignClientFactory feignClientFactory = new FeignClientFactory();
-			feignClientFactory.setConfigurations(Collections.singletonList(
-					new FeignClientSpecification("test", null, new Class[] { LoadBalancerAutoConfiguration.class })));
-			return feignClientFactory;
-		}
+        @Bean
+        FeignClientFactory feignContext() {
+            FeignClientFactory feignClientFactory = new FeignClientFactory();
+            feignClientFactory.setConfigurations(Collections.singletonList(
+                new FeignClientSpecification("test", null, new Class[]{LoadBalancerAutoConfiguration.class})));
+            return feignClientFactory;
+        }
 
-		@Bean
-		FeignClientProperties feignClientProperties() {
-			return new FeignClientProperties();
-		}
+        @Bean
+        FeignClientProperties feignClientProperties() {
+            return new FeignClientProperties();
+        }
 
-		@Bean
-		Targeter targeter() {
-			return new DefaultTargeter();
-		}
+        @Bean
+        Targeter targeter() {
+            return new DefaultTargeter();
+        }
 
-		@Bean
-		FeignClientFactoryBean feignClientFactoryBean() {
-			FeignClientFactoryBean feignClientFactoryBean = new FeignClientFactoryBean();
-			feignClientFactoryBean.setContextId("test");
-			feignClientFactoryBean.setName("test");
-			feignClientFactoryBean.setType(TestType.class);
-			feignClientFactoryBean.setPath("");
-			feignClientFactoryBean.setUrl("http://some.absolute.url");
-			return feignClientFactoryBean;
-		}
+        @Bean
+        FeignClientFactoryBean feignClientFactoryBean() {
+            FeignClientFactoryBean feignClientFactoryBean = new FeignClientFactoryBean();
+            feignClientFactoryBean.setContextId("test");
+            feignClientFactoryBean.setName("test");
+            feignClientFactoryBean.setType(TestType.class);
+            feignClientFactoryBean.setPath("");
+            feignClientFactoryBean.setUrl("http://some.absolute.url");
+            return feignClientFactoryBean;
+        }
 
-	}
+    }
 
-	static class FooConfig {
+    static class FooConfig {
 
-		@Bean
-		Foo foo() {
-			return new Foo();
-		}
+        @Bean
+        Foo foo() {
+            return new Foo();
+        }
 
-	}
+    }
 
-	static class Foo {
+    static class Foo {
 
-	}
+    }
 
-	static class BarConfig {
+    static class BarConfig {
 
-		@Bean
-		Bar bar() {
-			return new Bar();
-		}
+        @Bean
+        Bar bar() {
+            return new Bar();
+        }
 
-	}
+    }
 
-	static class Bar {
+    static class Bar {
 
-	}
+    }
 
 }
